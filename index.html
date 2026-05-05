@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landing Page Dentista</title>
+  <meta name="description" content="Landing page para dentista com apresentação de serviços, galeria de trabalhos e captação de leads por formulário e WhatsApp." />
+  <meta property="og:title" content="Landing Page Dentista" />
+  <meta property="og:description" content="Estrutura de landing page para apresentar o trabalho da dentista e gerar leads." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <a href="#inicio" class="brand" aria-label="Ir para o início da página">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C8.8 3 6 5.6 6 8.8C6 12.4 8.6 14.7 10.4 18.6C10.9 19.7 11.2 21 12 21C12.8 21 13.1 19.7 13.6 18.6C15.4 14.7 18 12.4 18 8.8C18 5.6 15.2 3 12 3Z" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M9.5 9.2C9.5 10.6 10.6 11.7 12 11.7C13.4 11.7 14.5 10.6 14.5 9.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <strong>Dra. Nome da Dentista</strong>
+          <span>Clínica odontológica · estética e saúde bucal</span>
+        </div>
+      </a>
+
+      <nav class="nav" aria-label="Menu principal">
+        <a href="#inicio">Início</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#trabalhos">Trabalhos</a>
+        <a href="#contato">Contato</a>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema"></button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ===================== MAIN ===================== -->
+  <main id="conteudo">
+
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+      <div class="container hero-grid">
+
+        <div class="hero-content">
+          <span class="eyebrow">Odontologia humanizada</span>
+          <h1>Sorriso, cuidado e confiança em cada atendimento.</h1>
+          <p>
+            Este bloco funciona como a área principal da landing page. Aqui você pode inserir uma
+            proposta de valor forte, explicar o diferencial da dentista e conduzir o visitante para
+            falar no WhatsApp ou preencher o formulário.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#contato">Agendar avaliação</a>
+            <a class="btn btn-secondary"
+               href="https://wa.me/5500000000000?text=Olá%2C+quero+agendar+uma+avaliação"
+               target="_blank" rel="noopener noreferrer">
+              Falar no WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <!-- Substitua a imagem de fundo no CSS (.hero-visual) pelo seu banner ou foto -->
+        <div class="hero-visual" aria-label="Espaço para banner ou imagem principal de fundo">
+          <div class="hero-card">
+            <strong>Espaço reservado para banner, foto da clínica ou imagem institucional.</strong>
+            <p>Troque a imagem de fundo desta área pela foto da dentista, do consultório ou por um banner com identidade visual própria.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section class="section" id="sobre">
+      <div class="container summary-grid">
+
+        <div class="summary-box">
+          <span class="eyebrow">Resumo</span>
+          <h2 class="section-title">Bloco para apresentação da profissional.</h2>
+          <p class="section-copy">
+            Esta seção foi pensada para receber um texto curto de apresentação: formação,
+            especialidades, filosofia de atendimento e principais benefícios para o paciente.
+          </p>
+          <ul class="summary-list" role="list">
+            <li>Espaço para destacar especialidades, como estética dental, clareamento, lentes ou ortodontia.</li>
+            <li>Espaço para reforçar diferenciais, como atendimento humanizado, tecnologia e acompanhamento próximo.</li>
+            <li>Espaço para trazer credibilidade com anos de experiência, cursos ou foco em resultados naturais.</li>
+          </ul>
+        </div>
+
+        <div class="highlight-box">
+          <span class="eyebrow">Destaques</span>
+          <h2 class="section-title">Área complementar para reforçar autoridade.</h2>
+          <p class="section-copy">
+            Aqui você pode inserir mini provas de confiança, uma frase institucional, números da
+            clínica, quantidade de pacientes atendidos ou tipos de tratamento com maior procura.
+          </p>
+          <div class="metrics">
+            <div class="metric">
+              <strong>+500</strong>
+              <span>Pacientes atendidos</span>
+            </div>
+            <div class="metric">
+              <strong>10 anos</strong>
+              <span>Experiência clínica</span>
+            </div>
+            <div class="metric">
+              <strong>5 estrelas</strong>
+              <span>Avaliação média</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TRABALHOS -->
+    <section class="section" id="trabalhos">
+      <div class="container">
+        <span class="eyebrow">Trabalhos e tratamentos</span>
+        <h2 class="section-title">Bloco de imagens com link e texto abaixo.</h2>
+        <p class="section-copy">
+          Mostre fotos de tratamentos, casos, estrutura da clínica ou principais serviços.
+          Cada card está pronto com imagem clicável e campo de texto abaixo.
+        </p>
+
+        <div class="gallery-grid">
+
+          <article class="gallery-card">
+            <a class="gallery-link" href="#contato" aria-label="Ver detalhes do clareamento dental">
+              <div class="gallery-media">
+                <!-- Substitua src= pela URL real da sua imagem -->
+                <img src="https://picsum.photos/seed/clareamento-dental/900/700"
+                     alt="Espaço para foto do tratamento de clareamento dental"
+                     width="900" height="700" loading="lazy" />
+              </div>
+              <div class="gallery-body">
+                <h3>Clareamento dental</h3>
+                <p>Campo para descrever o tratamento, seus benefícios e direcionar o visitante para entrar em contato.</p>
+              </div>
+            </a>
+          </article>
+
+          <article class="gallery-card">
+            <a class="gallery-link" href="#contato" aria-label="Ver detalhes das lentes de contato dental">
+              <div class="gallery-media">
+                <img src="https://picsum.photos/seed/lente-dental/900/700"
+                     alt="Espaço para foto de lentes de contato dental"
+                     width="900" height="700" loading="lazy" />
+              </div>
+              <div class="gallery-body">
+                <h3>Lentes de contato dental</h3>
+                <p>Campo para inserir uma explicação breve, com linguagem comercial e foco na transformação estética.</p>
+              </div>
+            </a>
+          </article>
+
+          <article class="gallery-card">
+            <a class="gallery-link" href="#contato" aria-label="Ver detalhes da avaliação personalizada">
+              <div class="gallery-media">
+                <img src="https://picsum.photos/seed/avaliacao-odontologica/900/700"
+                     alt="Espaço para foto de avaliação odontológica ou consultório"
+                     width="900" height="700" loading="lazy" />
+              </div>
+              <div class="gallery-body">
+                <h3>Avaliação personalizada</h3>
+                <p>Campo para descrever como funciona a consulta inicial e incentivar o agendamento.</p>
+              </div>
+            </a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTATO / LEADS -->
+    <section class="section" id="contato">
+      <div class="container lead-layout">
+
+        <aside class="lead-card">
+          <span class="eyebrow">Captação de leads</span>
+          <h2 class="section-title">Área pronta para WhatsApp e formulário.</h2>
+          <p class="section-copy">
+            Use o botão de WhatsApp para atendimento rápido e o formulário para captar leads de
+            pacientes interessados.
+          </p>
+          <ul class="lead-points" role="list">
+            <li>Ideal para campanhas pagas, tráfego orgânico ou link da bio.</li>
+            <li>Permite captar nome completo, celular e resumo da necessidade do paciente.</li>
+            <li>Pode ser conectado a Formspree, EmailJS, Google Forms, Zapier ou backend próprio.</li>
+          </ul>
+          <div class="contact-actions">
+            <a class="btn btn-whatsapp"
+               href="https://wa.me/5500000000000?text=Olá%2C+vim+pelo+site+e+quero+mais+informações"
+               target="_blank" rel="noopener noreferrer">
+              Abrir WhatsApp
+            </a>
+          </div>
+        </aside>
+
+        <div class="form-shell">
+          <!-- action= pode ser substituído pela URL de um serviço de formulários -->
+          <form class="lead-form" action="#" method="post">
+
+            <div class="field">
+              <label for="nome">Nome completo</label>
+              <input id="nome" name="nome" type="text"
+                     placeholder="Digite o nome completo do paciente" required />
+            </div>
+
+            <div class="field">
+              <label for="celular">Celular para contato</label>
+              <input id="celular" name="celular" type="tel"
+                     placeholder="(11) 99999-9999" required />
+            </div>
+
+            <div class="field">
+              <label for="mensagem">Resumo ou dúvida</label>
+              <textarea id="mensagem" name="mensagem"
+                        placeholder="Descreva brevemente o tratamento desejado, sua dúvida ou necessidade."></textarea>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Enviar solicitação</button>
+            <p class="form-note">
+              O formulário está pronto como estrutura. Conecte-o a um serviço de envio antes de
+              colocar em produção.
+            </p>
+
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>Dra. Nome da Dentista · CRO 00000 · São Paulo, SP</p>
+      <p>Estrutura estática pronta para versionar no GitHub e publicar na Vercel.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="./assets/main.js" defer></script>
+
+</body>
+</html>
