@@ -169,7 +169,7 @@ p, li { text-wrap: pretty; }
 }
 
 .section {
-  padding-block: clamp(var(--space-12), 8vw, var(--space-24));
+  padding-block: clamp(var(--space-6), 4vw, var(--space-12));
 }
 
 .eyebrow {
@@ -327,12 +327,7 @@ p, li { text-wrap: pretty; }
 .hero { overflow: hidden; }
 
 .hero-grid {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: clamp(var(--space-8), 4vw, var(--space-16));
-  align-items: center;
-  min-height: calc(100dvh - 90px);
-  padding-block: clamp(var(--space-12), 6vw, var(--space-20));
+  padding-block: clamp(var(--space-6), 4vw, var(--space-12));
 }
 
 .hero-content h1 {
@@ -357,7 +352,7 @@ p, li { text-wrap: pretty; }
 
 .hero-visual {
   position: relative;
-  min-height: 540px;
+  min-height: 480px;
   border-radius: calc(var(--radius-xl) + var(--space-2));
   overflow: hidden;
   background:
