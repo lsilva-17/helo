@@ -324,7 +324,10 @@ p, li { text-wrap: pretty; }
 /* ============================================================
    HERO
    ============================================================ */
-.hero { overflow: hidden; }
+.hero {
+  overflow: hidden;
+  margin-top: var(--space-8);
+}
 
 .hero-grid {
   padding-block: clamp(var(--space-6), 4vw, var(--space-12));
