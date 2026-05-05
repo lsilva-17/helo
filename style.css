@@ -366,7 +366,7 @@ p, li { text-wrap: pretty; }
 }
 
 .hero-card {
-  width: min(100%, 340px);
+  width: min(100%, 560px);
   background: color-mix(in srgb, var(--color-surface) 80%, transparent);
   backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
