@@ -2,7 +2,7 @@
 
 import {defineConfig} from 'sanity';
 import {structureTool} from 'sanity/structure';
-import {presentationTool} from 'sanity/presentation';
+import {defineDocuments, defineLocations, presentationTool} from 'sanity/presentation';
 import {schemaTypes} from './sanity/schemaTypes';
 import {PreviewDiagnostics} from './sanity/tools/PreviewDiagnostics';
 
@@ -10,6 +10,55 @@ const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helo-sable-five.vercel.app';
 const singletonTypes = new Set(['siteSettings']);
+
+const mainDocuments = defineDocuments([
+  {
+    route: '/',
+    type: 'siteSettings',
+  },
+]);
+
+const locations = {
+  siteSettings: defineLocations({
+    select: {
+      title: 'professionalName',
+    },
+    resolve: (doc) => ({
+      locations: [
+        {
+          title: doc?.title || 'Página inicial',
+          href: '/',
+        },
+      ],
+    }),
+  }),
+  treatment: defineLocations({
+    select: {
+      title: 'title',
+    },
+    resolve: (doc) => ({
+      locations: [
+        {
+          title: doc?.title || 'Tratamentos',
+          href: '/#tratamentos',
+        },
+      ],
+    }),
+  }),
+  caseStudy: defineLocations({
+    select: {
+      title: 'title',
+    },
+    resolve: (doc) => ({
+      locations: [
+        {
+          title: doc?.title || 'Casos clínicos',
+          href: '/#casos',
+        },
+      ],
+    }),
+  }),
+};
 
 export default defineConfig({
   name: 'heloisa-site',
@@ -47,6 +96,10 @@ export default defineConfig({
           enable: '/api/draft-mode/enable',
           disable: '/api/draft-mode/disable',
         },
+      },
+      resolve: {
+        mainDocuments,
+        locations,
       },
       allowOrigins: [siteUrl],
     }),
