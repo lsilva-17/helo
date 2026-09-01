@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  deployment_status:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
 
 concurrency:
   group: helo-quality-gate-${{ github.ref }}
@@ -13,6 +17,7 @@ concurrency:
 jobs:
   validate:
     name: Pre-deploy validation
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -37,18 +42,25 @@ jobs:
 
   production-qa:
     name: Production QA
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      (github.event_name == 'deployment_status' &&
+       github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       PRODUCTION_URL: https://helo.vercel.app
+      EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
     steps:
-      - name: Wait for this commit to reach production
+      - name: Wait for expected commit to reach production
         shell: bash
         run: |
           set -euo pipefail
-          echo "Waiting for production commit $GITHUB_SHA"
+          echo "Waiting for production commit $EXPECTED_SHA"
 
           for attempt in $(seq 1 30); do
             response=$(curl -sS --max-time 15 "$PRODUCTION_URL/api/health" || true)
@@ -57,7 +69,7 @@ jobs:
 
             echo "Attempt $attempt/30: commit=${deployed_commit:-unavailable}, status=${health_status:-unavailable}"
 
-            if [ "$deployed_commit" = "$GITHUB_SHA" ] && [ "$health_status" = "ok" ]; then
+            if [ "$deployed_commit" = "$EXPECTED_SHA" ] && [ "$health_status" = "ok" ]; then
               echo "Production is running the expected commit and health is OK."
               exit 0
             fi
@@ -65,7 +77,7 @@ jobs:
             sleep 20
           done
 
-          echo "Production did not become healthy for commit $GITHUB_SHA within 10 minutes."
+          echo "Production did not become healthy for commit $EXPECTED_SHA within 10 minutes."
           exit 1
 
       - name: Smoke test homepage
@@ -92,9 +104,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsSL --max-time 20 "$PRODUCTION_URL/api/health" | jq -e '
+          curl -fsSL --max-time 20 "$PRODUCTION_URL/api/health" | jq -e --arg sha "$EXPECTED_SHA" '
             .status == "ok" and
             .cms == "reachable" and
-            .commit == env.GITHUB_SHA
+            .commit == $sha
           '
           echo "Final production QA passed."
