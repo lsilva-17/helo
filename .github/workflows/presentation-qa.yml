@@ -72,16 +72,22 @@ jobs:
 
   postdeploy-presentation:
     name: Post-deploy /studio/presentation
-    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
+    needs: [predeploy-presentation]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
+      PRODUCTION_URL: https://helo-sable-five.vercel.app
       DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
+      EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
     steps:
       - name: Checkout deployed commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.deployment.sha }}
+          ref: ${{ github.event.deployment.sha || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -93,16 +99,33 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Validate deployment URL
+      - name: Resolve and verify deployed URL
         shell: bash
         run: |
           set -euo pipefail
-          if [ -z "$DEPLOYMENT_URL" ]; then
-            echo "Vercel deployment did not provide environment_url."
-            exit 1
+          target="$PRODUCTION_URL"
+          if [ "${{ github.event_name }}" = "deployment_status" ] && [ -n "$DEPLOYMENT_URL" ]; then
+            target="$DEPLOYMENT_URL"
+          else
+            echo "Waiting for production commit $EXPECTED_SHA"
+            for attempt in $(seq 1 30); do
+              response=$(curl -sS --max-time 15 "$PRODUCTION_URL/api/health" || true)
+              deployed=$(printf '%s' "$response" | jq -r '.commit // empty' 2>/dev/null || true)
+              status=$(printf '%s' "$response" | jq -r '.status // empty' 2>/dev/null || true)
+              echo "Attempt $attempt/30: deployed=${deployed:-missing}, status=${status:-missing}"
+              if [ "$deployed" = "$EXPECTED_SHA" ] && [ "$status" = "ok" ]; then
+                break
+              fi
+              if [ "$attempt" = "30" ]; then
+                echo "FAIL: exact main commit was not deployed; /studio/presentation post-deploy QA cannot pass."
+                exit 1
+              fi
+              sleep 20
+            done
           fi
-          echo "Validating $DEPLOYMENT_URL/studio/presentation"
-          status=$(curl -sSL -o /tmp/presentation.html -w '%{http_code}' --max-time 30 "$DEPLOYMENT_URL/studio/presentation")
+
+          echo "TARGET_URL=$target" >> "$GITHUB_ENV"
+          status=$(curl -sSL -o /tmp/presentation.html -w '%{http_code}' --max-time 30 "$target/studio/presentation")
           echo "HTTP $status"
           if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
             echo "Presentation route is not reachable after deploy."
@@ -115,13 +138,13 @@ jobs:
         run: |
           set -euo pipefail
           npx playwright install --with-deps chromium
-          SMOKE_BASE_URL="$DEPLOYMENT_URL" npm run smoke:presentation
+          SMOKE_BASE_URL="$TARGET_URL" npm run smoke:presentation
 
       - name: Verify Presentation dependencies
         shell: bash
         run: |
           set -euo pipefail
-          diagnostics=$(curl -fsSL --max-time 20 "$DEPLOYMENT_URL/api/preview/diagnostics" || true)
+          diagnostics=$(curl -fsSL --max-time 20 "$TARGET_URL/api/preview/diagnostics" || true)
           if [ -n "$diagnostics" ]; then
             printf '%s' "$diagnostics" | jq '{status, checks, deployment}' || printf '%s\n' "$diagnostics"
             printf '%s' "$diagnostics" | jq -e '.checks.publicQuery.ok == true and .checks.tokenConfigured.ok == true and .checks.authenticatedQuery.ok == true'
