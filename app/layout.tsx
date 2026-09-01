@@ -4,6 +4,7 @@ import {VisualEditing} from 'next-sanity/visual-editing';
 import {VisualBuilder} from '@/app/components/VisualBuilder';
 import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDrag';
 import {ThemeToggle} from '@/app/components/ThemeToggle';
+import {SiteStyleBridge} from '@/app/components/SiteStyleBridge';
 import {SanityLive} from '@/sanity/lib/live';
 import './globals.css';
 import './visual-builder.css';
@@ -21,6 +22,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
   return (
     <html lang="pt-BR">
       <body>
+        <SiteStyleBridge />
         {children}
         <ThemeToggle />
         <SanityLive />
