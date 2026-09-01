@@ -59,6 +59,8 @@ jobs:
       PRODUCTION_URL: https://helo-sable-five.vercel.app
       DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
       EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
+      SANITY_PROJECT_ID: f9ampmu2
+      SANITY_DATASET: production
     steps:
       - name: Verify Vercel deployment URL
         if: github.event_name == 'deployment_status' && github.event.deployment_status.environment_url != ''
@@ -116,6 +118,57 @@ jobs:
             exit 1
           fi
           echo "Studio QA passed with HTTP $status."
+
+      - name: Validate Sanity preview diagnostics API
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL --max-time 20 "$PRODUCTION_URL/api/preview/diagnostics" | jq -e --arg sha "$EXPECTED_SHA" '
+            .status == "ok" and
+            .checks.publicQuery.ok == true and
+            .checks.tokenConfigured.ok == true and
+            .checks.authenticatedQuery.ok == true and
+            .deployment.commit == $sha
+          '
+          echo "Sanity preview diagnostics API passed."
+
+      - name: Validate Sanity CORS with credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://${SANITY_PROJECT_ID}.api.sanity.io/v2026-09-01/data/query/${SANITY_DATASET}?query=count(*)"
+          headers=$(curl -sS -D - -o /tmp/sanity-cors-body --max-time 20 \
+            -H "Origin: $PRODUCTION_URL" \
+            "$url")
+
+          allow_origin=$(printf '%s\n' "$headers" | awk 'BEGIN{IGNORECASE=1} /^access-control-allow-origin:/ {sub(/^[^:]+:[[:space:]]*/, ""); gsub(/\r/, ""); print; exit}')
+          allow_credentials=$(printf '%s\n' "$headers" | awk 'BEGIN{IGNORECASE=1} /^access-control-allow-credentials:/ {sub(/^[^:]+:[[:space:]]*/, ""); gsub(/\r/, ""); print; exit}')
+
+          echo "Access-Control-Allow-Origin: ${allow_origin:-missing}"
+          echo "Access-Control-Allow-Credentials: ${allow_credentials:-missing}"
+
+          if [ "$allow_origin" != "$PRODUCTION_URL" ]; then
+            echo "Sanity CORS origin does not match production URL."
+            exit 1
+          fi
+
+          if [ "${allow_credentials,,}" != "true" ]; then
+            echo "Sanity CORS is missing Allow credentials."
+            exit 1
+          fi
+
+          echo "Sanity CORS with credentials passed."
+
+      - name: Smoke test Sanity diagnostics tool
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl -sSL -o /tmp/studio-diagnostics.html -w '%{http_code}' --max-time 20 "$PRODUCTION_URL/studio/diagnostics")
+          if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+            echo "Sanity diagnostics tool returned HTTP $status"
+            exit 1
+          fi
+          echo "Sanity diagnostics tool QA passed with HTTP $status."
 
       - name: Final production health check
         shell: bash
