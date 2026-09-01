@@ -110,15 +110,20 @@ function cleanUrl(value?: string) {
   return value ? stegaClean(value) : undefined;
 }
 
+function cleanConfig(value: string | undefined, fallback: string) {
+  return value ? stegaClean(value) : fallback;
+}
+
 function typographyStyle(font: string | undefined, size: number | undefined, fallbackFont: string, fallbackSize: number) {
+  const cleanFont = cleanConfig(font, fallbackFont);
   return {
-    fontFamily: fontStacks[font || fallbackFont] || fontStacks[fallbackFont],
+    fontFamily: fontStacks[cleanFont] || fontStacks[fallbackFont],
     fontSize: `${size || fallbackSize}px`,
   };
 }
 
 function sectionPosition(order: string[] | undefined, section: string) {
-  const list = order?.length === 5 ? order : defaultSectionOrder;
+  const list = (order?.length === 5 ? order : defaultSectionOrder).map((item) => stegaClean(item));
   const index = list.indexOf(section);
   return index === -1 ? 99 : index;
 }
@@ -131,7 +136,7 @@ function siteText(field: string, label: string, fontField?: string, sizeField?: 
     'data-vb-label': label,
     'data-vb-font-field': fontField,
     'data-vb-size-field': sizeField,
-    'data-vb-font-value': fontValue,
+    'data-vb-font-value': fontValue ? stegaClean(fontValue) : undefined,
     'data-vb-size-value': sizeValue,
   };
 }
