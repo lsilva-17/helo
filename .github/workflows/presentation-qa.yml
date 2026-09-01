@@ -1,0 +1,133 @@
+name: Presentation Route QA
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  deployment_status:
+  workflow_dispatch:
+
+concurrency:
+  group: helo-presentation-qa-${{ github.ref }}-${{ github.event.deployment.id || 'code' }}
+  cancel-in-progress: true
+
+jobs:
+  predeploy-presentation:
+    name: Pre-deploy /studio/presentation
+    if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build production bundle
+        run: npm run validate
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SITE_URL: http://localhost:3333
+
+      - name: Validate /studio/presentation in Chromium
+        shell: bash
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SITE_URL: http://localhost:3333
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          PORT=3333 npm run start > /tmp/helo-presentation-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 3 http://localhost:3333/studio/presentation >/dev/null; then
+              break
+            fi
+            if [ "$attempt" = "30" ]; then
+              echo "Presentation route did not become reachable."
+              cat /tmp/helo-presentation-next.log || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          if ! SMOKE_BASE_URL=http://localhost:3333 npm run smoke:presentation; then
+            echo "--- Next.js server log ---"
+            cat /tmp/helo-presentation-next.log || true
+            exit 1
+          fi
+
+  postdeploy-presentation:
+    name: Post-deploy /studio/presentation
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
+    steps:
+      - name: Checkout deployed commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Validate deployment URL
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            echo "Vercel deployment did not provide environment_url."
+            exit 1
+          fi
+          echo "Validating $DEPLOYMENT_URL/studio/presentation"
+          status=$(curl -sSL -o /tmp/presentation.html -w '%{http_code}' --max-time 30 "$DEPLOYMENT_URL/studio/presentation")
+          echo "HTTP $status"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+            echo "Presentation route is not reachable after deploy."
+            head -c 2000 /tmp/presentation.html || true
+            exit 1
+          fi
+
+      - name: Browser QA /studio/presentation after deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          SMOKE_BASE_URL="$DEPLOYMENT_URL" npm run smoke:presentation
+
+      - name: Verify Presentation dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          diagnostics=$(curl -fsSL --max-time 20 "$DEPLOYMENT_URL/api/preview/diagnostics" || true)
+          if [ -n "$diagnostics" ]; then
+            printf '%s' "$diagnostics" | jq '{status, checks, deployment}' || printf '%s\n' "$diagnostics"
+            printf '%s' "$diagnostics" | jq -e '.checks.publicQuery.ok == true and .checks.tokenConfigured.ok == true and .checks.authenticatedQuery.ok == true'
+          else
+            echo "Preview diagnostics endpoint did not respond."
+            exit 1
+          fi
+
+          echo "Presentation route post-deploy QA passed."
