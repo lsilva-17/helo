@@ -1,6 +1,6 @@
 {
   "name": "helo-site",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -15,7 +15,7 @@
     "next-sanity": "11.5.5",
     "react": "19.1.1",
     "react-dom": "19.1.1",
-    "sanity": "5.28.0",
+    "sanity": "5.1.0",
     "styled-components": "6.1.19"
   },
   "devDependencies": {
