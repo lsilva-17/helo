@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run build"
   },
   "dependencies": {
     "@sanity/client": "^7.11.2",
