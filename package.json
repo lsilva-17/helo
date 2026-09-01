@@ -1,6 +1,6 @@
 {
   "name": "helo-site",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,18 +10,18 @@
     "validate": "npm run typecheck && npm run build"
   },
   "dependencies": {
-    "@sanity/client": "^7.26.1",
-    "next": "^15.5.2",
-    "next-sanity": "^12.0.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "sanity": "^5.28.0",
-    "styled-components": "^6.1.19"
+    "@sanity/client": "7.12.0",
+    "next": "15.5.9",
+    "next-sanity": "11.5.5",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "sanity": "4.10.3",
+    "styled-components": "6.1.19"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
-    "typescript": "^5.7.2"
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "typescript": "5.7.2"
   }
 }
