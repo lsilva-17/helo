@@ -19,7 +19,7 @@ jobs:
     name: Pre-deploy validation
     if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout exact commit
         uses: actions/checkout@v4
@@ -42,6 +42,37 @@ jobs:
           NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
           NEXT_PUBLIC_SANITY_DATASET: production
           NEXT_PUBLIC_SITE_URL: https://helo-sable-five.vercel.app
+
+      - name: Browser smoke test Sanity Studio
+        shell: bash
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SITE_URL: https://helo-sable-five.vercel.app
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          npm run start > /tmp/helo-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 3 http://127.0.0.1:3000/ >/dev/null; then
+              break
+            fi
+            if [ "$attempt" = "30" ]; then
+              echo "Local Next.js server did not become ready."
+              cat /tmp/helo-next.log || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          if ! SMOKE_BASE_URL=http://127.0.0.1:3000 npm run smoke:studio; then
+            echo "--- Next.js server log ---"
+            cat /tmp/helo-next.log || true
+            exit 1
+          fi
 
   production-qa:
     name: Production QA
