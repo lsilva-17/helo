@@ -1,9 +1,10 @@
 'use client';
 
-import { defineConfig } from 'sanity';
-import { structureTool } from 'sanity/structure';
-import { presentationTool } from 'sanity/presentation';
-import { schemaTypes } from './sanity/schemaTypes';
+import {defineConfig} from 'sanity';
+import {structureTool} from 'sanity/structure';
+import {presentationTool} from 'sanity/presentation';
+import {schemaTypes} from './sanity/schemaTypes';
+import {PreviewDiagnostics} from './sanity/tools/PreviewDiagnostics';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -50,13 +51,20 @@ export default defineConfig({
       allowOrigins: [siteUrl],
     }),
   ],
-  schema: { types: schemaTypes },
+  tools: [
+    {
+      name: 'diagnostics',
+      title: 'Diagnóstico',
+      component: PreviewDiagnostics,
+    },
+  ],
+  schema: {types: schemaTypes},
   document: {
     newDocumentOptions: (prev) =>
       prev.filter((item) => !singletonTypes.has(item.templateId)),
     actions: (prev, context) =>
       singletonTypes.has(context.schemaType)
-        ? prev.filter(({ action }) => action !== 'duplicate' && action !== 'delete')
+        ? prev.filter(({action}) => action !== 'duplicate' && action !== 'delete')
         : prev,
   },
 });
