@@ -1,6 +1,7 @@
 'use client';
 
-import {ChangeEvent, useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
+import type {ChangeEvent} from 'react';
 import {stegaClean} from 'next-sanity';
 
 type Selection = {
@@ -99,7 +100,7 @@ export function VisualBuilder() {
 
       event.preventDefault();
       event.stopPropagation();
-      if ('stopImmediatePropagation' in event) event.stopImmediatePropagation();
+      event.stopImmediatePropagation();
 
       const previous = selectedRef.current?.element;
       if (previous && previous !== editable && previous.dataset.vbField) {
@@ -168,24 +169,38 @@ export function VisualBuilder() {
         section.addEventListener('drop', async (event) => {
           event.preventDefault();
           section.classList.remove('vb-drop-target');
-          const id = event.dataTransfer?.getData('text/plain');
-          if (!id || id === section.dataset.vbSection) return;
+          const draggedId = event.dataTransfer?.getData('text/plain');
+          const targetId = section.dataset.vbSection;
+          if (!draggedId || !targetId || draggedId === targetId) return;
 
           const container = section.parentElement;
-          const dragged = container?.querySelector<HTMLElement>(`[data-vb-section="${id}"]`);
-          if (!container || !dragged) return;
+          if (!container) return;
 
-          const rect = section.getBoundingClientRect();
-          const after = event.clientY > rect.top + rect.height / 2;
-          container.insertBefore(dragged, after ? section.nextSibling : section);
-
-          const order = Array.from(container.querySelectorAll<HTMLElement>(':scope > [data-vb-section]'))
+          const sectionElements = Array.from(container.querySelectorAll<HTMLElement>(':scope > [data-vb-section]'));
+          const visualOrder = sectionElements
+            .slice()
+            .sort((a, b) => Number.parseInt(getComputedStyle(a).order || '0', 10) - Number.parseInt(getComputedStyle(b).order || '0', 10))
             .map((item) => item.dataset.vbSection)
             .filter((item): item is string => Boolean(item));
 
+          const sourceIndex = visualOrder.indexOf(draggedId);
+          if (sourceIndex === -1) return;
+          visualOrder.splice(sourceIndex, 1);
+
+          const targetIndex = visualOrder.indexOf(targetId);
+          if (targetIndex === -1) return;
+          const rect = section.getBoundingClientRect();
+          const after = event.clientY > rect.top + rect.height / 2;
+          visualOrder.splice(targetIndex + (after ? 1 : 0), 0, draggedId);
+
+          sectionElements.forEach((item) => {
+            const id = item.dataset.vbSection;
+            if (id) item.style.order = String(visualOrder.indexOf(id));
+          });
+
           setSaveState('saving');
           try {
-            await patchField('siteSettings', 'siteSettings', 'sectionOrder', order);
+            await patchField('siteSettings', 'siteSettings', 'sectionOrder', visualOrder);
             setSaveState('saved');
             setMessage('Nova ordem salva como rascunho.');
           } catch (error) {
