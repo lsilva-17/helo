@@ -9,6 +9,7 @@
     "validate": "npm run build",
     "smoke:studio": "node scripts/studio-smoke.mjs",
     "smoke:presentation": "node scripts/presentation-smoke.mjs",
+    "smoke:visual-features": "node scripts/visual-features-smoke.mjs",
     "start": "next start"
   },
   "dependencies": {
