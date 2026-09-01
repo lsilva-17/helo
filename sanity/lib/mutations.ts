@@ -1,6 +1,6 @@
 import {createClient} from '@sanity/client';
 
-const token = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_API_READ_TOKEN;
+const token = process.env.SANITY_API_WRITE_TOKEN;
 
 export const mutationClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2',
