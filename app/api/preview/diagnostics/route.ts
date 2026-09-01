@@ -10,6 +10,7 @@ const apiVersion = '2026-09-01';
 
 export async function GET() {
   const token = process.env.SANITY_API_READ_TOKEN;
+  const writeToken = process.env.SANITY_API_WRITE_TOKEN;
   const publicClient = createClient({projectId, dataset, apiVersion, useCdn: false});
   const authenticatedClient = createClient({
     projectId,
@@ -43,6 +44,7 @@ export async function GET() {
   }
 
   const tokenConfigured = Boolean(token);
+  const writeTokenConfigured = Boolean(writeToken);
   const ok = publicQuery && tokenConfigured && authenticatedQuery;
 
   return NextResponse.json(
@@ -55,6 +57,7 @@ export async function GET() {
         publicQuery: {ok: publicQuery, error: publicError},
         tokenConfigured: {ok: tokenConfigured},
         authenticatedQuery: {ok: authenticatedQuery, error: authenticatedError},
+        writeTokenConfigured: {ok: writeTokenConfigured},
       },
       deployment: {
         commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
