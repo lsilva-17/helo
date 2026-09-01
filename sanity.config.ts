@@ -39,9 +39,12 @@ export default defineConfig({
           ]),
     }),
     presentationTool({
-      title: 'Prévia do site',
+      title: 'Editor visual',
       previewUrl: {
         origin: siteUrl,
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+        },
       },
     }),
   ],

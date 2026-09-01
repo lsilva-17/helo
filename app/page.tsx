@@ -1,4 +1,5 @@
-import { sanityClient } from '@/sanity/lib/client';
+import { stegaClean } from 'next-sanity';
+import { sanityFetch } from '@/sanity/lib/live';
 
 export const revalidate = 60;
 
@@ -27,6 +28,13 @@ type Settings = {
 
 type Treatment = { _id: string; title: string; summary?: string; imageUrl?: string };
 type CaseStudy = { _id: string; title: string; description?: string; beforeUrl?: string; afterUrl?: string; treatmentTitle?: string };
+type Content = { settings: Settings | null; treatments: Treatment[]; cases: CaseStudy[] };
+
+const contentQuery = `{
+  "settings": *[_type == "siteSettings"][0]{..., "heroImageUrl": heroImage.asset->url},
+  "treatments": *[_type == "treatment" && featured == true] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
+  "cases": *[_type == "caseStudy" && featured == true] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}
+}`;
 
 const fallbackSettings: Settings = {
   professionalName: 'Dra. Heloisa Veiga',
@@ -48,34 +56,42 @@ const fallbackSettings: Settings = {
   contactDescription: 'Entre em contato pelo WhatsApp para tirar dúvidas e agendar uma avaliação.',
 };
 
-const fallbackTreatments: Treatment[] = [
-  { _id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.' },
-  { _id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.' },
-  { _id: 'avaliacao', title: 'Avaliação estética', summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.' },
-];
-
 async function getContent() {
   try {
-    const [settings, treatments, cases] = await Promise.all([
-      sanityClient.fetch<Settings | null>(`*[_type == "siteSettings"][0]{..., "heroImageUrl": heroImage.asset->url}`),
-      sanityClient.fetch<Treatment[]>(`*[_type == "treatment" && featured == true] | order(order asc){_id,title,summary,"imageUrl":image.asset->url}`),
-      sanityClient.fetch<CaseStudy[]>(`*[_type == "caseStudy" && featured == true] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}`),
-    ]);
-    return { settings: { ...fallbackSettings, ...(settings || {}) }, treatments, cases };
+    const response = await sanityFetch({ query: contentQuery });
+    const data = response.data as Content;
+    return {
+      settings: { ...fallbackSettings, ...(data.settings || {}) },
+      treatments: data.treatments || [],
+      cases: data.cases || [],
+    };
   } catch {
     return { settings: fallbackSettings, treatments: [], cases: [] };
   }
 }
 
 function whatsappLink(number?: string) {
-  const clean = (number || fallbackSettings.whatsapp || '').replace(/\D/g, '');
+  const cleanNumber = stegaClean(number || fallbackSettings.whatsapp || '');
+  const clean = cleanNumber.replace(/\D/g, '');
   return `https://wa.me/${clean}?text=${encodeURIComponent('Olá, vim pelo site e gostaria de agendar uma avaliação.')}`;
+}
+
+function cleanUrl(value?: string) {
+  return value ? stegaClean(value) : undefined;
 }
 
 export default async function HomePage() {
   const { settings, treatments, cases } = await getContent();
   const wa = whatsappLink(settings.whatsapp);
-  const displayedTreatments: Treatment[] = treatments.length ? treatments : fallbackTreatments;
+  const instagram = cleanUrl(settings.instagram);
+  const mapsUrl = cleanUrl(settings.mapsUrl);
+  const heroImageUrl = cleanUrl(settings.heroImageUrl || fallbackSettings.heroImageUrl);
+
+  const fallbackTreatments: Treatment[] = [
+    { _id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.' },
+    { _id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.' },
+    { _id: 'avaliacao', title: 'Avaliação estética', summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.' },
+  ];
 
   return (
     <>
@@ -104,11 +120,11 @@ export default async function HomePage() {
                 <p>{settings.heroDescription}</p>
                 <div className="hero-actions">
                   <a className="btn btn-primary" href={wa} target="_blank" rel="noreferrer">Agendar avaliação</a>
-                  {settings.instagram && <a className="btn btn-secondary" href={settings.instagram} target="_blank" rel="noreferrer">Ver Instagram</a>}
+                  {instagram && <a className="btn btn-secondary" href={instagram} target="_blank" rel="noreferrer">Ver Instagram</a>}
                 </div>
               </div>
               <div className="hero-photo">
-                <img src={settings.heroImageUrl || fallbackSettings.heroImageUrl} alt={`Foto de ${settings.professionalName || 'Dra. Heloisa Veiga'}`} />
+                {heroImageUrl && <img src={heroImageUrl} alt={`Foto de ${stegaClean(settings.professionalName || '')}`} />}
               </div>
             </div>
           </div>
@@ -133,12 +149,15 @@ export default async function HomePage() {
             <h2 className="section-title">{settings.treatmentsTitle}</h2>
             <p className="section-copy">{settings.treatmentsDescription}</p>
             <div className="gallery-grid">
-              {displayedTreatments.map((item) => (
-                <article className="gallery-card" key={item._id}>
-                  {item.imageUrl ? <img className="gallery-media" src={item.imageUrl} alt={item.title} /> : <div className="gallery-placeholder">{item.title}</div>}
-                  <div className="gallery-body"><h3>{item.title}</h3><p>{item.summary}</p></div>
-                </article>
-              ))}
+              {(treatments.length ? treatments : fallbackTreatments).map((item) => {
+                const imageUrl = cleanUrl(item.imageUrl);
+                return (
+                  <article className="gallery-card" key={item._id}>
+                    {imageUrl ? <img className="gallery-media" src={imageUrl} alt={stegaClean(item.title)} /> : <div className="gallery-placeholder">{item.title}</div>}
+                    <div className="gallery-body"><h3>{item.title}</h3><p>{item.summary}</p></div>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -148,15 +167,19 @@ export default async function HomePage() {
             <span className="eyebrow">Casos clínicos</span>
             <h2 className="section-title">{settings.casesTitle}</h2>
             <p className="section-copy">{settings.casesDescription}</p>
-            {cases.length ? <div className="cases-grid">{cases.map((item) => (
-              <article className="case-card" key={item._id}>
-                <div className="before-after">
-                  {item.beforeUrl && <figure><img src={item.beforeUrl} alt={`Antes - ${item.title}`} /><figcaption>Antes</figcaption></figure>}
-                  {item.afterUrl && <figure><img src={item.afterUrl} alt={`Depois - ${item.title}`} /><figcaption>Depois</figcaption></figure>}
-                </div>
-                <div className="case-body">{item.treatmentTitle && <span className="case-label">{item.treatmentTitle}</span>}<h3>{item.title}</h3><p>{item.description}</p></div>
-              </article>
-            ))}</div> : <div className="empty-state">Publique casos em <strong>/studio → Casos clínicos</strong> e eles aparecerão aqui automaticamente.</div>}
+            {cases.length ? <div className="cases-grid">{cases.map((item) => {
+              const beforeUrl = cleanUrl(item.beforeUrl);
+              const afterUrl = cleanUrl(item.afterUrl);
+              return (
+                <article className="case-card" key={item._id}>
+                  <div className="before-after">
+                    {beforeUrl && <figure><img src={beforeUrl} alt={`Antes - ${stegaClean(item.title)}`} /><figcaption>Antes</figcaption></figure>}
+                    {afterUrl && <figure><img src={afterUrl} alt={`Depois - ${stegaClean(item.title)}`} /><figcaption>Depois</figcaption></figure>}
+                  </div>
+                  <div className="case-body">{item.treatmentTitle && <span className="case-label">{item.treatmentTitle}</span>}<h3>{item.title}</h3><p>{item.description}</p></div>
+                </article>
+              );
+            })}</div> : <div className="empty-state">Publique casos em <strong>Conteúdo → Casos clínicos</strong> e eles aparecerão aqui automaticamente.</div>}
           </div>
         </section>
 
@@ -165,7 +188,7 @@ export default async function HomePage() {
             <div><span className="eyebrow">Contato</span><h2 className="section-title">{settings.contactTitle}</h2><p className="section-copy">{settings.contactDescription}</p></div>
             <div className="contact-actions">
               <a className="btn btn-whatsapp" href={wa} target="_blank" rel="noreferrer">Falar no WhatsApp</a>
-              {settings.mapsUrl && <a className="btn btn-secondary" href={settings.mapsUrl} target="_blank" rel="noreferrer">Como chegar</a>}
+              {mapsUrl && <a className="btn btn-secondary" href={mapsUrl} target="_blank" rel="noreferrer">Como chegar</a>}
             </div>
             {settings.clinicAddress && <p className="address">{settings.clinicAddress}</p>}
           </div>
