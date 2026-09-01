@@ -1,0 +1,139 @@
+name: Visual Features QA
+
+on:
+  push:
+    branches: [main]
+  deployment_status:
+  workflow_dispatch:
+
+concurrency:
+  group: helo-visual-features-${{ github.ref }}-${{ github.event.deployment.id || 'code' }}
+  cancel-in-progress: true
+
+jobs:
+  predeploy-features:
+    name: Pre-deploy visual features
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build production bundle
+        run: npm run validate
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SITE_URL: http://localhost:3333
+
+      - name: Validate visual features in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          PORT=3333 npm run start > /tmp/helo-visual-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 3 http://localhost:3333/ >/dev/null; then
+              break
+            fi
+            if [ "$attempt" = "30" ]; then
+              echo "Local app did not become ready."
+              cat /tmp/helo-visual-next.log || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          SMOKE_BASE_URL=http://localhost:3333 npm run smoke:visual-features
+
+  production-features:
+    name: Post-deploy visual features
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: predeploy-features
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PRODUCTION_URL: https://helo-sable-five.vercel.app
+      EXPECTED_SHA: ${{ github.sha }}
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Wait for exact commit in production
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Waiting for production commit $EXPECTED_SHA"
+          for attempt in $(seq 1 30); do
+            response=$(curl -sS --max-time 15 "$PRODUCTION_URL/api/health" || true)
+            deployed=$(printf '%s' "$response" | jq -r '.commit // empty' 2>/dev/null || true)
+            status=$(printf '%s' "$response" | jq -r '.status // empty' 2>/dev/null || true)
+            echo "Attempt $attempt/30: deployed=${deployed:-missing}, status=${status:-missing}"
+            if [ "$deployed" = "$EXPECTED_SHA" ] && [ "$status" = "ok" ]; then
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "FAIL: requested main commit was not deployed. Post-deploy feature QA cannot be considered successful."
+          exit 1
+
+      - name: Validate deployed visual features in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          SMOKE_BASE_URL="$PRODUCTION_URL" npm run smoke:visual-features
+
+  deployment-features:
+    name: Deployment event visual features
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment_url != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
+    steps:
+      - name: Checkout deployed commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Validate exact deployment visual features
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          SMOKE_BASE_URL="$DEPLOYMENT_URL" npm run smoke:visual-features
