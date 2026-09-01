@@ -2,11 +2,12 @@
 
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { visionTool } from '@sanity/vision';
+import { presentationTool } from 'sanity/presentation';
 import { schemaTypes } from './sanity/schemaTypes';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helo-sable-five.vercel.app';
 const singletonTypes = new Set(['siteSettings']);
 
 export default defineConfig({
@@ -17,6 +18,7 @@ export default defineConfig({
   dataset,
   plugins: [
     structureTool({
+      title: 'Conteúdo',
       structure: (S) =>
         S.list()
           .title('Conteúdo')
@@ -36,7 +38,12 @@ export default defineConfig({
             ),
           ]),
     }),
-    visionTool(),
+    presentationTool({
+      title: 'Prévia do site',
+      previewUrl: {
+        origin: siteUrl,
+      },
+    }),
   ],
   schema: { types: schemaTypes },
   document: {
