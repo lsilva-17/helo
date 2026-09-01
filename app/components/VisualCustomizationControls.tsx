@@ -12,6 +12,8 @@ type Selected = {
   text: string;
 };
 
+type ResizeBox = {left: number; top: number; width: number; height: number} | null;
+
 function toHex(value: string, fallback: string) {
   if (/^#[0-9a-f]{6}$/i.test(value)) return value.toLowerCase();
   const match = value.match(/rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
@@ -50,16 +52,26 @@ async function save(payload: Record<string, unknown>) {
   if (!response.ok) throw new Error(body?.error || 'Falha ao salvar customização.');
 }
 
+function applyWidth(selected: Selected, width: number) {
+  selected.element.style.width = `${width}%`;
+  selected.element.style.maxWidth = '100%';
+}
+
 export function VisualCustomizationControls() {
   const [selected, setSelected] = useState<Selected | null>(null);
   const [status, setStatus] = useState('');
+  const [resizeBox, setResizeBox] = useState<ResizeBox>(null);
 
   useEffect(() => {
     if (window.self === window.top || window.location.pathname.startsWith('/studio')) return;
 
     const sync = () => {
       const element = document.querySelector<HTMLElement>('.vb-selected[data-vb-field]');
-      if (!element) return setSelected(null);
+      if (!element) {
+        setSelected(null);
+        setResizeBox(null);
+        return;
+      }
       setSelected(selectionFromElement(element));
     };
 
@@ -69,13 +81,30 @@ export function VisualCustomizationControls() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!selected || selected.isButton) {
+      setResizeBox(null);
+      return;
+    }
+
+    const updateBox = () => {
+      const rect = selected.element.getBoundingClientRect();
+      setResizeBox({left: rect.left, top: rect.top, width: rect.width, height: rect.height});
+    };
+
+    updateBox();
+    window.addEventListener('resize', updateBox);
+    window.addEventListener('scroll', updateBox, true);
+    return () => {
+      window.removeEventListener('resize', updateBox);
+      window.removeEventListener('scroll', updateBox, true);
+    };
+  }, [selected]);
+
   const canResizeText = useMemo(() => Boolean(selected && !selected.isButton), [selected]);
   if (!selected) return null;
 
-  const updateWidth = async (width: number) => {
-    selected.element.style.width = `${width}%`;
-    selected.element.style.maxWidth = '100%';
-    setSelected({...selected, width});
+  const persistWidth = async (width: number) => {
     setStatus('Salvando…');
     try {
       await save({kind: 'textWidth', key: selected.key, label: selected.label, width});
@@ -83,6 +112,46 @@ export function VisualCustomizationControls() {
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Erro ao salvar');
     }
+  };
+
+  const updateWidth = async (width: number) => {
+    applyWidth(selected, width);
+    setSelected({...selected, width});
+    requestAnimationFrame(() => {
+      const rect = selected.element.getBoundingClientRect();
+      setResizeBox({left: rect.left, top: rect.top, width: rect.width, height: rect.height});
+    });
+    await persistWidth(width);
+  };
+
+  const startResize = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (!selected || selected.isButton) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const startX = event.clientX;
+    const parentWidth = selected.element.parentElement?.getBoundingClientRect().width || selected.element.getBoundingClientRect().width || 1;
+    const startWidth = selected.element.getBoundingClientRect().width;
+    let latestWidth = selected.width;
+
+    const move = (pointerEvent: PointerEvent) => {
+      const pixels = Math.max(parentWidth * 0.25, Math.min(parentWidth, startWidth + pointerEvent.clientX - startX));
+      latestWidth = Math.max(25, Math.min(100, Math.round((pixels / parentWidth) * 100)));
+      applyWidth(selected, latestWidth);
+      setSelected((current) => current ? {...current, width: latestWidth} : current);
+      const rect = selected.element.getBoundingClientRect();
+      setResizeBox({left: rect.left, top: rect.top, width: rect.width, height: rect.height});
+      setStatus(`Largura: ${latestWidth}%`);
+    };
+
+    const end = async () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', end);
+      await persistWidth(latestWidth);
+    };
+
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', end, {once: true});
   };
 
   const updateButton = async (background: string, text: string) => {
@@ -99,31 +168,49 @@ export function VisualCustomizationControls() {
   };
 
   return (
-    <div className="vb-extra-controls" aria-label="Customização adicional">
-      <strong>Mais opções</strong>
-      <span className="vb-extra-label">{selected.label}</span>
+    <>
+      <div className="vb-extra-controls" data-testid="visual-customization-controls" aria-label="Customização adicional">
+        <strong>Mais opções</strong>
+        <span className="vb-extra-label">{selected.label}</span>
 
-      {selected.isButton && (
-        <>
+        {selected.isButton && (
+          <>
+            <label>
+              <span>Cor do botão</span>
+              <input data-testid="button-background-color" type="color" value={selected.background} onChange={(event) => void updateButton(event.target.value, selected.text)} />
+            </label>
+            <label>
+              <span>Cor do texto do botão</span>
+              <input data-testid="button-text-color" type="color" value={selected.text} onChange={(event) => void updateButton(selected.background, event.target.value)} />
+            </label>
+          </>
+        )}
+
+        {canResizeText && (
           <label>
-            <span>Cor do botão</span>
-            <input type="color" value={selected.background} onChange={(event) => void updateButton(event.target.value, selected.text)} />
+            <span>Largura da caixa de texto <b>{selected.width}%</b></span>
+            <input data-testid="text-box-width" type="range" min="25" max="100" step="1" value={selected.width} onChange={(event) => void updateWidth(Number(event.target.value))} />
           </label>
-          <label>
-            <span>Cor do texto do botão</span>
-            <input type="color" value={selected.text} onChange={(event) => void updateButton(selected.background, event.target.value)} />
-          </label>
-        </>
-      )}
+        )}
 
-      {canResizeText && (
-        <label>
-          <span>Largura da caixa de texto <b>{selected.width}%</b></span>
-          <input type="range" min="25" max="100" step="1" value={selected.width} onChange={(event) => void updateWidth(Number(event.target.value))} />
-        </label>
-      )}
+        {status && <small>{status}</small>}
+      </div>
 
-      {status && <small>{status}</small>}
-    </div>
+      {canResizeText && resizeBox && (
+        <div
+          className="vb-text-resize-outline"
+          aria-hidden="true"
+          style={{left: resizeBox.left, top: resizeBox.top, width: resizeBox.width, height: resizeBox.height}}
+        >
+          <button
+            type="button"
+            className="vb-text-resize-handle"
+            data-testid="text-resize-handle"
+            aria-label="Arrastar para redimensionar caixa de texto"
+            onPointerDown={startResize}
+          />
+        </div>
+      )}
+    </>
   );
 }
