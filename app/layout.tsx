@@ -19,12 +19,23 @@ export const metadata: Metadata = {
     'Odontologia estética com atendimento personalizado em São Paulo. Conheça o trabalho da Dra. Heloisa Veiga e agende uma avaliação.',
 };
 
+const visualCapabilities = [
+  'theme-toggle',
+  'expanded-fonts',
+  'text-color',
+  'section-background-color',
+  'button-background-color',
+  'button-text-color',
+  'text-box-width',
+  'text-direct-resize',
+].join(' ');
+
 export default async function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
   const {isEnabled: isDraftMode} = await draftMode();
 
   return (
     <html lang="pt-BR">
-      <body>
+      <body data-visual-capabilities={visualCapabilities}>
         <SiteStyleBridge />
         <VisualCustomizationBridge />
         {children}
