@@ -4,7 +4,6 @@ import {ensureDraftDocument, mutationClient} from '@/sanity/lib/mutations';
 
 export const runtime = 'nodejs';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helo-sable-five.vercel.app';
 const allowedImages: Record<string, Set<string>> = {
   siteSettings: new Set(['heroImage']),
   treatment: new Set(['image']),
@@ -13,7 +12,7 @@ const allowedImages: Record<string, Set<string>> = {
 
 function validateOrigin(request: NextRequest) {
   const origin = request.headers.get('origin');
-  return !origin || origin === new URL(siteUrl).origin;
+  return !origin || origin === request.nextUrl.origin;
 }
 
 export async function POST(request: NextRequest) {
