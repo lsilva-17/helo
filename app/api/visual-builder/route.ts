@@ -41,6 +41,24 @@ const allowedFields: Record<string, Set<string>> = {
   caseStudy: new Set(['title', 'description']),
 };
 
+const fallbackTreatments: Record<string, {title: string; summary: string; order: number}> = {
+  facetas: {
+    title: 'Facetas em resina',
+    summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.',
+    order: 1,
+  },
+  clareamento: {
+    title: 'Clareamento dental',
+    summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.',
+    order: 2,
+  },
+  avaliacao: {
+    title: 'Avaliação estética',
+    summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.',
+    order: 3,
+  },
+};
+
 const fontValues = new Set([
   'editorial', 'sans', 'classic', 'arial', 'roboto', 'inter', 'opensans', 'montserrat',
   'poppins', 'dmsans', 'lato', 'playfair', 'lora', 'merriweather',
@@ -123,6 +141,17 @@ export async function PATCH(request: NextRequest) {
     }
 
     const draftId = await ensureDraftDocument(documentId, documentType);
+
+    if (documentType === 'treatment' && fallbackTreatments[documentId]) {
+      const defaults = fallbackTreatments[documentId];
+      await mutationClient.patch(draftId).setIfMissing({
+        featured: true,
+        order: defaults.order,
+        title: defaults.title,
+        summary: defaults.summary,
+      }).commit();
+    }
+
     const value = cleanValue(field, body.value);
     const result = await mutationClient.patch(draftId).set({[field]: value}).commit();
 
