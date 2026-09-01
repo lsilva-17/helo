@@ -4,6 +4,7 @@ import {VisualEditing} from 'next-sanity/visual-editing';
 import {VisualBuilder} from '@/app/components/VisualBuilder';
 import {SanityLive} from '@/sanity/lib/live';
 import './globals.css';
+import './visual-builder.css';
 
 export const metadata: Metadata = {
   title: 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo',
