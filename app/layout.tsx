@@ -3,6 +3,7 @@ import {draftMode} from 'next/headers';
 import {VisualEditing} from 'next-sanity/visual-editing';
 import {VisualBuilder} from '@/app/components/VisualBuilder';
 import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDrag';
+import {ThemeToggle} from '@/app/components/ThemeToggle';
 import {SanityLive} from '@/sanity/lib/live';
 import './globals.css';
 import './visual-builder.css';
@@ -21,6 +22,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
     <html lang="pt-BR">
       <body>
         {children}
+        <ThemeToggle />
         <SanityLive />
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}
