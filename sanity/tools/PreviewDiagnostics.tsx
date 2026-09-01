@@ -20,6 +20,7 @@ type DiagnosticsResponse = {
     publicQuery: {ok: boolean; error: string | null};
     tokenConfigured: {ok: boolean};
     authenticatedQuery: {ok: boolean; error: string | null};
+    writeTokenConfigured?: {ok: boolean};
   };
   deployment: {commit: string | null; environment: string};
 };
@@ -64,8 +65,8 @@ export function PreviewDiagnostics() {
         label: 'SANITY_API_READ_TOKEN na Vercel',
         status: server.checks.tokenConfigured.ok ? 'pass' : 'fail',
         detail: server.checks.tokenConfigured.ok
-          ? 'Token privado presente no deployment.'
-          : 'Token ausente no ambiente da Vercel.',
+          ? 'Token Viewer privado presente no deployment.'
+          : 'Token de leitura ausente no ambiente da Vercel.',
       });
 
       nextChecks.push({
@@ -75,6 +76,15 @@ export function PreviewDiagnostics() {
         detail: server.checks.authenticatedQuery.ok
           ? 'Consulta autenticada ao Content Lake concluída.'
           : server.checks.authenticatedQuery.error || 'Falha na consulta autenticada.',
+      });
+
+      nextChecks.push({
+        id: 'write-token',
+        label: 'Visual Builder · token de escrita',
+        status: server.checks.writeTokenConfigured?.ok ? 'pass' : 'warn',
+        detail: server.checks.writeTokenConfigured?.ok
+          ? 'SANITY_API_WRITE_TOKEN está configurado somente no servidor.'
+          : 'Adicione SANITY_API_WRITE_TOKEN na Vercel para edição inline, drag-and-drop e troca de imagens.',
       });
 
       const expectedOrigin = new URL(server.siteUrl).origin;
@@ -159,7 +169,7 @@ export function PreviewDiagnostics() {
         <div>
           <h1 style={{fontSize: 28, margin: 0}}>Diagnóstico do editor visual</h1>
           <p style={{opacity: 0.72, marginTop: 8}}>
-            Valida Vercel, Content Lake, token de drafts, CORS e Draft Mode sem expor credenciais.
+            Valida Vercel, Content Lake, tokens, CORS, Draft Mode e prontidão do Visual Builder sem expor credenciais.
           </p>
         </div>
         <button
@@ -174,9 +184,9 @@ export function PreviewDiagnostics() {
 
       {!running && checks.length > 0 && (
         <div style={{padding: 16, borderRadius: 10, marginBottom: 20, border: '1px solid #555'}}>
-          <strong>{failures === 0 ? 'Todas as validações passaram.' : `${failures} validação(ões) falharam.`}</strong>
+          <strong>{failures === 0 ? 'Todas as validações obrigatórias passaram.' : `${failures} validação(ões) obrigatória(s) falharam.`}</strong>
           <div style={{marginTop: 6, opacity: 0.72}}>
-            O Editor visual só deve ser considerado saudável quando todos os itens obrigatórios estiverem em OK.
+            Itens em Atenção são recursos opcionais ou ainda não configurados; itens em Falhou bloqueiam o Editor visual.
           </div>
         </div>
       )}
