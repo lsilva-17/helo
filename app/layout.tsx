@@ -5,6 +5,7 @@ import {VisualBuilder} from '@/app/components/VisualBuilder';
 import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDrag';
 import {VisualCustomizationBridge} from '@/app/components/VisualCustomizationBridge';
 import {VisualCustomizationControls} from '@/app/components/VisualCustomizationControls';
+import {FallbackTreatmentBindings} from '@/app/components/FallbackTreatmentBindings';
 import {ThemeToggle} from '@/app/components/ThemeToggle';
 import {SiteStyleBridge} from '@/app/components/SiteStyleBridge';
 import {SanityLive} from '@/sanity/lib/live';
@@ -28,6 +29,7 @@ const visualCapabilities = [
   'button-text-color',
   'text-box-width',
   'text-direct-resize',
+  'editable-fallback-treatment-cards',
 ].join(' ');
 
 export default async function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
@@ -41,6 +43,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
         {children}
         <ThemeToggle />
         <SanityLive />
+        {isDraftMode && <FallbackTreatmentBindings />}
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}
         {isDraftMode && <VisualCustomizationControls />}
