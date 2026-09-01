@@ -1,0 +1,4 @@
+.visual-builder-enabled .vb-toolbar-head { cursor: move; }
+.visual-builder-enabled .vb-toolbar-head::before { content: '⋮⋮'; color: rgba(255,255,255,.38); font-size: 14px; letter-spacing: -2px; margin-right: 8px; }
+.vb-toolbar-dragging, .vb-toolbar-dragging * { cursor: grabbing !important; user-select: none !important; }
+.visual-builder-enabled .brand-mark[data-vb-image-field] { cursor: pointer; }

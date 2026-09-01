@@ -2,9 +2,11 @@ import type {Metadata} from 'next';
 import {draftMode} from 'next/headers';
 import {VisualEditing} from 'next-sanity/visual-editing';
 import {VisualBuilder} from '@/app/components/VisualBuilder';
+import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDrag';
 import {SanityLive} from '@/sanity/lib/live';
 import './globals.css';
 import './visual-builder.css';
+import './visual-builder-toolbar-drag.css';
 
 export const metadata: Metadata = {
   title: 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo',
@@ -21,6 +23,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
         {children}
         <SanityLive />
         {isDraftMode && <VisualBuilder />}
+        {isDraftMode && <VisualBuilderToolbarDrag />}
         {isDraftMode && <VisualEditing />}
       </body>
     </html>

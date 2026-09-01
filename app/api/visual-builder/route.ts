@@ -27,6 +27,7 @@ const sectionKeys = ['hero', 'about', 'treatments', 'cases', 'contact'] as const
 
 const layoutFields = [
   ...sectionKeys.flatMap((key) => [`${key}Width`, `${key}OffsetX`, `${key}OffsetY`, `${key}PaddingY`]),
+  'heroImageWidth', 'heroImageOffsetX', 'heroImageOffsetY',
   'heroImageHeight', 'heroImagePositionX', 'heroImagePositionY',
   'treatmentImageHeight', 'treatmentImagePositionX', 'treatmentImagePositionY',
   'caseImageHeight', 'caseImagePositionX', 'caseImagePositionY',

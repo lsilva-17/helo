@@ -100,6 +100,9 @@ export const siteSettings = defineType({
     mapsCtaLabel: 'Como chegar',
     footerLocation: 'São Paulo, SP',
     sectionOrder: ['hero', 'about', 'treatments', 'cases', 'contact'],
+    heroImageWidth: 100,
+    heroImageOffsetX: 0,
+    heroImageOffsetY: 0,
     heroImageHeight: 450,
     heroImagePositionX: 50,
     heroImagePositionY: 10,
@@ -115,6 +118,7 @@ export const siteSettings = defineType({
   fields: [
     defineField({ name: 'professionalName', title: 'Nome profissional', type: 'string', group: 'content' }),
     defineField({ name: 'brandSubtitle', title: 'Subtítulo da marca', type: 'string', group: 'content' }),
+    defineField({ name: 'brandLogo', title: 'Ícone / logo da marca', type: 'image', options: {hotspot: true}, group: 'content', description: 'Substitui o ícone HV no cabeçalho.' }),
     defineField({ name: 'cro', title: 'CRO', type: 'string', group: 'content' }),
     defineField({ name: 'whatsapp', title: 'WhatsApp', type: 'string', group: 'content', description: 'Somente números, com DDI e DDD. Ex.: 5511999999999' }),
     defineField({ name: 'instagram', title: 'Instagram', type: 'url', group: 'content' }),
@@ -160,22 +164,11 @@ export const siteSettings = defineType({
     defineField({ name: 'footerLocation', title: 'Rodapé · localização', type: 'string', group: 'content' }),
 
     defineField({
-      name: 'sectionOrder',
-      title: 'Ordem das seções',
-      description: 'Também pode ser alterada arrastando as seções no Construtor visual.',
-      type: 'array',
-      of: [{ type: 'string' }],
-      options: {
-        list: [
-          { title: 'Hero', value: 'hero' },
-          { title: 'Sobre', value: 'about' },
-          { title: 'Tratamentos', value: 'treatments' },
-          { title: 'Casos clínicos', value: 'cases' },
-          { title: 'Contato', value: 'contact' },
-        ],
-      },
-      validation: (Rule) => Rule.unique().min(5).max(5),
-      group: 'layout',
+      name: 'sectionOrder', title: 'Ordem das seções', description: 'Também pode ser alterada arrastando as seções no Construtor visual.', type: 'array', of: [{ type: 'string' }],
+      options: {list: [
+        { title: 'Hero', value: 'hero' }, { title: 'Sobre', value: 'about' }, { title: 'Tratamentos', value: 'treatments' }, { title: 'Casos clínicos', value: 'cases' }, { title: 'Contato', value: 'contact' },
+      ]},
+      validation: (Rule) => Rule.unique().min(5).max(5), group: 'layout',
     }),
 
     ...sectionLayoutFields.flatMap(([key, label, width, x, y, padding]) => [
@@ -185,6 +178,9 @@ export const siteSettings = defineType({
       defineField({ name: `${key}PaddingY`, title: `${label} · espaçamento vertical`, type: 'number', initialValue: padding, validation: (Rule) => Rule.min(16).max(160), group: 'layout' }),
     ]),
 
+    defineField({ name: 'heroImageWidth', title: 'Hero · largura da imagem', type: 'number', initialValue: 100, validation: (Rule) => Rule.min(60).max(100), group: 'layout' }),
+    defineField({ name: 'heroImageOffsetX', title: 'Hero · deslocamento horizontal da imagem', type: 'number', initialValue: 0, validation: (Rule) => Rule.min(-100).max(100), group: 'layout' }),
+    defineField({ name: 'heroImageOffsetY', title: 'Hero · deslocamento vertical da imagem', type: 'number', initialValue: 0, validation: (Rule) => Rule.min(-80).max(80), group: 'layout' }),
     defineField({ name: 'heroImageHeight', title: 'Hero · altura da imagem', type: 'number', initialValue: 450, validation: (Rule) => Rule.min(260).max(720), group: 'layout' }),
     defineField({ name: 'heroImagePositionX', title: 'Hero · foco horizontal da imagem', type: 'number', initialValue: 50, validation: (Rule) => Rule.min(0).max(100), group: 'layout' }),
     defineField({ name: 'heroImagePositionY', title: 'Hero · foco vertical da imagem', type: 'number', initialValue: 10, validation: (Rule) => Rule.min(0).max(100), group: 'layout' }),
