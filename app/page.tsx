@@ -4,7 +4,7 @@ import {sanityFetch} from '@/sanity/lib/live';
 export const revalidate = 60;
 
 type Settings = {
-  professionalName?: string; brandSubtitle?: string; cro?: string; whatsapp?: string; instagram?: string; clinicAddress?: string; mapsUrl?: string;
+  professionalName?: string; brandSubtitle?: string; brandLogoUrl?: string; cro?: string; whatsapp?: string; instagram?: string; clinicAddress?: string; mapsUrl?: string;
   navAboutLabel?: string; navTreatmentsLabel?: string; navCasesLabel?: string; navContactLabel?: string;
   heroEyebrow?: string; heroTitle?: string; heroDescription?: string; heroImageUrl?: string; primaryCtaLabel?: string; instagramCtaLabel?: string;
   aboutEyebrow?: string; aboutTitle?: string; aboutDescription?: string;
@@ -13,7 +13,7 @@ type Settings = {
   casesEyebrow?: string; casesTitle?: string; casesDescription?: string; beforeLabel?: string; afterLabel?: string;
   contactEyebrow?: string; contactTitle?: string; contactDescription?: string; whatsappCtaLabel?: string; mapsCtaLabel?: string; footerLocation?: string;
   sectionOrder?: string[];
-  heroImageHeight?: number; heroImagePositionX?: number; heroImagePositionY?: number;
+  heroImageWidth?: number; heroImageOffsetX?: number; heroImageOffsetY?: number; heroImageHeight?: number; heroImagePositionX?: number; heroImagePositionY?: number;
   treatmentImageHeight?: number; treatmentImagePositionX?: number; treatmentImagePositionY?: number;
   caseImageHeight?: number; caseImagePositionX?: number; caseImagePositionY?: number;
   [key: string]: string | number | string[] | undefined;
@@ -24,7 +24,7 @@ type CaseStudy = {_id: string; title: string; description?: string; beforeUrl?: 
 type Content = {settings: Settings | null; treatments: Treatment[]; cases: CaseStudy[]};
 
 const contentQuery = `{
-  "settings": *[_type == "siteSettings"][0]{..., "heroImageUrl": heroImage.asset->url},
+  "settings": *[_type == "siteSettings"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url},
   "treatments": *[_type == "treatment" && featured == true] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
   "cases": *[_type == "caseStudy" && featured == true] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}
 }`;
@@ -50,6 +50,7 @@ const fallbackSettings: Settings = {
   casesEyebrow: 'Casos clínicos', casesTitle: 'Resultados e casos clínicos.', casesDescription: 'Casos publicados no CMS aparecem aqui automaticamente. As imagens devem ser usadas sempre com a autorização adequada do paciente.', beforeLabel: 'Antes', afterLabel: 'Depois',
   contactEyebrow: 'Contato', contactTitle: 'Vamos conversar sobre o seu sorriso?', contactDescription: 'Entre em contato pelo WhatsApp para tirar dúvidas e agendar uma avaliação.', whatsappCtaLabel: 'Falar no WhatsApp', mapsCtaLabel: 'Como chegar', footerLocation: 'São Paulo, SP',
   sectionOrder: defaultSectionOrder,
+  heroImageWidth: 100, heroImageOffsetX: 0, heroImageOffsetY: 0,
 };
 
 async function getContent() {
@@ -67,7 +68,6 @@ function whatsappLink(number?: string) {
   return `https://wa.me/${cleanNumber.replace(/\D/g, '')}?text=${encodeURIComponent('Olá, vim pelo site e gostaria de agendar uma avaliação.')}`;
 }
 function cleanUrl(value?: string) { return value ? stegaClean(value) : undefined; }
-function cleanConfig(value: string | undefined, fallback: string) { return value ? stegaClean(value) : fallback; }
 function n(settings: Settings, field: string, fallback: number) { const value = settings[field]; return typeof value === 'number' ? value : fallback; }
 function s(settings: Settings, field: string, fallback: string) { const value = settings[field]; return typeof value === 'string' ? stegaClean(value) : fallback; }
 
@@ -128,17 +128,23 @@ function imageMeta(settings: Settings, documentId: string, documentType: string,
     'data-vb-height-field': heightField, 'data-vb-position-x-field': positionXField, 'data-vb-position-y-field': positionYField,
     'data-vb-height-value': n(settings, heightField, prefix === 'hero' ? 450 : prefix === 'treatment' ? 260 : 320),
     'data-vb-position-x-value': n(settings, positionXField, 50), 'data-vb-position-y-value': n(settings, positionYField, prefix === 'hero' ? 10 : 50),
+    ...(prefix === 'hero' ? {
+      'data-vb-width-field': 'heroImageWidth', 'data-vb-x-field': 'heroImageOffsetX', 'data-vb-y-field': 'heroImageOffsetY',
+      'data-vb-width-value': n(settings, 'heroImageWidth', 100), 'data-vb-x-value': n(settings, 'heroImageOffsetX', 0), 'data-vb-y-value': n(settings, 'heroImageOffsetY', 0),
+    } : {}),
   };
 }
 
 function imageStyle(settings: Settings, prefix: 'hero' | 'treatment' | 'case') {
   const fallbackHeight = prefix === 'hero' ? 450 : prefix === 'treatment' ? 260 : 320;
-  return {height: `${n(settings, `${prefix}ImageHeight`, fallbackHeight)}px`, objectFit: 'cover' as const, objectPosition: `${n(settings, `${prefix}ImagePositionX`, 50)}% ${n(settings, `${prefix}ImagePositionY`, prefix === 'hero' ? 10 : 50)}%`};
+  const base = {height: `${n(settings, `${prefix}ImageHeight`, fallbackHeight)}px`, objectFit: 'cover' as const, objectPosition: `${n(settings, `${prefix}ImagePositionX`, 50)}% ${n(settings, `${prefix}ImagePositionY`, prefix === 'hero' ? 10 : 50)}%`};
+  if (prefix !== 'hero') return base;
+  return {...base, width: `${n(settings, 'heroImageWidth', 100)}%`, transform: `translate(${n(settings, 'heroImageOffsetX', 0)}px, ${n(settings, 'heroImageOffsetY', 0)}px)`, marginInline: 'auto'};
 }
 
 export default async function HomePage() {
   const {settings, treatments, cases} = await getContent();
-  const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl));
+  const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = cleanUrl(settings.brandLogoUrl) || '/brand-hv.svg';
   const fallbackTreatments: Treatment[] = [
     {_id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.'},
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
@@ -149,7 +155,7 @@ export default async function HomePage() {
 
   return <>
     <header className="site-header"><div className="container header-inner">
-      <a className="brand" href="#inicio"><span className="brand-mark">HV</span><span className="brand-text">
+      <a className="brand" href="#inicio"><img className="brand-mark" src={brandLogoUrl} alt="Marca" data-vb-doc-id="siteSettings" data-vb-doc-type="siteSettings" data-vb-image-field="brandLogo" data-vb-label="Ícone da marca" style={{objectFit: 'cover'}} /><span className="brand-text">
         <strong {...siteText(settings, 'professionalName', 'Nome profissional', 'brandName')} style={typographyStyle(settings, 'brandName', 'sans', 15)}>{settings.professionalName}</strong>
         <small {...siteText(settings, 'brandSubtitle', 'Subtítulo da marca', 'brandSubtitleStyle')} style={typographyStyle(settings, 'brandSubtitleStyle', 'sans', 12)}>{settings.brandSubtitle}</small>
       </span></a>
