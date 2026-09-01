@@ -48,6 +48,12 @@ const fallbackSettings: Settings = {
   contactDescription: 'Entre em contato pelo WhatsApp para tirar dúvidas e agendar uma avaliação.',
 };
 
+const fallbackTreatments: Treatment[] = [
+  { _id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.' },
+  { _id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.' },
+  { _id: 'avaliacao', title: 'Avaliação estética', summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.' },
+];
+
 async function getContent() {
   try {
     const [settings, treatments, cases] = await Promise.all([
@@ -69,6 +75,7 @@ function whatsappLink(number?: string) {
 export default async function HomePage() {
   const { settings, treatments, cases } = await getContent();
   const wa = whatsappLink(settings.whatsapp);
+  const displayedTreatments: Treatment[] = treatments.length ? treatments : fallbackTreatments;
 
   return (
     <>
@@ -101,7 +108,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="hero-photo">
-                <img src={settings.heroImageUrl || fallbackSettings.heroImageUrl} alt={`Foto de ${settings.professionalName}`} />
+                <img src={settings.heroImageUrl || fallbackSettings.heroImageUrl} alt={`Foto de ${settings.professionalName || 'Dra. Heloisa Veiga'}`} />
               </div>
             </div>
           </div>
@@ -126,11 +133,7 @@ export default async function HomePage() {
             <h2 className="section-title">{settings.treatmentsTitle}</h2>
             <p className="section-copy">{settings.treatmentsDescription}</p>
             <div className="gallery-grid">
-              {(treatments.length ? treatments : [
-                { _id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.' },
-                { _id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.' },
-                { _id: 'avaliacao', title: 'Avaliação estética', summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.' },
-              ]).map((item) => (
+              {displayedTreatments.map((item) => (
                 <article className="gallery-card" key={item._id}>
                   {item.imageUrl ? <img className="gallery-media" src={item.imageUrl} alt={item.title} /> : <div className="gallery-placeholder">{item.title}</div>}
                   <div className="gallery-body"><h3>{item.title}</h3><p>{item.summary}</p></div>
