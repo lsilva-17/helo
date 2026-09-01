@@ -6,6 +6,7 @@ import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDra
 import {SanityLive} from '@/sanity/lib/live';
 import './globals.css';
 import './visual-builder.css';
+import './visual-builder-toolbar-drag.css';
 
 export const metadata: Metadata = {
   title: 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo',
