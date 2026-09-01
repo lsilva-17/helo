@@ -8,7 +8,6 @@ import {PreviewDiagnostics} from './sanity/tools/PreviewDiagnostics';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helo-sable-five.vercel.app';
 const singletonTypes = new Set(['siteSettings']);
 
 const mainDocuments = defineDocuments([
@@ -90,8 +89,10 @@ export default defineConfig({
     }),
     presentationTool({
       title: 'Editor visual',
+      // Studio and frontend live in the same Next.js deployment. In this setup
+      // Sanity resolves the current deployment origin implicitly, including
+      // Vercel Preview branches. Only the Draft Mode paths need configuration.
       previewUrl: {
-        initial: siteUrl,
         previewMode: {
           enable: '/api/draft-mode/enable',
           disable: '/api/draft-mode/disable',
@@ -101,7 +102,6 @@ export default defineConfig({
         mainDocuments,
         locations,
       },
-      allowOrigins: [siteUrl],
     }),
   ],
   tools: [

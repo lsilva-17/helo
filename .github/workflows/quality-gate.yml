@@ -19,7 +19,7 @@ jobs:
     name: Pre-deploy validation
     if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout exact commit
         uses: actions/checkout@v4
@@ -42,6 +42,73 @@ jobs:
           NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
           NEXT_PUBLIC_SANITY_DATASET: production
           NEXT_PUBLIC_SITE_URL: https://helo-sable-five.vercel.app
+
+      - name: Browser smoke test Sanity Studio
+        shell: bash
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SITE_URL: https://helo-sable-five.vercel.app
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          PORT=3333 npm run start > /tmp/helo-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 3 http://localhost:3333/ >/dev/null; then
+              break
+            fi
+            if [ "$attempt" = "30" ]; then
+              echo "Local Next.js server did not become ready."
+              cat /tmp/helo-next.log || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          if ! SMOKE_BASE_URL=http://localhost:3333 npm run smoke:studio; then
+            echo "--- Next.js server log ---"
+            cat /tmp/helo-next.log || true
+            exit 1
+          fi
+
+      - name: Validate Sanity CORS for Vercel preview
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          SANITY_PROJECT_ID: f9ampmu2
+          SANITY_DATASET: production
+        run: |
+          set -euo pipefail
+          branch_slug=$(printf '%s' "$GITHUB_HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g; s/^-+|-+$//g; s/-+/-/g')
+          preview_origin="https://helo-git-${branch_slug}-pauliino1996-5063s-projects.vercel.app"
+          url="https://${SANITY_PROJECT_ID}.api.sanity.io/v2026-09-01/data/query/${SANITY_DATASET}?query=count(*)"
+
+          echo "Checking Sanity CORS for $preview_origin"
+          headers=$(curl -sS -D - -o /tmp/sanity-preview-cors-body --max-time 20 \
+            -H "Origin: $preview_origin" \
+            "$url")
+
+          allow_origin=$(printf '%s\n' "$headers" | awk 'BEGIN{IGNORECASE=1} /^access-control-allow-origin:/ {sub(/^[^:]+:[[:space:]]*/, ""); gsub(/\r/, ""); print; exit}')
+          allow_credentials=$(printf '%s\n' "$headers" | awk 'BEGIN{IGNORECASE=1} /^access-control-allow-credentials:/ {sub(/^[^:]+:[[:space:]]*/, ""); gsub(/\r/, ""); print; exit}')
+
+          echo "Access-Control-Allow-Origin: ${allow_origin:-missing}"
+          echo "Access-Control-Allow-Credentials: ${allow_credentials:-missing}"
+
+          if [ "$allow_origin" != "$preview_origin" ]; then
+            echo "Sanity does not allow this Vercel Preview origin."
+            echo "Recommended CORS entry: https://*-pauliino1996-5063s-projects.vercel.app with Allow credentials enabled."
+            exit 1
+          fi
+
+          if [ "${allow_credentials,,}" != "true" ]; then
+            echo "Sanity preview CORS is missing Allow credentials."
+            exit 1
+          fi
+
+          echo "Sanity Vercel Preview CORS passed."
 
   production-qa:
     name: Production QA
