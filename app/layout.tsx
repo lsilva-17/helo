@@ -3,10 +3,13 @@ import {draftMode} from 'next/headers';
 import {VisualEditing} from 'next-sanity/visual-editing';
 import {VisualBuilder} from '@/app/components/VisualBuilder';
 import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDrag';
+import {VisualCustomizationBridge} from '@/app/components/VisualCustomizationBridge';
+import {VisualCustomizationControls} from '@/app/components/VisualCustomizationControls';
 import {SanityLive} from '@/sanity/lib/live';
 import './globals.css';
 import './visual-builder.css';
 import './visual-builder-toolbar-drag.css';
+import './visual-customization.css';
 
 export const metadata: Metadata = {
   title: 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo',
@@ -21,9 +24,11 @@ export default async function RootLayout({children}: Readonly<{children: React.R
     <html lang="pt-BR">
       <body>
         {children}
+        <VisualCustomizationBridge />
         <SanityLive />
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}
+        {isDraftMode && <VisualCustomizationControls />}
         {isDraftMode && <VisualEditing />}
       </body>
     </html>
