@@ -10,6 +10,7 @@ const expectedCapabilities = [
   'button-text-color',
   'text-box-width',
   'text-direct-resize',
+  'editable-fallback-treatment-cards',
 ];
 
 const browser = await chromium.launch({headless: true});
