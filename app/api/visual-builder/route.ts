@@ -26,14 +26,14 @@ const typographyKeys = [
 const sectionKeys = ['hero', 'about', 'treatments', 'cases', 'contact'] as const;
 
 const layoutFields = [
-  ...sectionKeys.flatMap((key) => [`${key}Width`, `${key}OffsetX`, `${key}OffsetY`, `${key}PaddingY`]),
+  ...sectionKeys.flatMap((key) => [`${key}Width`, `${key}OffsetX`, `${key}OffsetY`, `${key}PaddingY`, `${key}Background`]),
   'heroImageWidth', 'heroImageOffsetX', 'heroImageOffsetY',
   'heroImageHeight', 'heroImagePositionX', 'heroImagePositionY',
   'treatmentImageHeight', 'treatmentImagePositionX', 'treatmentImagePositionY',
   'caseImageHeight', 'caseImagePositionX', 'caseImagePositionY',
 ];
 
-const styleFields = typographyKeys.flatMap((key) => [`${key}Font`, `${key}Size`, `${key}Align`]);
+const styleFields = typographyKeys.flatMap((key) => [`${key}Font`, `${key}Size`, `${key}Align`, `${key}Color`]);
 
 const allowedFields: Record<string, Set<string>> = {
   siteSettings: new Set([...contentFields, ...layoutFields, ...styleFields]),
@@ -41,7 +41,10 @@ const allowedFields: Record<string, Set<string>> = {
   caseStudy: new Set(['title', 'description']),
 };
 
-const fontValues = new Set(['editorial', 'sans', 'classic']);
+const fontValues = new Set([
+  'editorial', 'sans', 'classic', 'arial', 'roboto', 'inter', 'opensans', 'montserrat',
+  'poppins', 'dmsans', 'lato', 'playfair', 'lora', 'merriweather',
+]);
 const alignValues = new Set(['left', 'center', 'right']);
 const sectionValues = new Set(sectionKeys);
 
@@ -54,6 +57,12 @@ function boundedNumber(value: unknown, min: number, max: number, label: string) 
   const clean = Number(value);
   if (!Number.isFinite(clean) || clean < min || clean > max) throw new Error(`Invalid ${label}`);
   return Math.round(clean);
+}
+
+function cleanColor(value: unknown) {
+  const clean = String(value).trim();
+  if (!/^#[0-9a-f]{6}$/i.test(clean)) throw new Error('Invalid color');
+  return clean.toLowerCase();
 }
 
 function cleanValue(field: string, value: unknown) {
@@ -78,6 +87,7 @@ function cleanValue(field: string, value: unknown) {
     return clean;
   }
 
+  if (field.endsWith('Color') || field.endsWith('Background')) return cleanColor(value);
   if (field.endsWith('Size')) return boundedNumber(value, 10, 110, 'font size');
   if (field.endsWith('Width')) return boundedNumber(value, 60, 100, 'width');
   if (field.endsWith('OffsetX')) return boundedNumber(value, -100, 100, 'horizontal offset');
