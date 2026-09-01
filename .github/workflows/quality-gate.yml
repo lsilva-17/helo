@@ -123,13 +123,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsSL --max-time 20 "$PRODUCTION_URL/api/preview/diagnostics" | jq -e --arg sha "$EXPECTED_SHA" '
+          http_status=$(curl -sS -o /tmp/sanity-diagnostics.json -w '%{http_code}' --max-time 20 "$PRODUCTION_URL/api/preview/diagnostics")
+          echo "Sanity diagnostics HTTP: $http_status"
+          jq '{status, projectId, dataset, siteUrl, checks, deployment}' /tmp/sanity-diagnostics.json || cat /tmp/sanity-diagnostics.json
+
+          jq -e --arg sha "$EXPECTED_SHA" '
             .status == "ok" and
             .checks.publicQuery.ok == true and
             .checks.tokenConfigured.ok == true and
             .checks.authenticatedQuery.ok == true and
             .deployment.commit == $sha
-          '
+          ' /tmp/sanity-diagnostics.json
           echo "Sanity preview diagnostics API passed."
 
       - name: Validate Sanity CORS with credentials
