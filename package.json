@@ -8,6 +8,7 @@
     "build": "npm run typecheck && next build",
     "validate": "npm run build",
     "smoke:studio": "node scripts/studio-smoke.mjs",
+    "smoke:presentation": "node scripts/presentation-smoke.mjs",
     "start": "next start"
   },
   "dependencies": {

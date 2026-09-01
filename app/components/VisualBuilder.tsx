@@ -16,6 +16,8 @@ type Selection = {
   fontField?: string;
   sizeField?: string;
   alignField?: string;
+  colorField?: string;
+  backgroundField?: string;
   widthField?: string;
   xField?: string;
   yField?: string;
@@ -26,6 +28,8 @@ type Selection = {
   fontValue?: string;
   sizeValue?: number;
   alignValue?: string;
+  colorValue?: string;
+  backgroundValue?: string;
   widthValue?: number;
   xValue?: number;
   yValue?: number;
@@ -36,12 +40,23 @@ type Selection = {
 };
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
-type StyleKind = 'font' | 'size' | 'align' | 'width' | 'x' | 'y' | 'padding' | 'height' | 'positionX' | 'positionY';
+type StyleKind = 'font' | 'size' | 'align' | 'color' | 'background' | 'width' | 'x' | 'y' | 'padding' | 'height' | 'positionX' | 'positionY';
 
 const fontStacks: Record<string, string> = {
   editorial: "'Cormorant Garamond', Georgia, serif",
   sans: "'Manrope', Arial, sans-serif",
   classic: "Georgia, 'Times New Roman', serif",
+  arial: 'Arial, Helvetica, sans-serif',
+  roboto: "'Roboto', Arial, sans-serif",
+  inter: "'Inter', Arial, sans-serif",
+  opensans: "'Open Sans', Arial, sans-serif",
+  montserrat: "'Montserrat', Arial, sans-serif",
+  poppins: "'Poppins', Arial, sans-serif",
+  dmsans: "'DM Sans', Arial, sans-serif",
+  lato: "'Lato', Arial, sans-serif",
+  playfair: "'Playfair Display', Georgia, serif",
+  lora: "'Lora', Georgia, serif",
+  merriweather: "'Merriweather', Georgia, serif",
 };
 
 async function patchField(documentId: string, documentType: string, field: string, value: unknown) {
@@ -62,10 +77,21 @@ function numeric(value?: string) {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
+function cssColorToHex(value: string, fallback: string) {
+  if (/^#[0-9a-f]{6}$/i.test(value)) return value.toLowerCase();
+  const match = value.match(/rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,/\s]+([\d.]+))?\)/i);
+  if (!match || (match[4] !== undefined && Number(match[4]) === 0)) return fallback;
+  return `#${[match[1], match[2], match[3]].map((part) => Math.max(0, Math.min(255, Number(part))).toString(16).padStart(2, '0')).join('')}`;
+}
+
 function selectionFromElement(element: HTMLElement): Selection | null {
   const documentId = element.dataset.vbDocId || element.dataset.vbStyleDocId;
   const documentType = element.dataset.vbDocType || element.dataset.vbStyleDocType;
   if (!documentId || !documentType) return null;
+
+  const fontField = element.dataset.vbFontField;
+  const widthField = element.dataset.vbWidthField;
+  const computed = getComputedStyle(element);
 
   return {
     element,
@@ -76,10 +102,12 @@ function selectionFromElement(element: HTMLElement): Selection | null {
     label: element.dataset.vbLabel || 'Componente',
     styleDocumentId: element.dataset.vbStyleDocId || documentId,
     styleDocumentType: element.dataset.vbStyleDocType || documentType,
-    fontField: element.dataset.vbFontField,
+    fontField,
     sizeField: element.dataset.vbSizeField,
     alignField: element.dataset.vbAlignField,
-    widthField: element.dataset.vbWidthField,
+    colorField: fontField?.replace(/Font$/, 'Color'),
+    backgroundField: element.dataset.vbLayout === 'true' && widthField ? widthField.replace(/Width$/, 'Background') : undefined,
+    widthField,
     xField: element.dataset.vbXField,
     yField: element.dataset.vbYField,
     paddingField: element.dataset.vbPaddingField,
@@ -89,6 +117,8 @@ function selectionFromElement(element: HTMLElement): Selection | null {
     fontValue: element.dataset.vbFontValue,
     sizeValue: numeric(element.dataset.vbSizeValue),
     alignValue: element.dataset.vbAlignValue,
+    colorValue: fontField ? cssColorToHex(computed.color, '#2b2621') : undefined,
+    backgroundValue: element.dataset.vbLayout === 'true' ? cssColorToHex(computed.backgroundColor, '#ffffff') : undefined,
     widthValue: numeric(element.dataset.vbWidthValue),
     xValue: numeric(element.dataset.vbXValue),
     yValue: numeric(element.dataset.vbYValue),
@@ -165,7 +195,7 @@ export function VisualBuilder() {
 
       editable.classList.add('vb-selected');
       setSelection(current);
-      setMessage(current.imageField ? 'Troque a imagem ou ajuste enquadramento e tamanho.' : current.field ? 'Edite o texto diretamente ou ajuste sua aparência.' : 'Ajuste largura, posição e espaçamento deste bloco.');
+      setMessage(current.imageField ? 'Troque a imagem ou ajuste enquadramento e tamanho.' : current.field ? 'Edite o texto diretamente ou ajuste fonte, cor e posição.' : 'Ajuste tamanho, posição, espaçamento e cor de fundo.');
 
       if (current.field) {
         const original = editable.innerText || editable.textContent || '';
@@ -313,6 +343,12 @@ export function VisualBuilder() {
       selection.element.style.textAlign = String(value);
       selection.element.dataset.vbAlignValue = String(value);
       next.alignValue = String(value);
+    } else if (kind === 'color') {
+      selection.element.style.color = String(value);
+      next.colorValue = String(value);
+    } else if (kind === 'background') {
+      selection.element.style.backgroundColor = String(value);
+      next.backgroundValue = String(value);
     } else if (kind === 'width') {
       selection.element.style.width = `${value}%`;
       selection.element.dataset.vbWidthValue = String(value);
@@ -403,16 +439,41 @@ export function VisualBuilder() {
             <button type="button" onClick={closeSelection} aria-label="Fechar editor">×</button>
           </div>
 
-          <p className="vb-help">{selection.field ? 'Digite diretamente no conteúdo. Use os controles abaixo para aparência e posição.' : selection.imageField ? 'Troque a imagem e ajuste o enquadramento sem sair da página.' : 'Use os controles abaixo para redimensionar e reposicionar o bloco.'}</p>
+          <p className="vb-help">{selection.field ? 'Digite diretamente no conteúdo. Use os controles abaixo para aparência, cor e posição.' : selection.imageField ? 'Troque a imagem e ajuste o enquadramento sem sair da página.' : 'Use os controles abaixo para redimensionar, reposicionar e alterar o fundo do bloco.'}</p>
 
           {selection.fontField && (
             <label className="vb-control">
               <span>Fonte</span>
               <select value={selection.fontValue || 'sans'} onChange={(event) => updateStyle(selection.fontField, event.target.value, 'font')}>
-                <option value="editorial">Editorial</option>
-                <option value="sans">Moderna</option>
-                <option value="classic">Clássica</option>
+                <option value="editorial">Cormorant Garamond</option>
+                <option value="sans">Manrope</option>
+                <option value="classic">Georgia</option>
+                <option value="arial">Arial</option>
+                <option value="roboto">Roboto</option>
+                <option value="inter">Inter</option>
+                <option value="opensans">Open Sans</option>
+                <option value="montserrat">Montserrat</option>
+                <option value="poppins">Poppins</option>
+                <option value="dmsans">DM Sans</option>
+                <option value="lato">Lato</option>
+                <option value="playfair">Playfair Display</option>
+                <option value="lora">Lora</option>
+                <option value="merriweather">Merriweather</option>
               </select>
+            </label>
+          )}
+
+          {selection.colorField && (
+            <label className="vb-control">
+              <span>Cor do texto <b>{selection.colorValue}</b></span>
+              <input type="color" value={selection.colorValue || '#2b2621'} onChange={(event) => updateStyle(selection.colorField, event.target.value, 'color')} />
+            </label>
+          )}
+
+          {selection.backgroundField && (
+            <label className="vb-control">
+              <span>Cor de fundo <b>{selection.backgroundValue}</b></span>
+              <input type="color" value={selection.backgroundValue || '#ffffff'} onChange={(event) => updateStyle(selection.backgroundField, event.target.value, 'background')} />
             </label>
           )}
 

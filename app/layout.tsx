@@ -5,6 +5,8 @@ import {VisualBuilder} from '@/app/components/VisualBuilder';
 import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDrag';
 import {VisualCustomizationBridge} from '@/app/components/VisualCustomizationBridge';
 import {VisualCustomizationControls} from '@/app/components/VisualCustomizationControls';
+import {ThemeToggle} from '@/app/components/ThemeToggle';
+import {SiteStyleBridge} from '@/app/components/SiteStyleBridge';
 import {SanityLive} from '@/sanity/lib/live';
 import './globals.css';
 import './visual-builder.css';
@@ -23,8 +25,10 @@ export default async function RootLayout({children}: Readonly<{children: React.R
   return (
     <html lang="pt-BR">
       <body>
-        {children}
+        <SiteStyleBridge />
         <VisualCustomizationBridge />
+        {children}
+        <ThemeToggle />
         <SanityLive />
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}

@@ -2,11 +2,22 @@ import { defineField, defineType } from 'sanity';
 
 const fontOptions = {
   list: [
-    { title: 'Editorial — Cormorant Garamond', value: 'editorial' },
-    { title: 'Moderna — Manrope', value: 'sans' },
-    { title: 'Clássica — Georgia', value: 'classic' },
+    { title: 'Cormorant Garamond', value: 'editorial' },
+    { title: 'Manrope', value: 'sans' },
+    { title: 'Georgia', value: 'classic' },
+    { title: 'Arial', value: 'arial' },
+    { title: 'Roboto', value: 'roboto' },
+    { title: 'Inter', value: 'inter' },
+    { title: 'Open Sans', value: 'opensans' },
+    { title: 'Montserrat', value: 'montserrat' },
+    { title: 'Poppins', value: 'poppins' },
+    { title: 'DM Sans', value: 'dmsans' },
+    { title: 'Lato', value: 'lato' },
+    { title: 'Playfair Display', value: 'playfair' },
+    { title: 'Lora', value: 'lora' },
+    { title: 'Merriweather', value: 'merriweather' },
   ],
-  layout: 'radio' as const,
+  layout: 'dropdown' as const,
 };
 
 const alignOptions = {
@@ -176,6 +187,7 @@ export const siteSettings = defineType({
       defineField({ name: `${key}OffsetX`, title: `${label} · posição horizontal`, type: 'number', initialValue: x, validation: (Rule) => Rule.min(-100).max(100), group: 'layout' }),
       defineField({ name: `${key}OffsetY`, title: `${label} · posição vertical`, type: 'number', initialValue: y, validation: (Rule) => Rule.min(-80).max(80), group: 'layout' }),
       defineField({ name: `${key}PaddingY`, title: `${label} · espaçamento vertical`, type: 'number', initialValue: padding, validation: (Rule) => Rule.min(16).max(160), group: 'layout' }),
+      defineField({ name: `${key}Background`, title: `${label} · cor de fundo`, type: 'string', description: 'Cor hexadecimal, ex.: #ffffff', validation: (Rule) => Rule.regex(/^#[0-9a-fA-F]{6}$/).warning('Use o formato #RRGGBB'), group: 'style' }),
     ]),
 
     defineField({ name: 'heroImageWidth', title: 'Hero · largura da imagem', type: 'number', initialValue: 100, validation: (Rule) => Rule.min(60).max(100), group: 'layout' }),
@@ -195,6 +207,7 @@ export const siteSettings = defineType({
       defineField({ name: `${key}Font`, title: `${label} · fonte`, type: 'string', options: fontOptions, initialValue: defaultFont, group: 'style' }),
       defineField({ name: `${key}Size`, title: `${label} · tamanho`, type: 'number', initialValue: defaultSize, validation: (Rule) => Rule.min(10).max(110), group: 'style' }),
       defineField({ name: `${key}Align`, title: `${label} · alinhamento`, type: 'string', options: alignOptions, initialValue: defaultAlign, group: 'style' }),
+      defineField({ name: `${key}Color`, title: `${label} · cor do texto`, type: 'string', description: 'Cor hexadecimal, ex.: #2b2621', validation: (Rule) => Rule.regex(/^#[0-9a-fA-F]{6}$/).warning('Use o formato #RRGGBB'), group: 'style' }),
     ]),
 
     defineField({ name: 'seoTitle', title: 'Título SEO', type: 'string', group: 'seo' }),
