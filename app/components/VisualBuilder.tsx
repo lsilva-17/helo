@@ -11,13 +11,32 @@ type Selection = {
   field?: string;
   imageField?: string;
   label: string;
+  styleDocumentId: string;
+  styleDocumentType: string;
   fontField?: string;
   sizeField?: string;
+  alignField?: string;
+  widthField?: string;
+  xField?: string;
+  yField?: string;
+  paddingField?: string;
+  heightField?: string;
+  positionXField?: string;
+  positionYField?: string;
   fontValue?: string;
   sizeValue?: number;
+  alignValue?: string;
+  widthValue?: number;
+  xValue?: number;
+  yValue?: number;
+  paddingValue?: number;
+  heightValue?: number;
+  positionXValue?: number;
+  positionYValue?: number;
 };
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+type StyleKind = 'font' | 'size' | 'align' | 'width' | 'x' | 'y' | 'padding' | 'height' | 'positionX' | 'positionY';
 
 const fontStacks: Record<string, string> = {
   editorial: "'Cormorant Garamond', Georgia, serif",
@@ -37,9 +56,15 @@ async function patchField(documentId: string, documentType: string, field: strin
   return body;
 }
 
+function numeric(value?: string) {
+  if (value === undefined || value === '') return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 function selectionFromElement(element: HTMLElement): Selection | null {
-  const documentId = element.dataset.vbDocId;
-  const documentType = element.dataset.vbDocType;
+  const documentId = element.dataset.vbDocId || element.dataset.vbStyleDocId;
+  const documentType = element.dataset.vbDocType || element.dataset.vbStyleDocType;
   if (!documentId || !documentType) return null;
 
   return {
@@ -48,12 +73,42 @@ function selectionFromElement(element: HTMLElement): Selection | null {
     documentType,
     field: element.dataset.vbField,
     imageField: element.dataset.vbImageField,
-    label: element.dataset.vbLabel || 'Elemento',
+    label: element.dataset.vbLabel || 'Componente',
+    styleDocumentId: element.dataset.vbStyleDocId || documentId,
+    styleDocumentType: element.dataset.vbStyleDocType || documentType,
     fontField: element.dataset.vbFontField,
     sizeField: element.dataset.vbSizeField,
+    alignField: element.dataset.vbAlignField,
+    widthField: element.dataset.vbWidthField,
+    xField: element.dataset.vbXField,
+    yField: element.dataset.vbYField,
+    paddingField: element.dataset.vbPaddingField,
+    heightField: element.dataset.vbHeightField,
+    positionXField: element.dataset.vbPositionXField,
+    positionYField: element.dataset.vbPositionYField,
     fontValue: element.dataset.vbFontValue,
-    sizeValue: element.dataset.vbSizeValue ? Number(element.dataset.vbSizeValue) : undefined,
+    sizeValue: numeric(element.dataset.vbSizeValue),
+    alignValue: element.dataset.vbAlignValue,
+    widthValue: numeric(element.dataset.vbWidthValue),
+    xValue: numeric(element.dataset.vbXValue),
+    yValue: numeric(element.dataset.vbYValue),
+    paddingValue: numeric(element.dataset.vbPaddingValue),
+    heightValue: numeric(element.dataset.vbHeightValue),
+    positionXValue: numeric(element.dataset.vbPositionXValue),
+    positionYValue: numeric(element.dataset.vbPositionYValue),
   };
+}
+
+function applyTranslate(selection: Selection, nextX?: number, nextY?: number) {
+  const x = nextX ?? selection.xValue ?? 0;
+  const y = nextY ?? selection.yValue ?? 0;
+  selection.element.style.transform = `translate(${x}px, ${y}px)`;
+}
+
+function selectionType(selection: Selection) {
+  if (selection.imageField) return 'Imagem';
+  if (selection.field) return 'Texto';
+  return 'Layout';
 }
 
 export function VisualBuilder() {
@@ -70,7 +125,7 @@ export function VisualBuilder() {
   }, [selection]);
 
   useEffect(() => {
-    if (window.self === window.top) return;
+    if (window.self === window.top || window.location.pathname.startsWith('/studio')) return;
     setEnabled(true);
     document.documentElement.classList.add('visual-builder-enabled');
 
@@ -87,12 +142,12 @@ export function VisualBuilder() {
           setSaveState('error');
           setMessage(error instanceof Error ? error.message : 'Erro ao salvar');
         }
-      }, 550);
+      }, 450);
     };
 
     const clickHandler = (event: Event) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
-      const editable = target?.closest<HTMLElement>('[data-vb-field], [data-vb-image-field]');
+      const editable = target?.closest<HTMLElement>('[data-vb-field], [data-vb-image-field], [data-vb-layout]');
       if (!editable) return;
 
       const current = selectionFromElement(editable);
@@ -103,18 +158,19 @@ export function VisualBuilder() {
       event.stopImmediatePropagation();
 
       const previous = selectedRef.current?.element;
-      if (previous && previous !== editable && previous.dataset.vbField) {
+      if (previous && previous !== editable) {
         previous.removeAttribute('contenteditable');
         previous.classList.remove('vb-selected');
       }
 
       editable.classList.add('vb-selected');
       setSelection(current);
-      setMessage(current.imageField ? 'Selecione uma nova imagem no painel abaixo.' : 'Edite o texto diretamente na página.');
+      setMessage(current.imageField ? 'Troque a imagem ou ajuste enquadramento e tamanho.' : current.field ? 'Edite o texto diretamente ou ajuste sua aparência.' : 'Ajuste largura, posição e espaçamento deste bloco.');
 
       if (current.field) {
-        const cleanText = stegaClean(editable.innerText || editable.textContent || '');
-        if ((editable.innerText || editable.textContent || '') !== cleanText) editable.innerText = cleanText;
+        const original = editable.innerText || editable.textContent || '';
+        const cleanText = stegaClean(original);
+        if (original !== cleanText) editable.innerText = cleanText;
         editable.setAttribute('contenteditable', 'true');
         editable.setAttribute('spellcheck', 'true');
         editable.focus({preventScroll: true});
@@ -146,7 +202,7 @@ export function VisualBuilder() {
         const handle = document.createElement('button');
         handle.type = 'button';
         handle.className = 'vb-drag-handle';
-        handle.textContent = '⋮⋮  Arrastar';
+        handle.textContent = '⋮⋮  Arrastar seção';
         handle.draggable = true;
         handle.setAttribute('aria-label', `Mover seção ${section.dataset.vbSection || ''}`);
 
@@ -241,26 +297,62 @@ export function VisualBuilder() {
     setMessage('');
   };
 
-  const updateStyle = async (field: string | undefined, value: string | number, kind: 'font' | 'size') => {
+  const updateStyle = async (field: string | undefined, value: string | number, kind: StyleKind) => {
     if (!selection || !field) return;
+
+    const next = {...selection};
     if (kind === 'font') {
       selection.element.style.fontFamily = fontStacks[String(value)] || fontStacks.sans;
       selection.element.dataset.vbFontValue = String(value);
-      setSelection({...selection, fontValue: String(value)});
-    } else {
+      next.fontValue = String(value);
+    } else if (kind === 'size') {
       selection.element.style.fontSize = `${value}px`;
       selection.element.dataset.vbSizeValue = String(value);
-      setSelection({...selection, sizeValue: Number(value)});
+      next.sizeValue = Number(value);
+    } else if (kind === 'align') {
+      selection.element.style.textAlign = String(value);
+      selection.element.dataset.vbAlignValue = String(value);
+      next.alignValue = String(value);
+    } else if (kind === 'width') {
+      selection.element.style.width = `${value}%`;
+      selection.element.dataset.vbWidthValue = String(value);
+      next.widthValue = Number(value);
+    } else if (kind === 'x') {
+      selection.element.dataset.vbXValue = String(value);
+      next.xValue = Number(value);
+      applyTranslate(next, Number(value), next.yValue);
+    } else if (kind === 'y') {
+      selection.element.dataset.vbYValue = String(value);
+      next.yValue = Number(value);
+      applyTranslate(next, next.xValue, Number(value));
+    } else if (kind === 'padding') {
+      selection.element.style.paddingTop = `${value}px`;
+      selection.element.style.paddingBottom = `${value}px`;
+      selection.element.dataset.vbPaddingValue = String(value);
+      next.paddingValue = Number(value);
+    } else if (kind === 'height') {
+      selection.element.style.height = `${value}px`;
+      selection.element.dataset.vbHeightValue = String(value);
+      next.heightValue = Number(value);
+    } else if (kind === 'positionX' || kind === 'positionY') {
+      const nextX = kind === 'positionX' ? Number(value) : next.positionXValue ?? 50;
+      const nextY = kind === 'positionY' ? Number(value) : next.positionYValue ?? 50;
+      next.positionXValue = nextX;
+      next.positionYValue = nextY;
+      selection.element.dataset.vbPositionXValue = String(nextX);
+      selection.element.dataset.vbPositionYValue = String(nextY);
+      selection.element.style.objectPosition = `${nextX}% ${nextY}%`;
     }
 
+    setSelection(next);
     setSaveState('saving');
     try {
-      await patchField(selection.documentId, selection.documentType, field, value);
+      await patchField(selection.styleDocumentId, selection.styleDocumentType, field, value);
       setSaveState('saved');
-      setMessage('Estilo salvo como rascunho.');
+      setMessage('Ajuste salvo como rascunho.');
     } catch (error) {
       setSaveState('error');
-      setMessage(error instanceof Error ? error.message : 'Erro ao salvar estilo');
+      setMessage(error instanceof Error ? error.message : 'Erro ao salvar ajuste');
     }
   };
 
@@ -291,6 +383,13 @@ export function VisualBuilder() {
     }
   };
 
+  const range = (label: string, field: string | undefined, value: number | undefined, min: number, max: number, kind: StyleKind, suffix: string) => field ? (
+    <label className="vb-control">
+      <span>{label} <b>{value ?? 0}{suffix}</b></span>
+      <input type="range" min={min} max={max} step="1" value={value ?? 0} onChange={(event) => updateStyle(field, Number(event.target.value), kind)} />
+    </label>
+  ) : null;
+
   return (
     <>
       <div className="vb-mode-badge">Construtor visual ativo</div>
@@ -299,17 +398,17 @@ export function VisualBuilder() {
           <div className="vb-toolbar-head">
             <div>
               <strong>{selection.label}</strong>
-              <span>{selection.imageField ? 'Imagem' : 'Texto'}</span>
+              <span>{selectionType(selection)}</span>
             </div>
             <button type="button" onClick={closeSelection} aria-label="Fechar editor">×</button>
           </div>
 
-          {selection.field && <p className="vb-help">Clique no texto e digite normalmente. As alterações ficam em rascunho.</p>}
+          <p className="vb-help">{selection.field ? 'Digite diretamente no conteúdo. Use os controles abaixo para aparência e posição.' : selection.imageField ? 'Troque a imagem e ajuste o enquadramento sem sair da página.' : 'Use os controles abaixo para redimensionar e reposicionar o bloco.'}</p>
 
           {selection.fontField && (
             <label className="vb-control">
               <span>Fonte</span>
-              <select value={selection.fontValue || 'editorial'} onChange={(event) => updateStyle(selection.fontField, event.target.value, 'font')}>
+              <select value={selection.fontValue || 'sans'} onChange={(event) => updateStyle(selection.fontField, event.target.value, 'font')}>
                 <option value="editorial">Editorial</option>
                 <option value="sans">Moderna</option>
                 <option value="classic">Clássica</option>
@@ -317,19 +416,25 @@ export function VisualBuilder() {
             </label>
           )}
 
-          {selection.sizeField && (
+          {selection.alignField && (
             <label className="vb-control">
-              <span>Tamanho <b>{selection.sizeValue || 16}px</b></span>
-              <input
-                type="range"
-                min="12"
-                max="96"
-                step="1"
-                value={selection.sizeValue || 16}
-                onChange={(event) => updateStyle(selection.sizeField, Number(event.target.value), 'size')}
-              />
+              <span>Alinhamento</span>
+              <select value={selection.alignValue || 'left'} onChange={(event) => updateStyle(selection.alignField, event.target.value, 'align')}>
+                <option value="left">Esquerda</option>
+                <option value="center">Centro</option>
+                <option value="right">Direita</option>
+              </select>
             </label>
           )}
+
+          {range('Tamanho', selection.sizeField, selection.sizeValue || 16, 10, 110, 'size', 'px')}
+          {range('Largura', selection.widthField, selection.widthValue || 100, 60, 100, 'width', '%')}
+          {range('Mover horizontal', selection.xField, selection.xValue || 0, -100, 100, 'x', 'px')}
+          {range('Mover vertical', selection.yField, selection.yValue || 0, -80, 80, 'y', 'px')}
+          {range('Espaçamento vertical', selection.paddingField, selection.paddingValue || 32, 16, 160, 'padding', 'px')}
+          {range('Altura da imagem', selection.heightField, selection.heightValue || 320, 160, 720, 'height', 'px')}
+          {range('Foco horizontal', selection.positionXField, selection.positionXValue ?? 50, 0, 100, 'positionX', '%')}
+          {range('Foco vertical', selection.positionYField, selection.positionYValue ?? 50, 0, 100, 'positionY', '%')}
 
           {selection.imageField && (
             <>
