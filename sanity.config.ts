@@ -41,11 +41,13 @@ export default defineConfig({
     presentationTool({
       title: 'Editor visual',
       previewUrl: {
-        origin: siteUrl,
+        initial: siteUrl,
         previewMode: {
           enable: '/api/draft-mode/enable',
+          disable: '/api/draft-mode/disable',
         },
       },
+      allowOrigins: [siteUrl],
     }),
   ],
   schema: { types: schemaTypes },
