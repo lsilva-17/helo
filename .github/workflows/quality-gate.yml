@@ -21,8 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout
+      - name: Checkout exact commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,6 +41,7 @@ jobs:
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
           NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SITE_URL: https://helo-sable-five.vercel.app
 
   production-qa:
     name: Production QA
@@ -48,14 +51,28 @@ jobs:
       github.event_name == 'schedule' ||
       (github.event_name == 'deployment_status' &&
        github.event.deployment_status.state == 'success' &&
-       github.event.deployment.environment == 'Production')
+       (github.event.deployment.environment == 'Production' || github.event.deployment.environment == 'production'))
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PRODUCTION_URL: https://helo.vercel.app
+      PRODUCTION_URL: https://helo-sable-five.vercel.app
+      DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
       EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
     steps:
+      - name: Verify Vercel deployment URL
+        if: github.event_name == 'deployment_status' && github.event.deployment_status.environment_url != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Checking Vercel deployment: $DEPLOYMENT_URL"
+          status=$(curl -sSL -o /tmp/deployment.html -w '%{http_code}' --max-time 20 "$DEPLOYMENT_URL/")
+          if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+            echo "Deployment URL returned HTTP $status"
+            exit 1
+          fi
+          echo "Deployment URL is reachable with HTTP $status."
+
       - name: Wait for expected commit to reach production
         shell: bash
         run: |

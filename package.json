@@ -1,13 +1,13 @@
 {
   "name": "helo-site",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
     "typecheck": "tsc --noEmit",
-    "validate": "npm run typecheck && npm run build"
+    "build": "npm run typecheck && next build",
+    "validate": "npm run build",
+    "start": "next start"
   },
   "dependencies": {
     "@sanity/client": "7.12.0",
