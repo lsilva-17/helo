@@ -8,7 +8,6 @@ import {PreviewDiagnostics} from './sanity/tools/PreviewDiagnostics';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helo-sable-five.vercel.app';
 const singletonTypes = new Set(['siteSettings']);
 
 const mainDocuments = defineDocuments([
@@ -91,7 +90,9 @@ export default defineConfig({
     presentationTool({
       title: 'Editor visual',
       previewUrl: {
-        initial: siteUrl,
+        // Keep the preview on the same deployment as the Studio. This makes
+        // Production use Production and every Vercel Preview use its own branch.
+        initial: '/',
         previewMode: {
           enable: '/api/draft-mode/enable',
           disable: '/api/draft-mode/disable',
@@ -101,7 +102,6 @@ export default defineConfig({
         mainDocuments,
         locations,
       },
-      allowOrigins: [siteUrl],
     }),
   ],
   tools: [
