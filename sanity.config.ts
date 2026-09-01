@@ -89,10 +89,10 @@ export default defineConfig({
     }),
     presentationTool({
       title: 'Editor visual',
+      // Studio and frontend live in the same Next.js deployment. In this setup
+      // Sanity resolves the current deployment origin implicitly, including
+      // Vercel Preview branches. Only the Draft Mode paths need configuration.
       previewUrl: {
-        // Keep the preview on the same deployment as the Studio. This makes
-        // Production use Production and every Vercel Preview use its own branch.
-        initial: '/',
         previewMode: {
           enable: '/api/draft-mode/enable',
           disable: '/api/draft-mode/disable',
