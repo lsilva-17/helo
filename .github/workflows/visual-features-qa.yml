@@ -110,11 +110,12 @@ jobs:
 
   deployment-features:
     name: Deployment event visual features
-    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment_url != ''
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
+      PRODUCTION_URL: https://helo-sable-five.vercel.app
+      EXPECTED_SHA: ${{ github.event.deployment.sha }}
     steps:
       - name: Checkout deployed commit
         uses: actions/checkout@v4
@@ -131,9 +132,26 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Validate exact deployment visual features
+      - name: Verify production alias is on deployed commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            response=$(curl -sS --max-time 15 "$PRODUCTION_URL/api/health" || true)
+            deployed=$(printf '%s' "$response" | jq -r '.commit // empty' 2>/dev/null || true)
+            status=$(printf '%s' "$response" | jq -r '.status // empty' 2>/dev/null || true)
+            echo "Attempt $attempt/30: deployed=${deployed:-missing}, expected=$EXPECTED_SHA, status=${status:-missing}"
+            if [ "$deployed" = "$EXPECTED_SHA" ] && [ "$status" = "ok" ]; then
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "FAIL: production alias did not resolve to the deployment commit."
+          exit 1
+
+      - name: Validate exact production visual features
         shell: bash
         run: |
           set -euo pipefail
           npx playwright install --with-deps chromium
-          SMOKE_BASE_URL="$DEPLOYMENT_URL" npm run smoke:visual-features
+          SMOKE_BASE_URL="$PRODUCTION_URL" npm run smoke:visual-features
