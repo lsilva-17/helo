@@ -6,6 +6,7 @@ import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDra
 import {VisualCustomizationBridge} from '@/app/components/VisualCustomizationBridge';
 import {VisualCustomizationControls} from '@/app/components/VisualCustomizationControls';
 import {FallbackTreatmentBindings} from '@/app/components/FallbackTreatmentBindings';
+import {PresentationEditingStabilizer} from '@/app/components/PresentationEditingStabilizer';
 import {ThemeToggle} from '@/app/components/ThemeToggle';
 import {SiteStyleBridge} from '@/app/components/SiteStyleBridge';
 import {SanityLive} from '@/sanity/lib/live';
@@ -44,6 +45,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
         {children}
         <ThemeToggle />
         {!isDraftMode && <SanityLive />}
+        {isDraftMode && <PresentationEditingStabilizer />}
         {isDraftMode && <FallbackTreatmentBindings />}
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}
