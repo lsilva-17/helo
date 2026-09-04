@@ -30,6 +30,7 @@ const visualCapabilities = [
   'text-box-width',
   'text-direct-resize',
   'editable-fallback-treatment-cards',
+  'presentation-stable-editing',
 ].join(' ');
 
 export default async function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
@@ -42,7 +43,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
         <VisualCustomizationBridge />
         {children}
         <ThemeToggle />
-        <SanityLive />
+        {!isDraftMode && <SanityLive />}
         {isDraftMode && <FallbackTreatmentBindings />}
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}
