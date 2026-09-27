@@ -227,9 +227,12 @@ export function VisualBuilder() {
     const saveText = (current: Selection, value: string) => {
       if (!current.field) return;
       pendingTextRef.current = {current, value};
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      setSaveState('saving');
-      debounceRef.current = setTimeout(() => void persistText(), 350);
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+      setSaveState('idle');
+      setMessage('Editando… a alteração será salva ao sair do texto.');
     };
 
     const clickHandler = (event: Event) => {
@@ -369,7 +372,11 @@ export function VisualBuilder() {
     };
 
     installSectionHandles();
-    const observer = new MutationObserver(() => installSectionHandles());
+    const observer = new MutationObserver(() => {
+      const active = selectedRef.current?.element;
+      if (active?.isContentEditable) return;
+      installSectionHandles();
+    });
     observer.observe(document.body, {childList: true, subtree: true});
 
     window.addEventListener('click', clickHandler, true);
@@ -402,6 +409,7 @@ export function VisualBuilder() {
 
   const updateStyle = async (field: string | undefined, value: string | number, kind: StyleKind) => {
     if (!selection || !field) return;
+    if (selection.element.isContentEditable) selection.element.blur();
 
     const next = {...selection};
     if (kind === 'font') {
