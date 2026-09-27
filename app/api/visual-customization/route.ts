@@ -92,16 +92,16 @@ export async function PATCH(request: Request) {
     let draft = await client.fetch<SiteSettings | null>(`*[_id == $id][0]`, {id: SITE_SETTINGS_DRAFT_ID});
 
     if (!draft) {
-      const base = published || ({_id: 'siteSettings', _type: 'siteSettings'} as SiteSettings);
+      const base = published || ({_id: SITE_SETTINGS_ID, _type: 'siteSettings'} as SiteSettings);
       const {_rev, _createdAt, _updatedAt, ...copy} = base as SiteSettings & {_rev?: string; _createdAt?: string; _updatedAt?: string};
-      await client.createIfNotExists({...copy, _id: 'drafts.siteSettings', _type: 'siteSettings'});
+      await client.createIfNotExists({...copy, _id: SITE_SETTINGS_DRAFT_ID, _type: 'siteSettings'});
       draft = await client.fetch<SiteSettings | null>(`*[_id == $id][0]`, {id: SITE_SETTINGS_DRAFT_ID});
     }
 
     if (kind === 'button') {
       const next: ButtonStyle = {key, label, background: cleanColor(body.background), text: cleanColor(body.text)};
       const items = [...(draft?.buttonCustomStyles || []).filter((item) => item?.key !== key), next];
-      await client.patch('drafts.siteSettings').set({buttonCustomStyles: items}).commit();
+      await client.patch(SITE_SETTINGS_DRAFT_ID).set({buttonCustomStyles: items}).commit();
       return NextResponse.json({ok: true, value: next});
     }
 
@@ -110,7 +110,7 @@ export async function PATCH(request: Request) {
       if (!Number.isFinite(width) || width < 25 || width > 100) throw new Error('A largura deve ficar entre 25% e 100%.');
       const next: TextWidth = {key, label, width};
       const items = [...(draft?.textBoxWidths || []).filter((item) => item?.key !== key), next];
-      await client.patch('drafts.siteSettings').set({textBoxWidths: items}).commit();
+      await client.patch(SITE_SETTINGS_DRAFT_ID).set({textBoxWidths: items}).commit();
       return NextResponse.json({ok: true, value: next});
     }
 
