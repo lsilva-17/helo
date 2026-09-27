@@ -197,7 +197,7 @@ body.brandbook-preview {
   background:
     radial-gradient(circle at 92% 7%, rgba(199,143,126,.10), transparent 28rem),
     #F6F1EB;
-  font-family: 'Inter', Arial, sans-serif !important;
+  font-family: 'Inter', Arial, sans-serif;
 }
 
 html[data-theme="dark"] body.brandbook-preview {
@@ -235,15 +235,15 @@ body.brandbook-preview .brand-mark {
   border: 0;
   border-radius: 0;
   background: transparent;
-  object-fit: contain !important;
+  object-fit: contain;
   box-shadow: none;
 }
 body.brandbook-preview .brand-text strong {
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  font-size: 1.32rem !important;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.32rem;
   font-weight: 600;
   letter-spacing: .015em;
-  color: #2F2B2A !important;
+  color: #2F2B2A;
 }
 body.brandbook-preview .brand-text small,
 body.brandbook-preview .nav a,
@@ -254,13 +254,13 @@ body.brandbook-preview .eyebrow,
 body.brandbook-preview .trust-grid span,
 body.brandbook-preview .case-label,
 body.brandbook-preview .footer-inner {
-  font-family: 'Inter', Arial, sans-serif !important;
+  font-family: 'Inter', Arial, sans-serif;
 }
 body.brandbook-preview .brand-text small {
-  color: #8A7467 !important;
+  color: #8A7467;
   text-transform: uppercase;
   letter-spacing: .16em;
-  font-size: .62rem !important;
+  font-size: .62rem;
 }
 body.brandbook-preview .nav a {
   color: #5F514A;
@@ -285,12 +285,12 @@ body.brandbook-preview .hero-visual {
   padding: clamp(1rem,2vw,1.6rem);
   background:
     radial-gradient(circle at 14% 18%, rgba(255,255,255,.78), transparent 22rem),
-    linear-gradient(120deg,#F6F1EB 0%,#F3EAE3 46%,#D9C2AE 100%) !important;
+    linear-gradient(120deg,#F6F1EB 0%,#F3EAE3 46%,#D9C2AE 100%);
   border: 1px solid rgba(138,116,103,.18);
   box-shadow: 0 30px 90px rgba(138,116,103,.12);
 }
 html[data-theme="dark"] body.brandbook-preview .hero-visual {
-  background: linear-gradient(120deg,#2F2B2A 0%,#443A35 58%,#725E53 100%) !important;
+  background: linear-gradient(120deg,#2F2B2A 0%,#443A35 58%,#725E53 100%);
 }
 body.brandbook-preview .hero-inner {
   grid-template-columns: minmax(0,1.15fr) minmax(290px,.85fr);
@@ -312,10 +312,10 @@ html[data-theme="dark"] body.brandbook-preview .hero-card {
 }
 body.brandbook-preview .eyebrow {
   padding: 0;
-  background: transparent !important;
-  color: #8A7467 !important;
+  background: transparent;
+  color: #8A7467;
   border-radius: 0;
-  font-size: .7rem !important;
+  font-size: .7rem;
   font-weight: 600;
   letter-spacing: .18em;
 }
@@ -324,9 +324,9 @@ body.brandbook-preview .section-title,
 body.brandbook-preview .gallery-body h3,
 body.brandbook-preview .case-body h3,
 body.brandbook-preview .trust-grid strong {
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  color: #2F2B2A !important;
-  font-weight: 500 !important;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: #2F2B2A;
+  font-weight: 500;
 }
 html[data-theme="dark"] body.brandbook-preview .hero-card h1,
 html[data-theme="dark"] body.brandbook-preview .section-title,
@@ -334,10 +334,10 @@ html[data-theme="dark"] body.brandbook-preview .gallery-body h3,
 html[data-theme="dark"] body.brandbook-preview .case-body h3,
 html[data-theme="dark"] body.brandbook-preview .trust-grid strong,
 html[data-theme="dark"] body.brandbook-preview .brand-text strong {
-  color: #F6F1EB !important;
+  color: #F6F1EB;
 }
 body.brandbook-preview .hero-card h1 {
-  font-size: clamp(3rem,5.8vw,5.2rem) !important;
+  font-size: clamp(3rem,5.8vw,5.2rem);
   line-height: .96;
   letter-spacing: -.025em;
   max-width: 11ch;
@@ -347,7 +347,7 @@ body.brandbook-preview .section-copy,
 body.brandbook-preview .gallery-body p,
 body.brandbook-preview .case-body p,
 body.brandbook-preview .address {
-  color: #6F6058 !important;
+  color: #6F6058;
 }
 html[data-theme="dark"] body.brandbook-preview .hero-card p,
 html[data-theme="dark"] body.brandbook-preview .section-copy,
@@ -356,7 +356,7 @@ html[data-theme="dark"] body.brandbook-preview .case-body p,
 html[data-theme="dark"] body.brandbook-preview .address,
 html[data-theme="dark"] body.brandbook-preview .brand-text small,
 html[data-theme="dark"] body.brandbook-preview .nav a {
-  color: #D9C2AE !important;
+  color: #D9C2AE;
 }
 
 body.brandbook-preview .hero-photo {
@@ -375,28 +375,28 @@ body.brandbook-preview .btn {
 }
 body.brandbook-preview .btn-primary,
 body.brandbook-preview .btn-whatsapp {
-  background: #2F2B2A !important;
-  color: #F6F1EB !important;
+  background: #2F2B2A;
+  color: #F6F1EB;
   box-shadow: 0 12px 30px rgba(47,43,42,.12);
 }
 body.brandbook-preview .btn-primary:hover,
 body.brandbook-preview .btn-whatsapp:hover {
-  background: #8A7467 !important;
+  background: #8A7467;
 }
 body.brandbook-preview .btn-secondary {
-  background: rgba(246,241,235,.72) !important;
-  border-color: #B99F90 !important;
-  color: #2F2B2A !important;
+  background: rgba(246,241,235,.72);
+  border-color: #B99F90;
+  color: #2F2B2A;
 }
 html[data-theme="dark"] body.brandbook-preview .btn-secondary {
-  background: transparent !important;
-  color: #F6F1EB !important;
-  border-color: #8A7467 !important;
+  background: transparent;
+  color: #F6F1EB;
+  border-color: #8A7467;
 }
 
 body.brandbook-preview .section { padding-block: clamp(4rem,8vw,7rem); }
 body.brandbook-preview .section-title {
-  font-size: clamp(2.7rem,4.8vw,4.4rem) !important;
+  font-size: clamp(2.7rem,4.8vw,4.4rem);
   line-height: .98;
   letter-spacing: -.018em;
 }
@@ -408,15 +408,15 @@ body.brandbook-preview .contact-card {
 }
 body.brandbook-preview .highlight-box {
   background:
-    linear-gradient(135deg,rgba(255,253,252,.96),rgba(246,241,235,.88)) !important;
+    linear-gradient(135deg,rgba(255,253,252,.96),rgba(246,241,235,.88));
 }
 body.brandbook-preview .trust-grid > div {
-  background: #EFE4DA !important;
+  background: #EFE4DA;
   border: 1px solid rgba(217,194,174,.75);
   border-radius: 22px;
 }
 body.brandbook-preview .trust-grid strong {
-  color: #C78F7E !important;
+  color: #C78F7E;
 }
 
 body.brandbook-preview .gallery-grid { gap: 1.5rem; }
@@ -424,38 +424,38 @@ body.brandbook-preview .gallery-card,
 body.brandbook-preview .case-card {
   border-radius: 26px;
   border-color: rgba(138,116,103,.18);
-  background: #FFFDFC !important;
+  background: #FFFDFC;
   box-shadow: 0 14px 45px rgba(47,43,42,.055);
 }
 html[data-theme="dark"] body.brandbook-preview .gallery-card,
 html[data-theme="dark"] body.brandbook-preview .case-card {
-  background: #383230 !important;
+  background: #383230;
 }
 body.brandbook-preview .gallery-media,
 body.brandbook-preview .gallery-placeholder {
   border-radius: 25px 25px 0 0;
 }
 body.brandbook-preview .gallery-placeholder {
-  background: linear-gradient(135deg,#EFE4DA,#D9C2AE) !important;
-  color: #8A7467 !important;
+  background: linear-gradient(135deg,#EFE4DA,#D9C2AE);
+  color: #8A7467;
 }
 body.brandbook-preview .gallery-body,
 body.brandbook-preview .case-body { padding: 1.45rem 1.5rem 1.65rem; }
 
 body.brandbook-preview .cases-section {
-  background: #EFE4DA !important;
+  background: #EFE4DA;
   border-block-color: rgba(138,116,103,.12);
 }
-html[data-theme="dark"] body.brandbook-preview .cases-section { background: #443A35 !important; }
-body.brandbook-preview .case-label { color: #C78F7E !important; }
+html[data-theme="dark"] body.brandbook-preview .cases-section { background: #443A35; }
+body.brandbook-preview .case-label { color: #C78F7E; }
 
 body.brandbook-preview .contact-card {
   background:
     radial-gradient(circle at 95% 0%,rgba(199,143,126,.20),transparent 24rem),
-    #FFFDFC !important;
+    #FFFDFC;
 }
 html[data-theme="dark"] body.brandbook-preview .contact-card {
-  background: linear-gradient(135deg,#383230,#443A35) !important;
+  background: linear-gradient(135deg,#383230,#443A35);
 }
 body.brandbook-preview .site-footer {
   border-top-color: rgba(138,116,103,.18);
@@ -490,7 +490,7 @@ html[data-theme="dark"] body.brandbook-preview .case-body h3,
 html[data-theme="dark"] body.brandbook-preview .trust-grid strong,
 html[data-theme="dark"] body.brandbook-preview .contact-card,
 html[data-theme="dark"] body.brandbook-preview .contact-card .section-title {
-  color: #F6F1EB !important;
+  color: #F6F1EB;
 }
 html[data-theme="dark"] body.brandbook-preview .hero-card p,
 html[data-theme="dark"] body.brandbook-preview .section-copy,
@@ -501,20 +501,20 @@ html[data-theme="dark"] body.brandbook-preview .trust-grid span,
 html[data-theme="dark"] body.brandbook-preview .footer-inner,
 html[data-theme="dark"] body.brandbook-preview .brand-text small,
 html[data-theme="dark"] body.brandbook-preview .nav a {
-  color: #D9C2AE !important;
+  color: #D9C2AE;
 }
 html[data-theme="dark"] body.brandbook-preview .eyebrow,
 html[data-theme="dark"] body.brandbook-preview .case-label {
-  color: #C78F7E !important;
+  color: #C78F7E;
 }
 html[data-theme="dark"] body.brandbook-preview .highlight-box,
 html[data-theme="dark"] body.brandbook-preview .contact-card {
-  background: #383230 !important;
-  border-color: #725E53 !important;
+  background: #383230;
+  border-color: #725E53;
 }
 html[data-theme="dark"] body.brandbook-preview .trust-grid > div {
-  background: #443A35 !important;
-  border-color: #725E53 !important;
+  background: #443A35;
+  border-color: #725E53;
 }
 html[data-theme="dark"] body.brandbook-preview .theme-toggle {
   background: #383230;
@@ -542,7 +542,7 @@ body.brandbook-preview .hero-photo {
 }
 body.brandbook-preview .hero-photo img {
   min-height: 100%;
-  height: 100% !important;
+  height: 100%;
 }
 body.brandbook-preview .gallery-grid,
 body.brandbook-preview .cases-grid {
@@ -569,7 +569,7 @@ body.brandbook-preview .gallery-body {
     height: 380px;
   }
   body.brandbook-preview .hero-photo img {
-    height: 100% !important;
+    height: 100%;
     min-height: 0;
   }
 }
@@ -615,4 +615,10 @@ body.brandbook-preview .gallery-body {
   .social-float-link { width: 50px; height: 50px; border-radius: 16px; }
   .social-float-link svg { width: 25px; height: 25px; }
   .visual-builder-enabled .social-float { bottom: 76px; }
+}
+
+
+/* CMS/Presentation values are authoritative over brandbook defaults. */
+body.brandbook-preview [data-vb-font-field] {
+  font-family: inherit;
 }
