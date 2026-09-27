@@ -41,14 +41,14 @@ jobs:
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
           NEXT_PUBLIC_SANITY_DATASET: production
-          NEXT_PUBLIC_SITE_URL: https://helo-sable-five.vercel.app
+          NEXT_PUBLIC_SITE_URL: https://draheloisaveiga.vercel.app
 
       - name: Browser smoke test Sanity Studio
         shell: bash
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: f9ampmu2
           NEXT_PUBLIC_SANITY_DATASET: production
-          NEXT_PUBLIC_SITE_URL: https://helo-sable-five.vercel.app
+          NEXT_PUBLIC_SITE_URL: https://draheloisaveiga.vercel.app
         run: |
           set -euo pipefail
           npx playwright install --with-deps chromium
@@ -83,7 +83,7 @@ jobs:
         run: |
           set -euo pipefail
           branch_slug=$(printf '%s' "$GITHUB_HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g; s/^-+|-+$//g; s/-+/-/g')
-          preview_origin="https://helo-git-${branch_slug}-pauliino1996-5063s-projects.vercel.app"
+          preview_origin="https://draheloisaveiga-git-${branch_slug}-pauliino1996-5063s-projects.vercel.app"
           url="https://${SANITY_PROJECT_ID}.api.sanity.io/v2026-09-01/data/query/${SANITY_DATASET}?query=count(*)"
 
           echo "Checking Sanity CORS for $preview_origin"
@@ -123,7 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PRODUCTION_URL: https://helo-sable-five.vercel.app
+      PRODUCTION_URL: https://draheloisaveiga.vercel.app
       DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
       EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
       SANITY_PROJECT_ID: f9ampmu2

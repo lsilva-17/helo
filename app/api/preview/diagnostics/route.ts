@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helo-sable-five.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://draheloisaveiga.vercel.app';
 const apiVersion = '2026-09-01';
 
 export async function GET() {

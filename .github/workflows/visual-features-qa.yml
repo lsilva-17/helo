@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PRODUCTION_URL: https://helo-sable-five.vercel.app
+      PRODUCTION_URL: https://draheloisaveiga.vercel.app
       EXPECTED_SHA: ${{ github.sha }}
     steps:
       - name: Checkout exact commit
@@ -114,7 +114,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PRODUCTION_URL: https://helo-sable-five.vercel.app
+      PRODUCTION_URL: https://draheloisaveiga.vercel.app
       EXPECTED_SHA: ${{ github.event.deployment.sha }}
     steps:
       - name: Checkout deployed commit

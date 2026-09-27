@@ -1,6 +1,6 @@
 import { createClient } from 'next-sanity';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helo-sable-five.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://draheloisaveiga.vercel.app';
 
 export const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2',
