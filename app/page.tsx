@@ -178,7 +178,7 @@ export default async function HomePage() {
       </nav>
     </div></header>
 
-    <main className="page-sections">
+    <main className="page-sections" data-vb-layout="true" data-vb-style-doc-id="siteSettings" data-vb-style-doc-type="siteSettings" data-vb-label="Fundo entre as seções" data-vb-background-field="pageBackground">
       <section className="hero" id="inicio" data-vb-section="hero" style={sectionOuterStyle(settings, 'hero')}><div className="container hero-visual" {...heroLayout.props} style={heroLayout.style}><div className="hero-inner">
         <div className="hero-card">
           <span className="eyebrow" {...siteText(settings, 'heroEyebrow', 'Hero · chamada curta', 'eyebrowStyle')} style={typographyStyle(settings, 'eyebrowStyle', 'sans', 12)}>{settings.heroEyebrow}</span>
