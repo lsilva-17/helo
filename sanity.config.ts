@@ -5,6 +5,7 @@ import {structureTool} from 'sanity/structure';
 import {defineDocuments, defineLocations, presentationTool} from 'sanity/presentation';
 import {schemaTypes} from './sanity/schemaTypes';
 import {PreviewDiagnostics} from './sanity/tools/PreviewDiagnostics';
+import {SyncedPublishAction} from './sanity/actions/SyncedPublishAction';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -89,9 +90,6 @@ export default defineConfig({
     }),
     presentationTool({
       title: 'Editor visual',
-      // Studio and frontend live in the same Next.js deployment. In this setup
-      // Sanity resolves the current deployment origin implicitly, including
-      // Vercel Preview branches. Only the Draft Mode paths need configuration.
       previewUrl: {
         previewMode: {
           enable: '/api/draft-mode/enable',
@@ -115,9 +113,14 @@ export default defineConfig({
   document: {
     newDocumentOptions: (prev) =>
       prev.filter((item) => !singletonTypes.has(item.templateId)),
-    actions: (prev, context) =>
-      singletonTypes.has(context.schemaType)
-        ? prev.filter(({action}) => action !== 'duplicate' && action !== 'delete')
-        : prev,
+    actions: (prev, context) => {
+      if (!singletonTypes.has(context.schemaType)) return prev;
+
+      return prev
+        .filter(({action}) => action !== 'duplicate' && action !== 'delete')
+        .map((originalAction) =>
+          originalAction.action === 'publish' ? SyncedPublishAction : originalAction,
+        );
+    },
   },
 });
