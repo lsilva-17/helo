@@ -25,7 +25,6 @@ export const SyncedPublishAction: DocumentActionComponent = (props) => {
       }
     };
 
-    setHasDraft(Boolean(props.draft));
     void refresh();
 
     const subscription = client
@@ -33,7 +32,7 @@ export const SyncedPublishAction: DocumentActionComponent = (props) => {
       .subscribe({
         next: () => void refresh(),
         error: () => {
-          // Studio props continue to be the fallback source if realtime listening fails.
+          // The button stays available and performs a fresh draft lookup on click.
         },
       });
 
@@ -44,20 +43,38 @@ export const SyncedPublishAction: DocumentActionComponent = (props) => {
   }, [client, draftId, props.draft]);
 
   return {
-    label: publishing ? 'Publicando…' : 'Publicar alterações',
-    disabled: publishing || !hasDraft,
+    label: publishing
+      ? 'Publicando…'
+      : hasDraft
+        ? 'Publicar alterações'
+        : 'Verificar e publicar',
+    disabled: publishing,
     tone: 'positive',
     group: ['default', 'paneActions'],
     onHandle: async () => {
       setPublishing(true);
       setError(null);
+
       try {
+        // Always re-read the draft at click time. Visual Builder mutations are
+        // written outside Sanity's form state and can arrive before Studio
+        // refreshes props.draft / the built-in publish disabled state.
+        const draft = await client.getDocument(draftId);
+
+        if (!draft) {
+          setHasDraft(false);
+          setError('Nenhuma alteração pendente foi encontrada. Faça uma edição no construtor visual e tente novamente.');
+          return;
+        }
+
         await client.action({
           actionType: 'sanity.action.document.publish',
           publishedId,
           draftId,
         });
+
         setHasDraft(false);
+        props.onComplete();
       } catch (publishError) {
         setError(
           publishError instanceof Error
