@@ -111,6 +111,7 @@ export const siteSettings = defineType({
     mapsCtaLabel: 'Como chegar',
     footerLocation: 'São Paulo, SP',
     sectionOrder: ['hero', 'about', 'treatments', 'cases', 'contact'],
+    pageBackground: '#F6F1EB',
     heroImageWidth: 100,
     heroImageOffsetX: 0,
     heroImageOffsetY: 0,
@@ -173,6 +174,8 @@ export const siteSettings = defineType({
     defineField({ name: 'whatsappCtaLabel', title: 'Contato · botão WhatsApp', type: 'string', group: 'content' }),
     defineField({ name: 'mapsCtaLabel', title: 'Contato · botão mapa', type: 'string', group: 'content' }),
     defineField({ name: 'footerLocation', title: 'Rodapé · localização', type: 'string', group: 'content' }),
+
+    defineField({ name: 'pageBackground', title: 'Fundo entre as seções', type: 'string', description: 'Cor exibida nos espaços entre os blocos. Use hexadecimal, ex.: #F6F1EB', validation: (Rule) => Rule.regex(/^#[0-9a-fA-F]{6}$/).warning('Use o formato #RRGGBB'), group: 'style' }),
 
     defineField({
       name: 'sectionOrder', title: 'Ordem das seções', description: 'Também pode ser alterada arrastando as seções no Construtor visual.', type: 'array', of: [{ type: 'string' }],
