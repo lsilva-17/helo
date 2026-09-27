@@ -1,5 +1,5 @@
 import {stegaClean} from 'next-sanity';
-import {sanityFetch} from '@/sanity/lib/live';
+import {sanityFetch, SanityLive} from '@/sanity/lib/live';
 
 export const revalidate = 60;
 
@@ -232,6 +232,8 @@ export default async function HomePage() {
     </main>
 
     <footer className="site-footer"><div className="container footer-inner" style={typographyStyle(settings, 'footerStyle', 'sans', 14)}><p><span {...siteText(settings, 'professionalName', 'Rodapé · nome', 'footerStyle')}>{settings.professionalName}</span>{settings.cro ? ` · ${settings.cro}` : ''}</p><p {...siteText(settings, 'footerLocation', 'Rodapé · localização', 'footerStyle')}>{settings.footerLocation}</p></div></footer>
+
+    <SanityLive />
 
     <aside className="social-float" aria-label="Canais de contato">
       <a className="social-float-link social-float-whatsapp" href={wa} target="_blank" rel="noreferrer" aria-label="Falar com a Dra. Heloisa no WhatsApp" title="WhatsApp">
