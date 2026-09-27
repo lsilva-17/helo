@@ -12,3 +12,7 @@ jobs:
           query='*[_type=="treatment"]|order(order asc){_id,title,featured,order,"hasImage":defined(image.asset),"imageUrl":image.asset->url}'
           encoded=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$query")
           curl -fsSL "https://f9ampmu2.api.sanity.io/v2026-09-01/data/query/production?query=$encoded" | jq '.result'
+          echo "Recent image assets:"
+          query2='*[_type=="sanity.imageAsset"]|order(_createdAt desc)[0...15]{_id,_createdAt,originalFilename,"url":url,metadata{dimensions{width,height}}}'
+          encoded2=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$query2")
+          curl -fsSL "https://f9ampmu2.api.sanity.io/v2026-09-01/data/query/production?query=$encoded2" | jq '.result'
