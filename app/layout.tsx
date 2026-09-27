@@ -8,6 +8,8 @@ import {VisualCustomizationControls} from '@/app/components/VisualCustomizationC
 import {FallbackTreatmentBindings} from '@/app/components/FallbackTreatmentBindings';
 import {ThemeToggle} from '@/app/components/ThemeToggle';
 import {SiteStyleBridge} from '@/app/components/SiteStyleBridge';
+import {GoogleTagManager} from '@/app/components/GoogleTagManager';
+import {ConversionTracking} from '@/app/components/ConversionTracking';
 import './globals.css';
 import './visual-builder.css';
 import './visual-builder-toolbar-drag.css';
@@ -45,6 +47,8 @@ export default async function RootLayout({children}: Readonly<{children: React.R
   return (
     <html lang="pt-BR">
       <body className="brandbook-preview" data-visual-capabilities={visualCapabilities}>
+        <GoogleTagManager />
+        <ConversionTracking />
         <SiteStyleBridge />
         <VisualCustomizationBridge />
         {children}
