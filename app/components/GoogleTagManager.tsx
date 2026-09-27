@@ -11,7 +11,7 @@ export function GoogleTagManager() {
     var f = document.getElementsByTagName('script')[0],
         j = document.createElement('script');
     j.async = true;
-    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + GTM_ID;
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=${GTM_ID}';
     f.parentNode.insertBefore(j, f);
   `;
 
