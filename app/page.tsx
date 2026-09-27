@@ -35,6 +35,17 @@ const fontStacks: Record<string, string> = {
   editorial: "'Cormorant Garamond', Georgia, serif",
   sans: "'Inter', Arial, sans-serif",
   classic: "Georgia, 'Times New Roman', serif",
+  arial: "Arial, Helvetica, sans-serif",
+  roboto: "'Roboto', Arial, sans-serif",
+  inter: "'Inter', Arial, sans-serif",
+  opensans: "'Open Sans', Arial, sans-serif",
+  montserrat: "'Montserrat', Arial, sans-serif",
+  poppins: "'Poppins', Arial, sans-serif",
+  dmsans: "'DM Sans', Arial, sans-serif",
+  lato: "'Lato', Arial, sans-serif",
+  playfair: "'Playfair Display', Georgia, serif",
+  lora: "'Lora', Georgia, serif",
+  merriweather: "'Merriweather', Georgia, serif",
 };
 
 const fallbackSettings: Settings = {
@@ -144,7 +155,7 @@ function imageStyle(settings: Settings, prefix: 'hero' | 'treatment' | 'case') {
 
 export default async function HomePage() {
   const {settings, treatments, cases} = await getContent();
-  const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = '/brand-hv.svg';
+  const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = cleanUrl(settings.brandLogoUrl) || '/brand-hv.svg';
   const fallbackTreatments: Treatment[] = [
     {_id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.'},
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
