@@ -161,7 +161,7 @@ function imageStyle(settings: Settings, prefix: 'hero' | 'treatment' | 'case') {
 export default async function HomePage() {
   const {isEnabled: isDraftMode} = await draftMode();
   const {settings, treatments, cases} = await getContent();
-  const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = cleanUrl(settings.brandLogoUrl) || '/brand-hv.svg';
+  const wa = whatsappLink(settings.whatsapp); const floatingWa = whatsappLink(String(fallbackSettings.whatsapp)); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = cleanUrl(settings.brandLogoUrl) || '/brand-hv.svg';
   const fallbackTreatments: Treatment[] = [
     {_id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.'},
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
@@ -254,7 +254,7 @@ export default async function HomePage() {
     {!isDraftMode && <SanityLive />}
 
     <aside className="social-float" aria-label="Canais de contato">
-      <a className="social-float-link social-float-whatsapp" href={wa} target="_blank" rel="noreferrer" aria-label="Falar com a Dra. Heloisa no WhatsApp" title="WhatsApp">
+      <a className="social-float-link social-float-whatsapp" href={floatingWa} target="_blank" rel="noreferrer" aria-label="Falar com a Dra. Heloisa no WhatsApp" title="WhatsApp">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.5 0 .2 5.3.2 11.9c0 2.1.6 4.2 1.7 6L0 24l6.3-1.7a12 12 0 0 0 5.8 1.5h.1C18.7 23.8 24 18.5 24 12A11.9 11.9 0 0 0 20.5 3.5Zm-8.4 18.3h-.1a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12.1 21.8Zm5.4-7.3c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.2-.2.3-.8.9-1 1.1-.2.2-.4.2-.7.1-1.8-.9-3-1.6-4.2-3.7-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.6l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.7 5.9 5.2.8.4 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3Z"/></svg>
       </a>
       {instagram && <a className="social-float-link social-float-instagram" href={instagram} target="_blank" rel="noreferrer" aria-label="Abrir Instagram da Dra. Heloisa" title="Instagram">
