@@ -23,6 +23,7 @@ type Selection = {
   yField?: string;
   paddingField?: string;
   heightField?: string;
+  blockHeightField?: string;
   positionXField?: string;
   positionYField?: string;
   fontValue?: string;
@@ -35,12 +36,13 @@ type Selection = {
   yValue?: number;
   paddingValue?: number;
   heightValue?: number;
+  blockHeightValue?: number;
   positionXValue?: number;
   positionYValue?: number;
 };
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
-type StyleKind = 'font' | 'size' | 'align' | 'color' | 'background' | 'width' | 'x' | 'y' | 'padding' | 'height' | 'positionX' | 'positionY';
+type StyleKind = 'font' | 'size' | 'align' | 'color' | 'background' | 'width' | 'x' | 'y' | 'padding' | 'height' | 'blockHeight' | 'positionX' | 'positionY';
 
 const fontStacks: Record<string, string> = {
   editorial: "'Cormorant Garamond', Georgia, serif",
@@ -148,6 +150,7 @@ function selectionFromElement(element: HTMLElement): Selection | null {
     yField: element.dataset.vbYField,
     paddingField: element.dataset.vbPaddingField,
     heightField: element.dataset.vbHeightField,
+    blockHeightField: element.dataset.vbBlockHeightField,
     positionXField: element.dataset.vbPositionXField,
     positionYField: element.dataset.vbPositionYField,
     fontValue: element.dataset.vbFontValue,
@@ -160,6 +163,7 @@ function selectionFromElement(element: HTMLElement): Selection | null {
     yValue: numeric(element.dataset.vbYValue),
     paddingValue: numeric(element.dataset.vbPaddingValue),
     heightValue: numeric(element.dataset.vbHeightValue),
+    blockHeightValue: numeric(element.dataset.vbBlockHeightValue),
     positionXValue: numeric(element.dataset.vbPositionXValue),
     positionYValue: numeric(element.dataset.vbPositionYValue),
   };
@@ -406,6 +410,10 @@ export function VisualBuilder() {
       selection.element.style.height = `${value}px`;
       selection.element.dataset.vbHeightValue = String(value);
       next.heightValue = Number(value);
+    } else if (kind === 'blockHeight') {
+      selection.element.style.minHeight = `${value}px`;
+      selection.element.dataset.vbBlockHeightValue = String(value);
+      next.blockHeightValue = Number(value);
     } else if (kind === 'positionX' || kind === 'positionY') {
       const nextX = kind === 'positionX' ? Number(value) : next.positionXValue ?? 50;
       const nextY = kind === 'positionY' ? Number(value) : next.positionYValue ?? 50;
@@ -538,7 +546,8 @@ export function VisualBuilder() {
           )}
 
           {range('Tamanho', selection.sizeField, selection.sizeValue || 16, 10, 110, 'size', 'px')}
-          {range('Largura', selection.widthField, selection.widthValue || 100, 60, 100, 'width', '%')}
+          {range('Largura do bloco', selection.widthField, selection.widthValue || 100, 60, 100, 'width', '%')}
+          {range('Altura mínima do bloco', selection.blockHeightField, selection.blockHeightValue || 320, 180, 1000, 'blockHeight', 'px')}
           {range('Mover horizontal', selection.xField, selection.xValue || 0, -100, 100, 'x', 'px')}
           {range('Mover vertical', selection.yField, selection.yValue || 0, -80, 80, 'y', 'px')}
           {range('Espaçamento vertical', selection.paddingField, selection.paddingValue || 32, 16, 160, 'padding', 'px')}

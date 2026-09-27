@@ -26,7 +26,7 @@ const typographyKeys = [
 const sectionKeys = ['hero', 'about', 'treatments', 'cases', 'contact'] as const;
 
 const layoutFields = [
-  ...sectionKeys.flatMap((key) => [`${key}Width`, `${key}OffsetX`, `${key}OffsetY`, `${key}PaddingY`, `${key}Background`]),
+  ...sectionKeys.flatMap((key) => [`${key}Width`, `${key}OffsetX`, `${key}OffsetY`, `${key}PaddingY`, `${key}Height`, `${key}Background`]),
   'heroImageWidth', 'heroImageOffsetX', 'heroImageOffsetY',
   'heroImageHeight', 'heroImagePositionX', 'heroImagePositionY',
   'treatmentImageHeight', 'treatmentImagePositionX', 'treatmentImagePositionY',
@@ -112,6 +112,7 @@ function cleanValue(field: string, value: unknown) {
   if (field.endsWith('OffsetX')) return boundedNumber(value, -100, 100, 'horizontal offset');
   if (field.endsWith('OffsetY')) return boundedNumber(value, -80, 80, 'vertical offset');
   if (field.endsWith('PaddingY')) return boundedNumber(value, 16, 160, 'spacing');
+  if (field.endsWith('Height') && !field.endsWith('ImageHeight')) return boundedNumber(value, 180, 1000, 'block height');
   if (field.endsWith('ImageHeight')) return boundedNumber(value, 160, 720, 'image height');
   if (field.endsWith('PositionX') || field.endsWith('PositionY')) return boundedNumber(value, 0, 100, 'image focal point');
 

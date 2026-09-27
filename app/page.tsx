@@ -120,14 +120,14 @@ function sectionOuterStyle(settings: Settings, key: string) {
 }
 
 function sectionLayout(settings: Settings, key: string, label: string) {
-  const width = n(settings, `${key}Width`, 100); const x = n(settings, `${key}OffsetX`, 0); const y = n(settings, `${key}OffsetY`, 0);
+  const width = n(settings, `${key}Width`, 100); const x = n(settings, `${key}OffsetX`, 0); const y = n(settings, `${key}OffsetY`, 0); const height = n(settings, `${key}Height`, key === 'hero' ? 560 : 320);
   return {
     props: {
       'data-vb-layout': 'true', 'data-vb-style-doc-id': 'siteSettings', 'data-vb-style-doc-type': 'siteSettings', 'data-vb-label': `${label} · layout`,
-      'data-vb-width-field': `${key}Width`, 'data-vb-x-field': `${key}OffsetX`, 'data-vb-y-field': `${key}OffsetY`, 'data-vb-padding-field': `${key}PaddingY`,
-      'data-vb-width-value': width, 'data-vb-x-value': x, 'data-vb-y-value': y, 'data-vb-padding-value': n(settings, `${key}PaddingY`, key === 'hero' ? 32 : 72),
+      'data-vb-width-field': `${key}Width`, 'data-vb-x-field': `${key}OffsetX`, 'data-vb-y-field': `${key}OffsetY`, 'data-vb-padding-field': `${key}PaddingY`, 'data-vb-block-height-field': `${key}Height`,
+      'data-vb-width-value': width, 'data-vb-x-value': x, 'data-vb-y-value': y, 'data-vb-padding-value': n(settings, `${key}PaddingY`, key === 'hero' ? 32 : 72), 'data-vb-block-height-value': height,
     },
-    style: {width: `${width}%`, transform: `translate(${x}px, ${y}px)`},
+    style: {width: `${width}%`, minHeight: `${height}px`, transform: `translate(${x}px, ${y}px)`},
   };
 }
 

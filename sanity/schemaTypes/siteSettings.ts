@@ -56,11 +56,11 @@ const typographyFields = [
 ] as const;
 
 const sectionLayoutFields = [
-  ['hero', 'Hero', 100, 0, 0, 32],
-  ['about', 'Sobre', 100, 0, 0, 72],
-  ['treatments', 'Tratamentos', 100, 0, 0, 72],
-  ['cases', 'Casos clínicos', 100, 0, 0, 72],
-  ['contact', 'Contato', 100, 0, 0, 72],
+  ['hero', 'Hero', 100, 0, 0, 32, 560],
+  ['about', 'Sobre', 100, 0, 0, 72, 320],
+  ['treatments', 'Tratamentos', 100, 0, 0, 72, 320],
+  ['cases', 'Casos clínicos', 100, 0, 0, 72, 320],
+  ['contact', 'Contato', 100, 0, 0, 72, 320],
 ] as const;
 
 export const siteSettings = defineType({
@@ -185,11 +185,12 @@ export const siteSettings = defineType({
       validation: (Rule) => Rule.unique().min(5).max(5), group: 'layout',
     }),
 
-    ...sectionLayoutFields.flatMap(([key, label, width, x, y, padding]) => [
+    ...sectionLayoutFields.flatMap(([key, label, width, x, y, padding, height]) => [
       defineField({ name: `${key}Width`, title: `${label} · largura`, type: 'number', initialValue: width, validation: (Rule) => Rule.min(60).max(100), group: 'layout' }),
       defineField({ name: `${key}OffsetX`, title: `${label} · posição horizontal`, type: 'number', initialValue: x, validation: (Rule) => Rule.min(-100).max(100), group: 'layout' }),
       defineField({ name: `${key}OffsetY`, title: `${label} · posição vertical`, type: 'number', initialValue: y, validation: (Rule) => Rule.min(-80).max(80), group: 'layout' }),
       defineField({ name: `${key}PaddingY`, title: `${label} · espaçamento vertical`, type: 'number', initialValue: padding, validation: (Rule) => Rule.min(16).max(160), group: 'layout' }),
+      defineField({ name: `${key}Height`, title: `${label} · altura mínima do bloco`, type: 'number', initialValue: height, validation: (Rule) => Rule.min(180).max(1000), group: 'layout' }),
       defineField({ name: `${key}Background`, title: `${label} · cor de fundo`, type: 'string', description: 'Cor hexadecimal, ex.: #ffffff', validation: (Rule) => Rule.regex(/^#[0-9a-fA-F]{6}$/).warning('Use o formato #RRGGBB'), group: 'style' }),
     ]),
 
