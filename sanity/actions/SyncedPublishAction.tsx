@@ -1,53 +1,15 @@
 'use client';
 
-import {useEffect, useState} from 'react';
-import {useClient, type DocumentActionComponent} from 'sanity';
-
-const apiVersion = '2026-09-01';
+import {useState} from 'react';
+import {type DocumentActionComponent} from 'sanity';
 
 export const SyncedPublishAction: DocumentActionComponent = (props) => {
-  const client = useClient({apiVersion});
   const publishedId = props.id.replace(/^drafts\./, '');
-  const draftId = `drafts.${publishedId}`;
-  const [hasDraft, setHasDraft] = useState(Boolean(props.draft));
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let active = true;
-
-    const refresh = async () => {
-      try {
-        const draft = await client.getDocument(draftId);
-        if (active) setHasDraft(Boolean(draft));
-      } catch {
-        if (active) setHasDraft(Boolean(props.draft));
-      }
-    };
-
-    void refresh();
-
-    const subscription = client
-      .listen(`*[_id == $draftId]`, {draftId}, {includeResult: false, visibility: 'query'})
-      .subscribe({
-        next: () => void refresh(),
-        error: () => {
-          // The button stays available and performs a fresh draft lookup on click.
-        },
-      });
-
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, [client, draftId, props.draft]);
-
   return {
-    label: publishing
-      ? 'Publicando…'
-      : hasDraft
-        ? 'Publicar alterações'
-        : 'Verificar e publicar',
+    label: publishing ? 'Publicando…' : 'Verificar e publicar',
     disabled: publishing,
     tone: 'positive',
     group: ['default', 'paneActions'],
@@ -56,24 +18,18 @@ export const SyncedPublishAction: DocumentActionComponent = (props) => {
       setError(null);
 
       try {
-        // Always re-read the draft at click time. Visual Builder mutations are
-        // written outside Sanity's form state and can arrive before Studio
-        // refreshes props.draft / the built-in publish disabled state.
-        const draft = await client.getDocument(draftId);
-
-        if (!draft) {
-          setHasDraft(false);
-          setError('Nenhuma alteração pendente foi encontrada. Faça uma edição no construtor visual e tente novamente.');
-          return;
-        }
-
-        await client.action({
-          actionType: 'sanity.action.document.publish',
-          publishedId,
-          draftId,
+        const response = await fetch('/api/visual-builder/publish', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({documentId: publishedId}),
         });
 
-        setHasDraft(false);
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(body?.error || 'Não foi possível publicar as alterações.');
+        }
+
         props.onComplete();
       } catch (publishError) {
         setError(
