@@ -10,6 +10,24 @@ const allowedImages: Record<string, Set<string>> = {
   caseStudy: new Set(['beforeImage', 'afterImage']),
 };
 
+const fallbackTreatments: Record<string, {title: string; summary: string; order: number}> = {
+  facetas: {
+    title: 'Facetas em resina',
+    summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.',
+    order: 1,
+  },
+  clareamento: {
+    title: 'Clareamento dental',
+    summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.',
+    order: 2,
+  },
+  avaliacao: {
+    title: 'Avaliação estética',
+    summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.',
+    order: 3,
+  },
+};
+
 function validateOrigin(request: NextRequest) {
   const origin = request.headers.get('origin');
   return !origin || origin === request.nextUrl.origin;
@@ -42,6 +60,17 @@ export async function POST(request: NextRequest) {
     }
 
     const draftId = await ensureDraftDocument(documentId, documentType);
+
+    if (documentType === 'treatment' && fallbackTreatments[documentId]) {
+      const defaults = fallbackTreatments[documentId];
+      await mutationClient.patch(draftId).setIfMissing({
+        featured: true,
+        order: defaults.order,
+        title: defaults.title,
+        summary: defaults.summary,
+      }).commit();
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
     const asset = await mutationClient.assets.upload('image', buffer, {
       filename: file.name || 'visual-builder-image',
