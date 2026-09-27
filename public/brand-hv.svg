@@ -1,10 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="HV">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#d8ece8"/>
-      <stop offset="1" stop-color="#ffffff"/>
-    </linearGradient>
-  </defs>
-  <circle cx="48" cy="48" r="46" fill="url(#bg)" stroke="#b9dcd6" stroke-width="2"/>
-  <text x="48" y="57" text-anchor="middle" font-family="Georgia, serif" font-size="31" font-weight="700" fill="#0f766e">HV</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Monograma Dra. Heloisa Veiga">
+  <title>Monograma Dra. Heloisa Veiga</title>
+  <g fill="none" stroke="#C78F7E" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 22v76" stroke-width="3.2"/>
+    <path d="M28 58c14-16 24-19 35-7 8 9 12 25 22 35" stroke-width="3.2"/>
+    <path d="M48 24c5 17 9 34 14 50 4 13 8 22 15 27" stroke-width="3.2"/>
+    <path d="M77 101c7-2 13-7 17-15 4-8 5-17 3-26" stroke-width="3.2"/>
+    <path d="M88 24c-5 6-7 12-7 19 0 5 2 8 6 11-5 2-7 6-6 10 1 4 4 7 9 8-3 5-3 10 0 14" stroke-width="2.5"/>
+    <path d="M88 24c6 3 10 7 13 12" stroke-width="2.1"/>
+  </g>
 </svg>
