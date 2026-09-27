@@ -187,6 +187,7 @@ export function VisualBuilder() {
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [message, setMessage] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingTextRef = useRef<{current: Selection; value: string} | null>(null);
   const selectedRef = useRef<Selection | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -199,20 +200,36 @@ export function VisualBuilder() {
     setEnabled(true);
     document.documentElement.classList.add('visual-builder-enabled');
 
+    const persistText = async () => {
+      const pending = pendingTextRef.current;
+      if (!pending?.current.field) return;
+      pendingTextRef.current = null;
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+
+      try {
+        await patchField(
+          pending.current.documentId,
+          pending.current.documentType,
+          pending.current.field,
+          stegaClean(pending.value),
+        );
+        setSaveState('saved');
+        setMessage('Alteração salva como rascunho.');
+      } catch (error) {
+        setSaveState('error');
+        setMessage(error instanceof Error ? error.message : 'Erro ao salvar');
+      }
+    };
+
     const saveText = (current: Selection, value: string) => {
       if (!current.field) return;
+      pendingTextRef.current = {current, value};
       if (debounceRef.current) clearTimeout(debounceRef.current);
       setSaveState('saving');
-      debounceRef.current = setTimeout(async () => {
-        try {
-          await patchField(current.documentId, current.documentType, current.field!, stegaClean(value));
-          setSaveState('saved');
-          setMessage('Alteração salva como rascunho.');
-        } catch (error) {
-          setSaveState('error');
-          setMessage(error instanceof Error ? error.message : 'Erro ao salvar');
-        }
-      }, 450);
+      debounceRef.current = setTimeout(() => void persistText(), 350);
     };
 
     const clickHandler = (event: Event) => {
@@ -229,6 +246,7 @@ export function VisualBuilder() {
 
       const previous = selectedRef.current?.element;
       if (previous && previous !== editable) {
+        void persistText();
         previous.removeAttribute('contenteditable');
         previous.classList.remove('vb-selected');
       }
@@ -254,8 +272,16 @@ export function VisualBuilder() {
       saveText(current, target.innerText || target.textContent || '');
     };
 
+    const focusOutHandler = (event: FocusEvent) => {
+      const target = event.target;
+      if (target instanceof HTMLElement && target.isContentEditable) {
+        void persistText();
+      }
+    };
+
     const keyHandler = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
+      void persistText();
       const current = selectedRef.current;
       if (current?.element) {
         current.element.removeAttribute('contenteditable');
@@ -348,15 +374,18 @@ export function VisualBuilder() {
 
     window.addEventListener('click', clickHandler, true);
     document.addEventListener('input', inputHandler, true);
+    document.addEventListener('focusout', focusOutHandler, true);
     window.addEventListener('keydown', keyHandler, true);
 
     return () => {
       observer.disconnect();
       window.removeEventListener('click', clickHandler, true);
       document.removeEventListener('input', inputHandler, true);
+      document.removeEventListener('focusout', focusOutHandler, true);
       window.removeEventListener('keydown', keyHandler, true);
       document.documentElement.classList.remove('visual-builder-enabled');
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (pendingTextRef.current) void persistText();
     };
   }, []);
 
@@ -364,6 +393,7 @@ export function VisualBuilder() {
 
   const closeSelection = () => {
     const current = selectedRef.current;
+    if (current?.element.isContentEditable) current.element.blur();
     current?.element.removeAttribute('contenteditable');
     current?.element.classList.remove('vb-selected');
     setSelection(null);

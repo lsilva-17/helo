@@ -1,4 +1,5 @@
 import {stegaClean} from 'next-sanity';
+import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
 
 export const revalidate = 60;
@@ -158,6 +159,7 @@ function imageStyle(settings: Settings, prefix: 'hero' | 'treatment' | 'case') {
 }
 
 export default async function HomePage() {
+  const {isEnabled: isDraftMode} = await draftMode();
   const {settings, treatments, cases} = await getContent();
   const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = cleanUrl(settings.brandLogoUrl) || '/brand-hv.svg';
   const fallbackTreatments: Treatment[] = [
@@ -237,7 +239,7 @@ export default async function HomePage() {
 
     <footer className="site-footer"><div className="container footer-inner" style={typographyStyle(settings, 'footerStyle', 'sans', 14)}><p><span {...siteText(settings, 'professionalName', 'Rodapé · nome', 'footerStyle')}>{settings.professionalName}</span>{settings.cro ? ` · ${settings.cro}` : ''}</p><p {...siteText(settings, 'footerLocation', 'Rodapé · localização', 'footerStyle')}>{settings.footerLocation}</p></div></footer>
 
-    <SanityLive />
+    {!isDraftMode && <SanityLive />}
 
     <aside className="social-float" aria-label="Canais de contato">
       <a className="social-float-link social-float-whatsapp" href={wa} target="_blank" rel="noreferrer" aria-label="Falar com a Dra. Heloisa no WhatsApp" title="WhatsApp">
