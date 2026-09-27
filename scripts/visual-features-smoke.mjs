@@ -86,6 +86,18 @@ try {
     if (!instagramHref || !/instagram\.com/i.test(instagramHref)) throw new Error('Floating Instagram link is invalid.');
   }
 
+  const heroTitle = page.locator('[data-vb-font-field="heroTitleFont"]').first();
+  if (await heroTitle.count()) {
+    const fontFamily = await heroTitle.evaluate((el) => getComputedStyle(el).fontFamily);
+    if (!fontFamily) throw new Error('Hero title font is not computed.');
+  }
+
+  const brandLogo = page.locator('[data-vb-image-field="brandLogo"]').first();
+  if (await brandLogo.count()) {
+    const src = await brandLogo.getAttribute('src');
+    if (!src) throw new Error('Brand logo does not expose a source.');
+  }
+
   const apiResponse = await context.request.get(`${baseUrl}/api/visual-customization`);
   if (!apiResponse.ok()) throw new Error(`/api/visual-customization returned HTTP ${apiResponse.status()}`);
   const payload = await apiResponse.json();
