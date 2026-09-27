@@ -26,11 +26,11 @@ export async function SiteStyleBridge() {
   const rules: string[] = [];
   for (const key of typographyKeys) {
     const color = safeColor(settings[`${key}Color`]);
-    if (color) rules.push(`[data-vb-font-field="${key}Font"]{color:${color}!important}`);
+    if (color) rules.push(`body.brandbook-preview [data-vb-font-field="${key}Font"][data-vb-font-field="${key}Font"]{color:${color}!important}`);
   }
   for (const key of sectionKeys) {
     const background = safeColor(settings[`${key}Background`]);
-    if (background) rules.push(`[data-vb-width-field="${key}Width"]{background-color:${background}!important}`);
+    if (background) rules.push(`body.brandbook-preview [data-vb-width-field="${key}Width"][data-vb-width-field="${key}Width"]{background-color:${background}!important;background-image:none!important}`);
   }
 
   if (!rules.length) return null;
