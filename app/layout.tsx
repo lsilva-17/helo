@@ -33,6 +33,7 @@ const visualCapabilities = [
   'editable-fallback-treatment-cards',
   'presentation-stable-editing',
   'matched-block-heights',
+  'floating-social-links',
 ].join(' ');
 
 export default async function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
