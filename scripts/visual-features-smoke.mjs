@@ -12,6 +12,7 @@ const expectedCapabilities = [
   'text-direct-resize',
   'editable-fallback-treatment-cards',
   'matched-block-heights',
+  'floating-social-links',
 ];
 
 const browser = await chromium.launch({headless: true});
@@ -73,6 +74,16 @@ try {
     if (heights.length > 1 && Math.max(...heights) - Math.min(...heights) > 2) {
       throw new Error(`Treatment cards are not height-matched: ${heights.join(', ')}`);
     }
+  }
+
+  const socialLinks = page.locator('.social-float-link');
+  if (await socialLinks.count() < 1) throw new Error('Floating social links are missing.');
+  const whatsappHref = await page.locator('.social-float-whatsapp').getAttribute('href');
+  if (!whatsappHref || !whatsappHref.includes('wa.me/')) throw new Error('Floating WhatsApp link is invalid.');
+  const instagramLink = page.locator('.social-float-instagram');
+  if (await instagramLink.count()) {
+    const instagramHref = await instagramLink.getAttribute('href');
+    if (!instagramHref || !/instagram\.com/i.test(instagramHref)) throw new Error('Floating Instagram link is invalid.');
   }
 
   const apiResponse = await context.request.get(`${baseUrl}/api/visual-customization`);
