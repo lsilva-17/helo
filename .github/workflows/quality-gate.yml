@@ -199,6 +199,7 @@ jobs:
             .checks.publicQuery.ok == true and
             .checks.tokenConfigured.ok == true and
             .checks.authenticatedQuery.ok == true and
+            .checks.writeTokenConfigured.ok == true and
             .deployment.commit == $sha
           ' /tmp/sanity-diagnostics.json
           echo "Sanity preview diagnostics API passed."
