@@ -34,6 +34,7 @@ const layoutFields = [
 ];
 
 const styleFields = typographyKeys.flatMap((key) => [`${key}Font`, `${key}Size`, `${key}Align`, `${key}Color`]);
+styleFields.push('pageBackground');
 
 const allowedFields: Record<string, Set<string>> = {
   siteSettings: new Set([...contentFields, ...layoutFields, ...styleFields]),
