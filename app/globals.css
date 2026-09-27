@@ -633,3 +633,36 @@ body.brandbook-preview .page-sections {
 body.brandbook-preview .page-sections > [data-vb-section] {
   padding-block: 0 !important;
 }
+
+
+/* Treatment cards: the upper area is an image slot; descriptive copy stays below. */
+body.brandbook-preview .gallery-media-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 25px 25px 0 0;
+  background: linear-gradient(135deg,#EFE4DA,#D9C2AE);
+}
+body.brandbook-preview .gallery-media-shell .gallery-media {
+  display: block;
+  width: 100%;
+  border-radius: 0;
+}
+body.brandbook-preview .gallery-media-empty {
+  opacity: .58;
+  object-fit: cover;
+}
+body.brandbook-preview .gallery-image-hint {
+  position: absolute;
+  inset: auto 0 18px;
+  text-align: center;
+  color: #8A7467;
+  font: 600 12px/1 'Inter',Arial,sans-serif;
+  letter-spacing: .04em;
+  pointer-events: none;
+}
+html:not(.visual-builder-enabled) body.brandbook-preview .gallery-image-hint {
+  display: none;
+}
+.visual-builder-enabled body.brandbook-preview .gallery-media-shell:hover .gallery-image-hint {
+  color: #2F2B2A;
+}
