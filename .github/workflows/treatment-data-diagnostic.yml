@@ -1,0 +1,14 @@
+name: Treatment Data Diagnostic
+on:
+  push:
+    branches: [main]
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect published treatment documents
+        run: |
+          set -euo pipefail
+          query='*[_type=="treatment"]|order(order asc){_id,title,featured,order,"hasImage":defined(image.asset),"imageUrl":image.asset->url}'
+          encoded=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$query")
+          curl -fsSL "https://f9ampmu2.api.sanity.io/v2026-09-01/data/query/production?query=$encoded" | jq '.result'
