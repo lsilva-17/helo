@@ -24,6 +24,8 @@ export async function SiteStyleBridge() {
   }
 
   const rules: string[] = [];
+  const pageBackground = safeColor(settings.pageBackground);
+  if (pageBackground) rules.push(`body.brandbook-preview .page-sections{background-color:${pageBackground}!important}`);
   for (const key of typographyKeys) {
     const color = safeColor(settings[`${key}Color`]);
     if (color) rules.push(`body.brandbook-preview [data-vb-font-field="${key}Font"][data-vb-font-field="${key}Font"]{color:${color}!important}`);
