@@ -34,7 +34,7 @@ const contentQuery = `{
 }`;
 
 const defaultSectionOrder = ['hero', 'about', 'treatments', 'cases', 'contact'];
-const fallbackTreatmentIds = new Set(['facetas', 'clareamento', 'avaliacao']);
+const fallbackTreatmentIds = new Set(['facetas', 'clareamento', 'estetica-facial']);
 const fontStacks: Record<string, string> = {
   editorial: "'Cormorant Garamond', Georgia, serif",
   sans: "'Inter', Arial, sans-serif",
@@ -165,8 +165,17 @@ export default async function HomePage() {
   const fallbackTreatments: Treatment[] = [
     {_id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.'},
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
-    {_id: 'avaliacao', title: 'Avaliação estética', summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.'},
+    {_id: 'estetica-facial', title: 'Estética facial', summary: 'Procedimentos estéticos planejados para harmonizar o sorriso com os traços e proporções do rosto.'},
   ];
+  const displayedTreatments = treatments.slice(0, 3);
+  for (const fallback of fallbackTreatments) {
+    if (displayedTreatments.length >= 3) break;
+    const alreadyPresent = displayedTreatments.some((item) =>
+      stegaClean(item._id) === fallback._id ||
+      stegaClean(item.title).trim().toLowerCase() === fallback.title.toLowerCase()
+    );
+    if (!alreadyPresent) displayedTreatments.push(fallback);
+  }
 
   const heroLayout = sectionLayout(settings, 'hero', 'Hero'); const aboutLayout = sectionLayout(settings, 'about', 'Sobre'); const treatmentsLayout = sectionLayout(settings, 'treatments', 'Tratamentos'); const casesLayout = sectionLayout(settings, 'cases', 'Casos'); const contactLayout = sectionLayout(settings, 'contact', 'Contato');
 
@@ -211,7 +220,7 @@ export default async function HomePage() {
         <span className="eyebrow" {...siteText(settings, 'treatmentsEyebrow', 'Tratamentos · chamada curta', 'eyebrowStyle')} style={typographyStyle(settings, 'eyebrowStyle', 'sans', 12)}>{settings.treatmentsEyebrow}</span>
         <h2 className="section-title" {...siteText(settings, 'treatmentsTitle', 'Tratamentos · título', 'treatmentsTitle')} style={typographyStyle(settings, 'treatmentsTitle', 'editorial', 56)}>{settings.treatmentsTitle}</h2>
         <p className="section-copy" {...siteText(settings, 'treatmentsDescription', 'Tratamentos · descrição', 'treatmentsDescription')} style={typographyStyle(settings, 'treatmentsDescription', 'sans', 16)}>{settings.treatmentsDescription}</p>
-        <div className="gallery-grid">{(treatments.length ? treatments : fallbackTreatments).map((item) => { const imageUrl = cleanUrl(item.imageUrl); const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); return <article className="gallery-card" key={item._id}>
+        <div className="gallery-grid">{displayedTreatments.map((item) => { const imageUrl = cleanUrl(item.imageUrl); const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); return <article className="gallery-card" key={item._id}>
           <div className="gallery-media-shell">
             <img className={`gallery-media${imageUrl ? '' : ' gallery-media-empty'}`} src={imageUrl || '/treatment-image-placeholder.svg'} alt={imageUrl ? stegaClean(item.title) : ''} {...imageProps} style={imageStyle(settings, 'treatment')} />
             {!imageUrl && <span className="gallery-image-hint" aria-hidden="true">Adicionar imagem</span>}
