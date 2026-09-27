@@ -88,8 +88,42 @@ try {
 
   const heroTitle = page.locator('[data-vb-font-field="heroTitleFont"]').first();
   if (await heroTitle.count()) {
-    const fontFamily = await heroTitle.evaluate((el) => getComputedStyle(el).fontFamily);
-    if (!fontFamily) throw new Error('Hero title font is not computed.');
+    await heroTitle.evaluate((el) => {
+      el.style.fontFamily = 'Arial, sans-serif';
+      el.style.fontSize = '42px';
+      el.style.color = 'rgb(17, 34, 51)';
+    });
+    const heroComputed = await heroTitle.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {fontFamily: style.fontFamily, fontSize: style.fontSize, color: style.color};
+    });
+    if (!/Arial/i.test(heroComputed.fontFamily)) throw new Error(`Brandbook blocked CMS font override: ${heroComputed.fontFamily}`);
+    if (heroComputed.fontSize !== '42px') throw new Error(`Brandbook blocked CMS font-size override: ${heroComputed.fontSize}`);
+    if (heroComputed.color !== 'rgb(17, 34, 51)') throw new Error(`Brandbook blocked CMS text-color override: ${heroComputed.color}`);
+  }
+
+  const heroLayout = page.locator('[data-vb-width-field="heroWidth"]').first();
+  if (await heroLayout.count()) {
+    await heroLayout.evaluate((el) => {
+      el.style.background = 'rgb(68, 85, 102)';
+      el.style.backgroundImage = 'none';
+    });
+    const background = await heroLayout.evaluate((el) => getComputedStyle(el).backgroundColor);
+    if (background !== 'rgb(68, 85, 102)') throw new Error(`Brandbook blocked CMS section background override: ${background}`);
+  }
+
+  const primaryButton = page.locator('.btn-primary[data-vb-field]').first();
+  if (await primaryButton.count()) {
+    await primaryButton.evaluate((el) => {
+      el.style.backgroundColor = 'rgb(85, 68, 51)';
+      el.style.color = 'rgb(246, 241, 235)';
+    });
+    const buttonComputed = await primaryButton.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {backgroundColor: style.backgroundColor, color: style.color};
+    });
+    if (buttonComputed.backgroundColor !== 'rgb(85, 68, 51)') throw new Error(`Brandbook blocked button background override: ${buttonComputed.backgroundColor}`);
+    if (buttonComputed.color !== 'rgb(246, 241, 235)') throw new Error(`Brandbook blocked button text-color override: ${buttonComputed.color}`);
   }
 
   const brandLogo = page.locator('[data-vb-image-field="brandLogo"]').first();
