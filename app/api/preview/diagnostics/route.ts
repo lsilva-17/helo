@@ -45,7 +45,7 @@ export async function GET() {
 
   const tokenConfigured = Boolean(token);
   const writeTokenConfigured = Boolean(writeToken);
-  const ok = publicQuery && tokenConfigured && authenticatedQuery;
+  const ok = publicQuery && tokenConfigured && authenticatedQuery && writeTokenConfigured;
 
   return NextResponse.json(
     {
