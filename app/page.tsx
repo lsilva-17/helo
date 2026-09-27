@@ -139,7 +139,7 @@ function imageStyle(settings: Settings, prefix: 'hero' | 'treatment' | 'case') {
   const fallbackHeight = prefix === 'hero' ? 450 : prefix === 'treatment' ? 260 : 320;
   const base = {height: `${n(settings, `${prefix}ImageHeight`, fallbackHeight)}px`, objectFit: 'cover' as const, objectPosition: `${n(settings, `${prefix}ImagePositionX`, 50)}% ${n(settings, `${prefix}ImagePositionY`, prefix === 'hero' ? 10 : 50)}%`};
   if (prefix !== 'hero') return base;
-  return {...base, width: `${n(settings, 'heroImageWidth', 100)}%`, transform: `translate(${n(settings, 'heroImageOffsetX', 0)}px, ${n(settings, 'heroImageOffsetY', 0)}px)`, marginInline: 'auto'};
+  return {...base, height: '100%', minHeight: `${n(settings, 'heroImageHeight', fallbackHeight)}px`, width: `${n(settings, 'heroImageWidth', 100)}%`, transform: `translate(${n(settings, 'heroImageOffsetX', 0)}px, ${n(settings, 'heroImageOffsetY', 0)}px)`, marginInline: 'auto'};
 }
 
 export default async function HomePage() {
