@@ -20,6 +20,10 @@ function publishableContent(document: Record<string, unknown>) {
   return content;
 }
 
+function publishedIdFromDraft(draftId: string) {
+  return draftId.replace(/^drafts\./, '');
+}
+
 export async function POST(request: NextRequest) {
   const {isEnabled} = await draftMode();
 
@@ -41,13 +45,25 @@ export async function POST(request: NextRequest) {
 
     const draftId = `drafts.${publishedId}`;
 
-    const draft = await mutationClient.fetch<Record<string, unknown> | null>(
-      '*[_id == $draftId][0]',
-      {draftId},
-      {perspective: 'raw'},
-    );
+    const [primaryDraft, visualDrafts] = await Promise.all([
+      mutationClient.fetch<Record<string, unknown> | null>(
+        '*[_id == $draftId][0]',
+        {draftId},
+        {perspective: 'raw'},
+      ),
+      mutationClient.fetch<Record<string, unknown>[]>(
+        '*[_id match "drafts.*" && _type in ["treatment","caseStudy"]]{...}',
+        {},
+        {perspective: 'raw'},
+      ),
+    ]);
 
-    if (!draft) {
+    const drafts = [
+      ...(primaryDraft ? [primaryDraft] : []),
+      ...visualDrafts.filter((draft) => draft._id !== draftId),
+    ];
+
+    if (!drafts.length) {
       return NextResponse.json(
         {
           error: 'Nenhuma alteração pendente foi encontrada. Aguarde o indicador “Salvo” no construtor visual e tente novamente.',
@@ -58,22 +74,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const publishedDocument = {
-      ...publishableContent(draft),
-      _id: publishedId,
-      _type: String(draft._type || 'siteSettings'),
-    };
+    let transaction = mutationClient.transaction();
 
-    const result = await mutationClient
-      .transaction()
-      .createOrReplace(publishedDocument)
-      .delete(draftId)
-      .commit();
+    for (const draft of drafts) {
+      const sourceDraftId = String(draft._id || '');
+      if (!sourceDraftId.startsWith('drafts.')) continue;
+      const targetId = publishedIdFromDraft(sourceDraftId);
+      const publishedDocument = {
+        ...publishableContent(draft),
+        _id: targetId,
+        _type: String(draft._type || 'siteSettings'),
+      };
+
+      transaction = transaction
+        .createOrReplace(publishedDocument)
+        .delete(sourceDraftId);
+    }
+
+    const result = await transaction.commit();
 
     return NextResponse.json({
       ok: true,
       publishedId,
       draftId,
+      publishedDocuments: drafts.map((draft) => publishedIdFromDraft(String(draft._id || ''))),
       transactionId: result.transactionId,
     });
   } catch (error) {
