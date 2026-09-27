@@ -211,8 +211,11 @@ export default async function HomePage() {
         <span className="eyebrow" {...siteText(settings, 'treatmentsEyebrow', 'Tratamentos · chamada curta', 'eyebrowStyle')} style={typographyStyle(settings, 'eyebrowStyle', 'sans', 12)}>{settings.treatmentsEyebrow}</span>
         <h2 className="section-title" {...siteText(settings, 'treatmentsTitle', 'Tratamentos · título', 'treatmentsTitle')} style={typographyStyle(settings, 'treatmentsTitle', 'editorial', 56)}>{settings.treatmentsTitle}</h2>
         <p className="section-copy" {...siteText(settings, 'treatmentsDescription', 'Tratamentos · descrição', 'treatmentsDescription')} style={typographyStyle(settings, 'treatmentsDescription', 'sans', 16)}>{settings.treatmentsDescription}</p>
-        <div className="gallery-grid">{(treatments.length ? treatments : fallbackTreatments).map((item) => { const imageUrl = cleanUrl(item.imageUrl); const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); return <article className="gallery-card" key={item._id}>
-          {imageUrl ? <img className="gallery-media" src={imageUrl} alt={stegaClean(item.title)} {...(editable ? imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment') : {})} style={imageStyle(settings, 'treatment')} /> : <div className="gallery-placeholder">{item.title}</div>}
+        <div className="gallery-grid">{(treatments.length ? treatments : fallbackTreatments).map((item) => { const imageUrl = cleanUrl(item.imageUrl); const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); return <article className="gallery-card" key={item._id}>
+          <div className="gallery-media-shell">
+            <img className={`gallery-media${imageUrl ? '' : ' gallery-media-empty'}`} src={imageUrl || '/treatment-image-placeholder.svg'} alt={imageUrl ? stegaClean(item.title) : ''} {...imageProps} style={imageStyle(settings, 'treatment')} />
+            {!imageUrl && <span className="gallery-image-hint" aria-hidden="true">Adicionar imagem</span>}
+          </div>
           <div className="gallery-body"><h3 {...(editable ? documentText(settings, item._id, 'treatment', 'title', 'Tratamento · título', 'treatmentCardTitleStyle') : {})} style={typographyStyle(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{item.title}</h3><p {...(editable ? documentText(settings, item._id, 'treatment', 'summary', 'Tratamento · descrição', 'treatmentCardBodyStyle') : {})} style={typographyStyle(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{item.summary}</p></div>
         </article>; })}</div>
       </div></section>
