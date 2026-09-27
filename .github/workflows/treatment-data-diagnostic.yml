@@ -16,20 +16,7 @@ jobs:
           query2='*[_type=="sanity.imageAsset"]|order(_createdAt desc)[0...100]{_id,_createdAt,originalFilename,"url":url,metadata{dimensions{width,height}}}'
           encoded2=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$query2")
           curl -fsSL "https://f9ampmu2.api.sanity.io/v2026-09-01/data/query/production?query=$encoded2" | jq '.result'
-          python3 - <<'PY'
-          import base64, io, urllib.request
-          from PIL import Image
-          urls = {
-            "faceta_named":"https://cdn.sanity.io/images/f9ampmu2/production/0c39b530fdf280dc77963e5d5f1026d2eed38bed-4494x2843.jpg",
-            "clareamento_named":"https://cdn.sanity.io/images/f9ampmu2/production/91a988d6b2d139dc45f8e6ff0126b57ad50015e7-988x790.jpg",
-            "one_square":"https://cdn.sanity.io/images/f9ampmu2/production/65ec9efb1820157009da6334f6aa66f81d64eb0d-4610x4610.jpg",
-            "photo_output":"https://cdn.sanity.io/images/f9ampmu2/production/05e6f7cffcd4165df00cb5c3f5bddf74ecf140b9-2560x2560.webp",
-            "recent_capture":"https://cdn.sanity.io/images/f9ampmu2/production/d005f65babcfa4faa2fa18141e1fbed8df46973f-417x411.png",
-          }
-          for name,url in urls.items():
-              raw=urllib.request.urlopen(url).read()
-              im=Image.open(io.BytesIO(raw)).convert("RGB")
-              im.thumbnail((160,160))
-              out=io.BytesIO(); im.save(out,format="JPEG",quality=70)
-              print("THUMB",name,base64.b64encode(out.getvalue()).decode())
-          PY
+          echo "Tools:"
+          which magick || true
+          which convert || true
+          which ffmpeg || true
