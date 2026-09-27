@@ -11,6 +11,7 @@ const expectedCapabilities = [
   'text-box-width',
   'text-direct-resize',
   'editable-fallback-treatment-cards',
+  'matched-block-heights',
 ];
 
 const browser = await chromium.launch({headless: true});
@@ -50,6 +51,29 @@ try {
   await page.locator('body').waitFor({state: 'visible', timeout: 10_000});
   const persistedTheme = await page.locator('html').getAttribute('data-theme');
   if (persistedTheme !== changedTheme) throw new Error('Theme choice did not persist after reload.');
+
+  const heroCard = page.locator('.hero-card');
+  const heroPhoto = page.locator('.hero-photo');
+  if (await heroCard.count() && await heroPhoto.count()) {
+    const [cardBox, photoBox] = await Promise.all([heroCard.boundingBox(), heroPhoto.boundingBox()]);
+    if (!cardBox || !photoBox) throw new Error('Unable to measure hero blocks.');
+    if (Math.abs(cardBox.height - photoBox.height) > 2) {
+      throw new Error(`Hero blocks are not height-matched: text=${cardBox.height}px image=${photoBox.height}px`);
+    }
+  }
+
+  const galleryCards = page.locator('.gallery-card');
+  const galleryCount = await galleryCards.count();
+  if (galleryCount > 1) {
+    const heights = [];
+    for (let i = 0; i < galleryCount; i++) {
+      const box = await galleryCards.nth(i).boundingBox();
+      if (box) heights.push(Math.round(box.height));
+    }
+    if (heights.length > 1 && Math.max(...heights) - Math.min(...heights) > 2) {
+      throw new Error(`Treatment cards are not height-matched: ${heights.join(', ')}`);
+    }
+  }
 
   const apiResponse = await context.request.get(`${baseUrl}/api/visual-customization`);
   if (!apiResponse.ok()) throw new Error(`/api/visual-customization returned HTTP ${apiResponse.status()}`);
