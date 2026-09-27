@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo',
   description:
     'Odontologia estética com atendimento personalizado em São Paulo. Conheça o trabalho da Dra. Heloisa Veiga e agende uma avaliação.',
+  icons: {
+    icon: [{url: '/favicon.png?v=4', type: 'image/png', sizes: '128x128'}],
+    shortcut: '/favicon.png?v=4',
+    apple: '/apple-touch-icon.png?v=4',
+  },
 };
 
 const visualCapabilities = [
