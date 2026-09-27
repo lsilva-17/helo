@@ -281,7 +281,7 @@ body.brandbook-preview .hero {
 }
 body.brandbook-preview .hero-visual {
   min-height: 560px;
-  border-radius: 34px;
+  border-radius: 0;
   padding: clamp(1rem,2vw,1.6rem);
   background:
     radial-gradient(circle at 14% 18%, rgba(255,255,255,.78), transparent 22rem),
@@ -300,7 +300,7 @@ body.brandbook-preview .hero-inner {
 body.brandbook-preview .hero-card {
   align-self: center;
   padding: clamp(2rem,4.5vw,4.2rem);
-  border-radius: 28px;
+  border-radius: 0;
   background: rgba(255,253,252,.78);
   border: 1px solid rgba(217,194,174,.55);
   box-shadow: 0 18px 60px rgba(47,43,42,.06);
@@ -360,12 +360,12 @@ html[data-theme="dark"] body.brandbook-preview .nav a {
 }
 
 body.brandbook-preview .hero-photo {
-  border-radius: 26px;
+  border-radius: 0;
   border: 1px solid rgba(138,116,103,.18);
   background: #D9C2AE;
   box-shadow: 0 18px 45px rgba(47,43,42,.09);
 }
-body.brandbook-preview .hero-photo img { border-radius: 25px; }
+body.brandbook-preview .hero-photo img { border-radius: 0; }
 
 body.brandbook-preview .btn {
   border-radius: 999px;
@@ -402,7 +402,7 @@ body.brandbook-preview .section-title {
 }
 body.brandbook-preview .highlight-box,
 body.brandbook-preview .contact-card {
-  border-radius: 32px;
+  border-radius: 0;
   border-color: rgba(138,116,103,.18);
   box-shadow: 0 18px 55px rgba(47,43,42,.055);
 }
@@ -413,7 +413,7 @@ body.brandbook-preview .highlight-box {
 body.brandbook-preview .trust-grid > div {
   background: #EFE4DA;
   border: 1px solid rgba(217,194,174,.75);
-  border-radius: 22px;
+  border-radius: 0;
 }
 body.brandbook-preview .trust-grid strong {
   color: #C78F7E;
@@ -422,7 +422,7 @@ body.brandbook-preview .trust-grid strong {
 body.brandbook-preview .gallery-grid { gap: 1.5rem; }
 body.brandbook-preview .gallery-card,
 body.brandbook-preview .case-card {
-  border-radius: 26px;
+  border-radius: 0;
   border-color: rgba(138,116,103,.18);
   background: #FFFDFC;
   box-shadow: 0 14px 45px rgba(47,43,42,.055);
@@ -433,7 +433,7 @@ html[data-theme="dark"] body.brandbook-preview .case-card {
 }
 body.brandbook-preview .gallery-media,
 body.brandbook-preview .gallery-placeholder {
-  border-radius: 25px 25px 0 0;
+  border-radius: 0;
 }
 body.brandbook-preview .gallery-placeholder {
   background: linear-gradient(135deg,#EFE4DA,#D9C2AE);
