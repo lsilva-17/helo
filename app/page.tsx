@@ -29,7 +29,7 @@ type Content = {settings: Settings | null; treatments: Treatment[]; cases: CaseS
 
 const contentQuery = `{
   "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url},
-  "treatments": *[_type == "treatment" && (featured == true || _id in ["facetas","clareamento","estetica-facial"])] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
+  "treatments": *[_type == "treatment" && featured == true] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
   "cases": *[_type == "caseStudy" && featured == true] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}
 }`;
 
@@ -167,6 +167,12 @@ export default async function HomePage() {
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
     {_id: 'estetica-facial', title: 'Estética facial', summary: 'Procedimentos estéticos planejados para harmonizar o sorriso com os traços e proporções do rosto.'},
   ];
+
+  const mobileTreatmentFallbackImages: Record<string, string> = {
+    facetas: 'https://cdn.sanity.io/images/f9ampmu2/production/0c39b530fdf280dc77963e5d5f1026d2eed38bed-4494x2843.jpg',
+    clareamento: 'https://cdn.sanity.io/images/f9ampmu2/production/91a988d6b2d139dc45f8e6ff0126b57ad50015e7-988x790.jpg',
+    'estetica-facial': 'https://cdn.sanity.io/images/f9ampmu2/production/a718460cbcd66472107b7d0f53cabafe1638d734-1922x2560.webp',
+  };
   const displayedTreatments: Treatment[] = treatments
     .slice(0, 3)
     .map((item): Treatment => {
@@ -232,7 +238,10 @@ export default async function HomePage() {
         <p className="section-copy" {...siteText(settings, 'treatmentsDescription', 'Tratamentos · descrição', 'treatmentsDescription')} style={typographyStyle(settings, 'treatmentsDescription', 'sans', 16)}>{settings.treatmentsDescription}</p>
         <div className="gallery-grid">{displayedTreatments.map((item) => { const imageUrl = cleanUrl(item.imageUrl); const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); return <article className="gallery-card" key={item._id}>
           <div className="gallery-media-shell">
-            <img className={`gallery-media${imageUrl ? '' : ' gallery-media-empty'}`} src={imageUrl || '/treatment-image-placeholder.svg'} alt={imageUrl ? stegaClean(item.title) : ''} {...imageProps} style={imageStyle(settings, 'treatment')} />
+            <picture className="gallery-media-picture">
+              {mobileTreatmentFallbackImages[stegaClean(item._id)] && <source media="(max-width: 820px)" srcSet={mobileTreatmentFallbackImages[stegaClean(item._id)]} />}
+              <img className={`gallery-media${imageUrl ? '' : ' gallery-media-empty'}`} src={imageUrl || '/treatment-image-placeholder.svg'} alt={stegaClean(item.title)} {...imageProps} style={imageStyle(settings, 'treatment')} />
+            </picture>
             {!imageUrl && <span className="gallery-image-hint" aria-hidden="true">Adicionar imagem</span>}
           </div>
           <div className="gallery-body"><h3 {...(editable ? documentText(settings, item._id, 'treatment', 'title', 'Tratamento · título', 'treatmentCardTitleStyle') : {})} style={typographyStyle(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{item.title}</h3><p {...(editable ? documentText(settings, item._id, 'treatment', 'summary', 'Tratamento · descrição', 'treatmentCardBodyStyle') : {})} style={typographyStyle(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{item.summary}</p></div>
