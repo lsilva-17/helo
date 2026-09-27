@@ -4,13 +4,13 @@ import {useEffect} from 'react';
 
 const fallbackIds = ['facetas', 'clareamento', 'avaliacao'] as const;
 
-function bindText(element: HTMLElement | null, documentId: string, field: 'title' | 'summary', label: string, styleKey: string, defaultFont: string, defaultSize: number) {
+function bindText(element: HTMLElement | null, documentId: string, settingsDocumentId: string, field: 'title' | 'summary', label: string, styleKey: string, defaultFont: string, defaultSize: number) {
   if (!element || element.dataset.vbField) return;
   element.dataset.vbDocId = documentId;
   element.dataset.vbDocType = 'treatment';
   element.dataset.vbField = field;
   element.dataset.vbLabel = label;
-  element.dataset.vbStyleDocId = 'siteSettings';
+  element.dataset.vbStyleDocId = settingsDocumentId;
   element.dataset.vbStyleDocType = 'siteSettings';
   element.dataset.vbFontField = `${styleKey}Font`;
   element.dataset.vbSizeField = `${styleKey}Size`;
@@ -23,6 +23,7 @@ function bindText(element: HTMLElement | null, documentId: string, field: 'title
 
 function bindFallbackCards() {
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.gallery-card'));
+  const settingsDocumentId = document.querySelector<HTMLElement>('[data-vb-site-settings-id]')?.dataset.vbSiteSettingsId || 'siteSettings';
   if (cards.length !== 3) return;
 
   cards.forEach((card, index) => {
@@ -32,8 +33,8 @@ function bindFallbackCards() {
     const summary = card.querySelector<HTMLElement>('.gallery-body p');
     if (title?.dataset.vbField || summary?.dataset.vbField) return;
 
-    bindText(title, documentId, 'title', `Tratamento ${index + 1} · título`, 'treatmentCardTitleStyle', 'editorial', 26);
-    bindText(summary, documentId, 'summary', `Tratamento ${index + 1} · descrição`, 'treatmentCardBodyStyle', 'sans', 16);
+    bindText(title, documentId, settingsDocumentId, 'title', `Tratamento ${index + 1} · título`, 'treatmentCardTitleStyle', 'editorial', 26);
+    bindText(summary, documentId, settingsDocumentId, 'summary', `Tratamento ${index + 1} · descrição`, 'treatmentCardBodyStyle', 'sans', 16);
   });
 }
 

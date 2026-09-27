@@ -5,6 +5,8 @@ import {createClient} from 'next-sanity';
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
 const apiVersion = '2026-09-01';
+const SITE_SETTINGS_ID = '143778fa-0f7b-4e2b-9f1b-d34bdce5907d';
+const SITE_SETTINGS_DRAFT_ID = `drafts.${SITE_SETTINGS_ID}`;
 
 type ButtonStyle = {key: string; label?: string; background?: string; text?: string};
 type TextWidth = {key: string; label?: string; width?: number};
@@ -55,10 +57,10 @@ function cleanKey(value: unknown) {
 async function getSettings(includeDraft: boolean): Promise<SiteSettings | null> {
   if (includeDraft && process.env.SANITY_API_READ_TOKEN) {
     const client = readClient();
-    const draft = await client.fetch<SiteSettings | null>(`*[_id == "drafts.siteSettings"][0]`);
+    const draft = await client.fetch<SiteSettings | null>(`*[_id == $id][0]`, {id: SITE_SETTINGS_DRAFT_ID});
     if (draft) return draft;
   }
-  return publicClient.fetch<SiteSettings | null>(`*[_id == "siteSettings"][0]`);
+  return publicClient.fetch<SiteSettings | null>(`*[_id == $id][0]`, {id: SITE_SETTINGS_ID});
 }
 
 export async function GET() {
@@ -86,14 +88,14 @@ export async function PATCH(request: Request) {
     const label = String(body.label || key).slice(0, 160);
 
     const client = writeClient();
-    const published = await client.fetch<SiteSettings | null>(`*[_id == "siteSettings"][0]`);
-    let draft = await client.fetch<SiteSettings | null>(`*[_id == "drafts.siteSettings"][0]`);
+    const published = await client.fetch<SiteSettings | null>(`*[_id == $id][0]`, {id: SITE_SETTINGS_ID});
+    let draft = await client.fetch<SiteSettings | null>(`*[_id == $id][0]`, {id: SITE_SETTINGS_DRAFT_ID});
 
     if (!draft) {
       const base = published || ({_id: 'siteSettings', _type: 'siteSettings'} as SiteSettings);
       const {_rev, _createdAt, _updatedAt, ...copy} = base as SiteSettings & {_rev?: string; _createdAt?: string; _updatedAt?: string};
       await client.createIfNotExists({...copy, _id: 'drafts.siteSettings', _type: 'siteSettings'});
-      draft = await client.fetch<SiteSettings | null>(`*[_id == "drafts.siteSettings"][0]`);
+      draft = await client.fetch<SiteSettings | null>(`*[_id == $id][0]`, {id: SITE_SETTINGS_DRAFT_ID});
     }
 
     if (kind === 'button') {

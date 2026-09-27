@@ -1,5 +1,7 @@
 import {sanityFetch} from '@/sanity/lib/live';
 
+const SITE_SETTINGS_ID = '143778fa-0f7b-4e2b-9f1b-d34bdce5907d';
+
 const typographyKeys = [
   'brandName', 'brandSubtitleStyle', 'navStyle', 'eyebrowStyle', 'buttonStyle',
   'heroTitle', 'heroDescription', 'aboutTitle', 'aboutDescription', 'trustTitleStyle', 'trustBodyStyle',
@@ -17,7 +19,7 @@ function safeColor(value: unknown) {
 export async function SiteStyleBridge() {
   let settings: Record<string, unknown> = {};
   try {
-    const response = await sanityFetch({query: '*[_type == "siteSettings"][0]{...}'});
+    const response = await sanityFetch({query: '*[_type == "siteSettings" && _id == $id][0]{...}', params: {id: SITE_SETTINGS_ID}});
     settings = (response.data || {}) as Record<string, unknown>;
   } catch {
     return null;

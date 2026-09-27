@@ -10,6 +10,7 @@ import {SyncedPublishAction} from './sanity/actions/SyncedPublishAction';
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f9ampmu2';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
 const singletonTypes = new Set(['siteSettings']);
+const SITE_SETTINGS_ID = '143778fa-0f7b-4e2b-9f1b-d34bdce5907d';
 
 const mainDocuments = defineDocuments([
   {
@@ -79,7 +80,7 @@ export default defineConfig({
               .child(
                 S.document()
                   .schemaType('siteSettings')
-                  .documentId('siteSettings')
+                  .documentId(SITE_SETTINGS_ID)
                   .title('Configurações do site'),
               ),
             S.divider(),

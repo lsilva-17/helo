@@ -3,7 +3,10 @@ import {sanityFetch, SanityLive} from '@/sanity/lib/live';
 
 export const revalidate = 60;
 
+const SITE_SETTINGS_ID = '143778fa-0f7b-4e2b-9f1b-d34bdce5907d';
+
 type Settings = {
+  _id?: string;
   professionalName?: string; brandSubtitle?: string; brandLogoUrl?: string; cro?: string; whatsapp?: string; instagram?: string; clinicAddress?: string; mapsUrl?: string;
   navAboutLabel?: string; navTreatmentsLabel?: string; navCasesLabel?: string; navContactLabel?: string;
   heroEyebrow?: string; heroTitle?: string; heroDescription?: string; heroImageUrl?: string; primaryCtaLabel?: string; instagramCtaLabel?: string;
@@ -24,7 +27,7 @@ type CaseStudy = {_id: string; title: string; description?: string; beforeUrl?: 
 type Content = {settings: Settings | null; treatments: Treatment[]; cases: CaseStudy[]};
 
 const contentQuery = `{
-  "settings": *[_type == "siteSettings"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url},
+  "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url},
   "treatments": *[_type == "treatment" && featured == true] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
   "cases": *[_type == "caseStudy" && featured == true] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}
 }`;
@@ -79,6 +82,7 @@ function whatsappLink(number?: string) {
   return `https://wa.me/${cleanNumber.replace(/\D/g, '')}?text=${encodeURIComponent('Olá, vim pelo site e gostaria de agendar uma avaliação.')}`;
 }
 function cleanUrl(value?: string) { return value ? stegaClean(value) : undefined; }
+function settingsId(settings: Settings) { return stegaClean(String(settings._id || SITE_SETTINGS_ID)).replace(/^drafts\./, ''); }
 function n(settings: Settings, field: string, fallback: number) { const value = settings[field]; return typeof value === 'number' ? value : fallback; }
 function s(settings: Settings, field: string, fallback: string) { const value = settings[field]; return typeof value === 'string' ? stegaClean(value) : fallback; }
 
@@ -89,7 +93,7 @@ function typographyStyle(settings: Settings, key: string, fallbackFont: string, 
 
 function typographyMeta(settings: Settings, key: string) {
   return {
-    'data-vb-style-doc-id': 'siteSettings', 'data-vb-style-doc-type': 'siteSettings',
+    'data-vb-style-doc-id': settingsId(settings), 'data-vb-style-doc-type': 'siteSettings',
     'data-vb-font-field': `${key}Font`, 'data-vb-size-field': `${key}Size`, 'data-vb-align-field': `${key}Align`,
     'data-vb-font-value': s(settings, `${key}Font`, 'sans'), 'data-vb-size-value': n(settings, `${key}Size`, 16), 'data-vb-align-value': s(settings, `${key}Align`, 'left'),
   };
@@ -97,7 +101,7 @@ function typographyMeta(settings: Settings, key: string) {
 
 function siteText(settings: Settings, field: string, label: string, styleKey?: string) {
   return {
-    'data-vb-doc-id': 'siteSettings', 'data-vb-doc-type': 'siteSettings', 'data-vb-field': field, 'data-vb-label': label,
+    'data-vb-doc-id': settingsId(settings), 'data-vb-doc-type': 'siteSettings', 'data-vb-field': field, 'data-vb-label': label,
     ...(styleKey ? typographyMeta(settings, styleKey) : {}),
   };
 }
@@ -123,7 +127,7 @@ function sectionLayout(settings: Settings, key: string, label: string) {
   const width = n(settings, `${key}Width`, 100); const x = n(settings, `${key}OffsetX`, 0); const y = n(settings, `${key}OffsetY`, 0); const height = n(settings, `${key}Height`, key === 'hero' ? 560 : 320);
   return {
     props: {
-      'data-vb-layout': 'true', 'data-vb-style-doc-id': 'siteSettings', 'data-vb-style-doc-type': 'siteSettings', 'data-vb-label': `${label} · layout`,
+      'data-vb-layout': 'true', 'data-vb-style-doc-id': settingsId(settings), 'data-vb-style-doc-type': 'siteSettings', 'data-vb-label': `${label} · layout`,
       'data-vb-width-field': `${key}Width`, 'data-vb-x-field': `${key}OffsetX`, 'data-vb-y-field': `${key}OffsetY`, 'data-vb-padding-field': `${key}PaddingY`, 'data-vb-block-height-field': `${key}Height`, 'data-vb-fixed-height': key === 'hero' ? 'true' : 'false',
       'data-vb-width-value': width, 'data-vb-x-value': x, 'data-vb-y-value': y, 'data-vb-padding-value': n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32), 'data-vb-block-height-value': height,
     },
@@ -135,7 +139,7 @@ function imageMeta(settings: Settings, documentId: string, documentType: string,
   const heightField = `${prefix}ImageHeight`; const positionXField = `${prefix}ImagePositionX`; const positionYField = `${prefix}ImagePositionY`;
   return {
     'data-vb-doc-id': documentId, 'data-vb-doc-type': documentType, 'data-vb-image-field': imageField, 'data-vb-label': label,
-    'data-vb-style-doc-id': 'siteSettings', 'data-vb-style-doc-type': 'siteSettings',
+    'data-vb-style-doc-id': settingsId(settings), 'data-vb-style-doc-type': 'siteSettings',
     'data-vb-height-field': heightField, 'data-vb-position-x-field': positionXField, 'data-vb-position-y-field': positionYField,
     'data-vb-height-value': n(settings, heightField, prefix === 'hero' ? 450 : prefix === 'treatment' ? 260 : 320),
     'data-vb-position-x-value': n(settings, positionXField, 50), 'data-vb-position-y-value': n(settings, positionYField, prefix === 'hero' ? 10 : 50),
@@ -166,7 +170,7 @@ export default async function HomePage() {
 
   return <>
     <header className="site-header"><div className="container header-inner">
-      <a className="brand" href="#inicio"><img className="brand-mark" src={brandLogoUrl} alt="Marca" data-vb-doc-id="siteSettings" data-vb-doc-type="siteSettings" data-vb-image-field="brandLogo" data-vb-label="Ícone da marca" style={{objectFit: 'cover'}} /><span className="brand-text">
+      <a className="brand" href="#inicio"><img className="brand-mark" src={brandLogoUrl} alt="Marca" data-vb-doc-id={settingsId(settings)} data-vb-doc-type="siteSettings" data-vb-image-field="brandLogo" data-vb-label="Ícone da marca" style={{objectFit: 'cover'}} /><span className="brand-text">
         <strong {...siteText(settings, 'professionalName', 'Nome profissional', 'brandName')} style={typographyStyle(settings, 'brandName', 'sans', 15)}>{settings.professionalName}</strong>
         <small {...siteText(settings, 'brandSubtitle', 'Subtítulo da marca', 'brandSubtitleStyle')} style={typographyStyle(settings, 'brandSubtitleStyle', 'sans', 12)}>{settings.brandSubtitle}</small>
       </span></a>
@@ -178,7 +182,7 @@ export default async function HomePage() {
       </nav>
     </div></header>
 
-    <main className="page-sections" data-vb-layout="true" data-vb-style-doc-id="siteSettings" data-vb-style-doc-type="siteSettings" data-vb-label="Fundo entre as seções" data-vb-background-field="pageBackground">
+    <main className="page-sections" data-vb-layout="true" data-vb-style-doc-id={settingsId(settings)} data-vb-site-settings-id={settingsId(settings)} data-vb-style-doc-type="siteSettings" data-vb-label="Fundo entre as seções" data-vb-background-field="pageBackground">
       <section className="hero" id="inicio" data-vb-section="hero" style={sectionOuterStyle(settings, 'hero')}><div className="container hero-visual" {...heroLayout.props} style={heroLayout.style}><div className="hero-inner">
         <div className="hero-card">
           <span className="eyebrow" {...siteText(settings, 'heroEyebrow', 'Hero · chamada curta', 'eyebrowStyle')} style={typographyStyle(settings, 'eyebrowStyle', 'sans', 12)}>{settings.heroEyebrow}</span>
@@ -187,7 +191,7 @@ export default async function HomePage() {
           <div className="hero-actions"><a className="btn btn-primary" href={wa} target="_blank" rel="noreferrer" {...siteText(settings, 'primaryCtaLabel', 'Botão · agendar avaliação', 'buttonStyle')} style={typographyStyle(settings, 'buttonStyle', 'sans', 14, 'center')}>{settings.primaryCtaLabel}</a>
           {instagram && <a className="btn btn-secondary" href={instagram} target="_blank" rel="noreferrer" {...siteText(settings, 'instagramCtaLabel', 'Botão · Instagram', 'buttonStyle')} style={typographyStyle(settings, 'buttonStyle', 'sans', 14, 'center')}>{settings.instagramCtaLabel}</a>}</div>
         </div>
-        <div className="hero-photo">{heroImageUrl && <img src={heroImageUrl} alt={`Foto de ${stegaClean(String(settings.professionalName || ''))}`} {...imageMeta(settings, 'siteSettings', 'siteSettings', 'heroImage', 'Foto principal', 'hero')} style={imageStyle(settings, 'hero')} />}</div>
+        <div className="hero-photo">{heroImageUrl && <img src={heroImageUrl} alt={`Foto de ${stegaClean(String(settings.professionalName || ''))}`} {...imageMeta(settings, settingsId(settings), 'siteSettings', 'heroImage', 'Foto principal', 'hero')} style={imageStyle(settings, 'hero')} />}</div>
       </div></div></section>
 
       <section className="section" id="sobre" data-vb-section="about" style={sectionOuterStyle(settings, 'about')}><div className="container highlight-box" {...aboutLayout.props} style={aboutLayout.style}>

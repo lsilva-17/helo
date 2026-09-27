@@ -326,7 +326,10 @@ export function VisualBuilder() {
 
           setSaveState('saving');
           try {
-            await patchField('siteSettings', 'siteSettings', 'sectionOrder', visualOrder);
+            const settingsDocumentId = section.querySelector<HTMLElement>('[data-vb-style-doc-type="siteSettings"]')?.dataset.vbStyleDocId
+              || document.querySelector<HTMLElement>('[data-vb-site-settings-id]')?.dataset.vbSiteSettingsId
+              || 'siteSettings';
+            await patchField(settingsDocumentId, 'siteSettings', 'sectionOrder', visualOrder);
             setSaveState('saved');
             setMessage('Nova ordem salva como rascunho.');
           } catch (error) {
