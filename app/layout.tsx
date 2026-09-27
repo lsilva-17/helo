@@ -39,7 +39,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
 
   return (
     <html lang="pt-BR">
-      <body data-visual-capabilities={visualCapabilities}>
+      <body className="brandbook-preview" data-visual-capabilities={visualCapabilities}>
         <SiteStyleBridge />
         <VisualCustomizationBridge />
         {children}
