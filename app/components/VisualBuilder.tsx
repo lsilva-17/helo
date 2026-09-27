@@ -44,7 +44,7 @@ type StyleKind = 'font' | 'size' | 'align' | 'color' | 'background' | 'width' | 
 
 const fontStacks: Record<string, string> = {
   editorial: "'Cormorant Garamond', Georgia, serif",
-  sans: "'Manrope', Arial, sans-serif",
+  sans: "'Inter', Arial, sans-serif",
   classic: "Georgia, 'Times New Roman', serif",
   arial: 'Arial, Helvetica, sans-serif',
   roboto: "'Roboto', Arial, sans-serif",
@@ -495,7 +495,7 @@ export function VisualBuilder() {
               <span>Fonte</span>
               <select value={selection.fontValue || 'sans'} onChange={(event) => updateStyle(selection.fontField, event.target.value, 'font')}>
                 <option value="editorial">Cormorant Garamond</option>
-                <option value="sans">Manrope</option>
+                <option value="sans">Inter (padrão da marca)</option>
                 <option value="classic">Georgia</option>
                 <option value="arial">Arial</option>
                 <option value="roboto">Roboto</option>

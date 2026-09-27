@@ -3,7 +3,7 @@ import { defineField, defineType } from 'sanity';
 const fontOptions = {
   list: [
     { title: 'Cormorant Garamond', value: 'editorial' },
-    { title: 'Manrope', value: 'sans' },
+    { title: 'Inter (padrão da marca)', value: 'sans' },
     { title: 'Georgia', value: 'classic' },
     { title: 'Arial', value: 'arial' },
     { title: 'Roboto', value: 'roboto' },
