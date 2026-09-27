@@ -612,10 +612,23 @@ body.brandbook-preview .gallery-body {
 .visual-builder-enabled .social-float { right: 18px; bottom: 88px; }
 
 @media (max-width: 520px) {
-  .social-float { right: 14px; bottom: 14px; gap: 8px; }
-  .social-float-link { width: 50px; height: 50px; border-radius: 16px; }
-  .social-float-link svg { width: 25px; height: 25px; }
-  .visual-builder-enabled .social-float { bottom: 76px; }
+  .social-float {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    gap: 8px;
+    max-width: calc(100vw - 32px);
+  }
+  .social-float-link {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    flex: 0 0 auto;
+  }
+  .social-float-link svg { width: 24px; height: 24px; }
+  .visual-builder-enabled .social-float {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(76px, calc(env(safe-area-inset-bottom) + 62px));
+  }
 }
 
 
