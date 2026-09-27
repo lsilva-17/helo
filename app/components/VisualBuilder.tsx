@@ -59,6 +59,42 @@ const fontStacks: Record<string, string> = {
   merriweather: "'Merriweather', Georgia, serif",
 };
 
+const MAX_DIRECT_UPLOAD_BYTES = 3.5 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION = 2560;
+
+async function prepareImageForUpload(file: File) {
+  if (file.size <= MAX_DIRECT_UPLOAD_BYTES) return file;
+
+  const bitmap = await createImageBitmap(file);
+  try {
+    const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Não foi possível preparar a imagem para envio.');
+    context.drawImage(bitmap, 0, 0, width, height);
+
+    const encode = (quality: number) => new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Não foi possível otimizar a imagem.')), 'image/webp', quality);
+    });
+
+    let blob = await encode(0.9);
+    if (blob.size > MAX_DIRECT_UPLOAD_BYTES) blob = await encode(0.78);
+    if (blob.size > MAX_DIRECT_UPLOAD_BYTES) blob = await encode(0.65);
+    if (blob.size > MAX_DIRECT_UPLOAD_BYTES) {
+      throw new Error('A imagem continua muito grande após otimização. Tente um arquivo menor.');
+    }
+
+    const baseName = file.name.replace(/\.[^.]+$/, '') || 'visual-builder-image';
+    return new File([blob], `${baseName}.webp`, {type: 'image/webp', lastModified: Date.now()});
+  } finally {
+    bitmap.close();
+  }
+}
+
 async function patchField(documentId: string, documentType: string, field: string, value: unknown) {
   const response = await fetch('/api/visual-builder', {
     method: 'PATCH',
@@ -396,18 +432,31 @@ export function VisualBuilder() {
     const file = event.target.files?.[0];
     if (!file || !selection?.imageField) return;
 
+    setSaveState('saving');
+    setMessage(file.size > MAX_DIRECT_UPLOAD_BYTES ? 'Otimizando imagem…' : 'Enviando imagem…');
+
+    let uploadFile: File;
+    try {
+      uploadFile = await prepareImageForUpload(file);
+    } catch (error) {
+      setSaveState('error');
+      setMessage(error instanceof Error ? error.message : 'Erro ao preparar imagem');
+      event.target.value = '';
+      return;
+    }
+
     const form = new FormData();
-    form.set('file', file);
+    form.set('file', uploadFile);
     form.set('documentId', selection.documentId);
     form.set('documentType', selection.documentType);
     form.set('field', selection.imageField);
 
-    setSaveState('saving');
-    setMessage('Enviando imagem…');
+    setMessage(uploadFile !== file ? 'Imagem otimizada. Enviando…' : 'Enviando imagem…');
     try {
       const response = await fetch('/api/visual-builder/image', {method: 'POST', credentials: 'same-origin', body: form});
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body?.error || 'Não foi possível trocar a imagem.');
+      if (response.status === 413) throw new Error('A imagem excedeu o limite de upload. Tente um arquivo menor.');
+      if (!response.ok) throw new Error(body?.error || `Não foi possível trocar a imagem (HTTP ${response.status}).`);
       if (selection.element instanceof HTMLImageElement && body.url) selection.element.src = body.url;
       setSaveState('saved');
       setMessage('Imagem atualizada no rascunho.');

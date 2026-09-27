@@ -31,8 +31,11 @@ export async function POST(request: NextRequest) {
     if (!(file instanceof File) || !file.type.startsWith('image/')) {
       return NextResponse.json({error: 'Select a valid image file.'}, {status: 400});
     }
-    if (file.size > 12 * 1024 * 1024) {
-      return NextResponse.json({error: 'Image must be smaller than 12 MB.'}, {status: 400});
+    if (file.size > 4 * 1024 * 1024) {
+      return NextResponse.json(
+        {error: 'A imagem excede o limite seguro de upload. O editor tenta otimizar arquivos grandes automaticamente; tente novamente ou use um arquivo menor.'},
+        {status: 413},
+      );
     }
     if (!documentId || !allowedImages[documentType]?.has(field)) {
       return NextResponse.json({error: 'This image is not editable in Visual Builder.'}, {status: 400});
@@ -55,6 +58,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok: true, url: asset.url, assetId: asset._id});
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to upload image';
+    console.error('[visual-builder:image] upload failed', {
+      message,
+      name: error instanceof Error ? error.name : 'unknown',
+    });
     return NextResponse.json({error: message}, {status: 500});
   }
 }

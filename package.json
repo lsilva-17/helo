@@ -6,10 +6,11 @@
     "dev": "next dev",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && next build",
-    "validate": "npm run build",
+    "validate": "npm run build && npm run test:image-upload",
     "smoke:studio": "node scripts/studio-smoke.mjs",
     "smoke:presentation": "node scripts/presentation-smoke.mjs",
     "smoke:visual-features": "node scripts/visual-features-smoke.mjs",
+    "test:image-upload": "node scripts/image-upload-regression.mjs",
     "start": "next start"
   },
   "dependencies": {
