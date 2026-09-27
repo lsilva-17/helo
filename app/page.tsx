@@ -33,7 +33,7 @@ const defaultSectionOrder = ['hero', 'about', 'treatments', 'cases', 'contact'];
 const fallbackTreatmentIds = new Set(['facetas', 'clareamento', 'avaliacao']);
 const fontStacks: Record<string, string> = {
   editorial: "'Cormorant Garamond', Georgia, serif",
-  sans: "'Manrope', Arial, sans-serif",
+  sans: "'Inter', Arial, sans-serif",
   classic: "Georgia, 'Times New Roman', serif",
 };
 
@@ -144,7 +144,7 @@ function imageStyle(settings: Settings, prefix: 'hero' | 'treatment' | 'case') {
 
 export default async function HomePage() {
   const {settings, treatments, cases} = await getContent();
-  const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = cleanUrl(settings.brandLogoUrl) || '/brand-hv.svg';
+  const wa = whatsappLink(settings.whatsapp); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = '/brand-hv.svg';
   const fallbackTreatments: Treatment[] = [
     {_id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.'},
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},

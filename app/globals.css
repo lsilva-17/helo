@@ -177,3 +177,347 @@ html[data-theme="dark"] .btn-primary { color: #102b28; }
   .vb-mode-badge { display: none; }
   .vb-toolbar { right: 8px; bottom: 8px; width: calc(100vw - 16px); }
 }
+
+
+/* Brandbook preview — Dra. Heloisa Veiga
+   Palette: Marfim #F6F1EB, Champagne #D9C2AE, Rosé Terracota #C78F7E,
+   Taupe #8A7467, Grafite #2F2B2A. */
+body.brandbook-preview {
+  --bg: #F6F1EB;
+  --surface: #FFFDFC;
+  --surface-2: #EFE4DA;
+  --border: #D9C2AE;
+  --text: #2F2B2A;
+  --muted: #8A7467;
+  --primary: #2F2B2A;
+  --primary-hover: #8A7467;
+  --primary-soft: #F1DFD7;
+  --whatsapp: #8A7467;
+  --shadow: 0 22px 60px rgba(47,43,42,.09);
+  background:
+    radial-gradient(circle at 92% 7%, rgba(199,143,126,.10), transparent 28rem),
+    #F6F1EB;
+  font-family: 'Inter', Arial, sans-serif !important;
+}
+
+html[data-theme="dark"] body.brandbook-preview {
+  --bg: #2F2B2A;
+  --surface: #383230;
+  --surface-2: #443A35;
+  --border: #725E53;
+  --text: #F6F1EB;
+  --muted: #D9C2AE;
+  --primary: #F6F1EB;
+  --primary-hover: #D9C2AE;
+  --primary-soft: #56453E;
+  --whatsapp: #D9C2AE;
+  --shadow: 0 22px 60px rgba(0,0,0,.24);
+}
+
+body.brandbook-preview [data-vb-font-field] {
+  color: inherit;
+}
+
+body.brandbook-preview .site-header {
+  background: color-mix(in srgb,#F6F1EB 94%,transparent);
+  border-bottom: 1px solid rgba(138,116,103,.18);
+  backdrop-filter: blur(18px);
+}
+html[data-theme="dark"] body.brandbook-preview .site-header {
+  background: color-mix(in srgb,#2F2B2A 92%,transparent);
+}
+
+body.brandbook-preview .header-inner { min-height: 90px; }
+body.brandbook-preview .brand { gap: .9rem; }
+body.brandbook-preview .brand-mark {
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  object-fit: contain !important;
+  box-shadow: none;
+}
+body.brandbook-preview .brand-text strong {
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+  font-size: 1.32rem !important;
+  font-weight: 600;
+  letter-spacing: .015em;
+  color: #2F2B2A !important;
+}
+body.brandbook-preview .brand-text small,
+body.brandbook-preview .nav a,
+body.brandbook-preview .theme-toggle,
+body.brandbook-preview .btn,
+body.brandbook-preview p,
+body.brandbook-preview .eyebrow,
+body.brandbook-preview .trust-grid span,
+body.brandbook-preview .case-label,
+body.brandbook-preview .footer-inner {
+  font-family: 'Inter', Arial, sans-serif !important;
+}
+body.brandbook-preview .brand-text small {
+  color: #8A7467 !important;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: .62rem !important;
+}
+body.brandbook-preview .nav a {
+  color: #5F514A;
+  font-weight: 500;
+}
+body.brandbook-preview .nav a:hover {
+  background: rgba(217,194,174,.28);
+  color: #2F2B2A;
+}
+body.brandbook-preview .theme-toggle {
+  border-color: #D9C2AE;
+  background: rgba(255,253,252,.82);
+}
+
+body.brandbook-preview .hero {
+  padding-top: 1.2rem;
+  padding-bottom: 2rem;
+}
+body.brandbook-preview .hero-visual {
+  min-height: 560px;
+  border-radius: 34px;
+  padding: clamp(1rem,2vw,1.6rem);
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255,255,255,.78), transparent 22rem),
+    linear-gradient(120deg,#F6F1EB 0%,#F3EAE3 46%,#D9C2AE 100%) !important;
+  border: 1px solid rgba(138,116,103,.18);
+  box-shadow: 0 30px 90px rgba(138,116,103,.12);
+}
+html[data-theme="dark"] body.brandbook-preview .hero-visual {
+  background: linear-gradient(120deg,#2F2B2A 0%,#443A35 58%,#725E53 100%) !important;
+}
+body.brandbook-preview .hero-inner {
+  grid-template-columns: minmax(0,1.15fr) minmax(290px,.85fr);
+  gap: 1.6rem;
+  min-height: 510px;
+}
+body.brandbook-preview .hero-card {
+  align-self: center;
+  padding: clamp(2rem,4.5vw,4.2rem);
+  border-radius: 28px;
+  background: rgba(255,253,252,.78);
+  border: 1px solid rgba(217,194,174,.55);
+  box-shadow: 0 18px 60px rgba(47,43,42,.06);
+  backdrop-filter: blur(14px);
+}
+html[data-theme="dark"] body.brandbook-preview .hero-card {
+  background: rgba(47,43,42,.72);
+  border-color: rgba(217,194,174,.2);
+}
+body.brandbook-preview .eyebrow {
+  padding: 0;
+  background: transparent !important;
+  color: #8A7467 !important;
+  border-radius: 0;
+  font-size: .7rem !important;
+  font-weight: 600;
+  letter-spacing: .18em;
+}
+body.brandbook-preview .hero-card h1,
+body.brandbook-preview .section-title,
+body.brandbook-preview .gallery-body h3,
+body.brandbook-preview .case-body h3,
+body.brandbook-preview .trust-grid strong {
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+  color: #2F2B2A !important;
+  font-weight: 500 !important;
+}
+html[data-theme="dark"] body.brandbook-preview .hero-card h1,
+html[data-theme="dark"] body.brandbook-preview .section-title,
+html[data-theme="dark"] body.brandbook-preview .gallery-body h3,
+html[data-theme="dark"] body.brandbook-preview .case-body h3,
+html[data-theme="dark"] body.brandbook-preview .trust-grid strong,
+html[data-theme="dark"] body.brandbook-preview .brand-text strong {
+  color: #F6F1EB !important;
+}
+body.brandbook-preview .hero-card h1 {
+  font-size: clamp(3rem,5.8vw,5.2rem) !important;
+  line-height: .96;
+  letter-spacing: -.025em;
+  max-width: 11ch;
+}
+body.brandbook-preview .hero-card p,
+body.brandbook-preview .section-copy,
+body.brandbook-preview .gallery-body p,
+body.brandbook-preview .case-body p,
+body.brandbook-preview .address {
+  color: #6F6058 !important;
+}
+html[data-theme="dark"] body.brandbook-preview .hero-card p,
+html[data-theme="dark"] body.brandbook-preview .section-copy,
+html[data-theme="dark"] body.brandbook-preview .gallery-body p,
+html[data-theme="dark"] body.brandbook-preview .case-body p,
+html[data-theme="dark"] body.brandbook-preview .address,
+html[data-theme="dark"] body.brandbook-preview .brand-text small,
+html[data-theme="dark"] body.brandbook-preview .nav a {
+  color: #D9C2AE !important;
+}
+
+body.brandbook-preview .hero-photo {
+  border-radius: 26px;
+  border: 1px solid rgba(138,116,103,.18);
+  background: #D9C2AE;
+  box-shadow: 0 18px 45px rgba(47,43,42,.09);
+}
+body.brandbook-preview .hero-photo img { border-radius: 25px; }
+
+body.brandbook-preview .btn {
+  border-radius: 999px;
+  min-height: 50px;
+  letter-spacing: .01em;
+  font-weight: 600;
+}
+body.brandbook-preview .btn-primary,
+body.brandbook-preview .btn-whatsapp {
+  background: #2F2B2A !important;
+  color: #F6F1EB !important;
+  box-shadow: 0 12px 30px rgba(47,43,42,.12);
+}
+body.brandbook-preview .btn-primary:hover,
+body.brandbook-preview .btn-whatsapp:hover {
+  background: #8A7467 !important;
+}
+body.brandbook-preview .btn-secondary {
+  background: rgba(246,241,235,.72) !important;
+  border-color: #B99F90 !important;
+  color: #2F2B2A !important;
+}
+html[data-theme="dark"] body.brandbook-preview .btn-secondary {
+  background: transparent !important;
+  color: #F6F1EB !important;
+  border-color: #8A7467 !important;
+}
+
+body.brandbook-preview .section { padding-block: clamp(4rem,8vw,7rem); }
+body.brandbook-preview .section-title {
+  font-size: clamp(2.7rem,4.8vw,4.4rem) !important;
+  line-height: .98;
+  letter-spacing: -.018em;
+}
+body.brandbook-preview .highlight-box,
+body.brandbook-preview .contact-card {
+  border-radius: 32px;
+  border-color: rgba(138,116,103,.18);
+  box-shadow: 0 18px 55px rgba(47,43,42,.055);
+}
+body.brandbook-preview .highlight-box {
+  background:
+    linear-gradient(135deg,rgba(255,253,252,.96),rgba(246,241,235,.88)) !important;
+}
+body.brandbook-preview .trust-grid > div {
+  background: #EFE4DA !important;
+  border: 1px solid rgba(217,194,174,.75);
+  border-radius: 22px;
+}
+body.brandbook-preview .trust-grid strong {
+  color: #C78F7E !important;
+}
+
+body.brandbook-preview .gallery-grid { gap: 1.5rem; }
+body.brandbook-preview .gallery-card,
+body.brandbook-preview .case-card {
+  border-radius: 26px;
+  border-color: rgba(138,116,103,.18);
+  background: #FFFDFC !important;
+  box-shadow: 0 14px 45px rgba(47,43,42,.055);
+}
+html[data-theme="dark"] body.brandbook-preview .gallery-card,
+html[data-theme="dark"] body.brandbook-preview .case-card {
+  background: #383230 !important;
+}
+body.brandbook-preview .gallery-media,
+body.brandbook-preview .gallery-placeholder {
+  border-radius: 25px 25px 0 0;
+}
+body.brandbook-preview .gallery-placeholder {
+  background: linear-gradient(135deg,#EFE4DA,#D9C2AE) !important;
+  color: #8A7467 !important;
+}
+body.brandbook-preview .gallery-body,
+body.brandbook-preview .case-body { padding: 1.45rem 1.5rem 1.65rem; }
+
+body.brandbook-preview .cases-section {
+  background: #EFE4DA !important;
+  border-block-color: rgba(138,116,103,.12);
+}
+html[data-theme="dark"] body.brandbook-preview .cases-section { background: #443A35 !important; }
+body.brandbook-preview .case-label { color: #C78F7E !important; }
+
+body.brandbook-preview .contact-card {
+  background:
+    radial-gradient(circle at 95% 0%,rgba(199,143,126,.20),transparent 24rem),
+    #FFFDFC !important;
+}
+html[data-theme="dark"] body.brandbook-preview .contact-card {
+  background: linear-gradient(135deg,#383230,#443A35) !important;
+}
+body.brandbook-preview .site-footer {
+  border-top-color: rgba(138,116,103,.18);
+}
+
+body.brandbook-preview .visual-builder-enabled [data-vb-field]:hover,
+body.brandbook-preview .visual-builder-enabled [data-vb-image-field]:hover {
+  outline-color: rgba(199,143,126,.85);
+}
+body.brandbook-preview .visual-builder-enabled .vb-selected {
+  outline-color: #C78F7E !important;
+}
+
+@media (max-width: 820px) {
+  body.brandbook-preview .header-inner { min-height: 76px; }
+  body.brandbook-preview .brand-mark { width: 48px; height: 48px; }
+  body.brandbook-preview .hero-inner { grid-template-columns: 1fr; }
+  body.brandbook-preview .hero-card { order: 2; }
+  body.brandbook-preview .hero-photo { order: 1; }
+}
+
+
+/* Dark-theme contrast refinement — brandbook palette only. */
+html[data-theme="dark"] body.brandbook-preview {
+  color: #F6F1EB;
+}
+html[data-theme="dark"] body.brandbook-preview .brand-text strong,
+html[data-theme="dark"] body.brandbook-preview .hero-card h1,
+html[data-theme="dark"] body.brandbook-preview .section-title,
+html[data-theme="dark"] body.brandbook-preview .gallery-body h3,
+html[data-theme="dark"] body.brandbook-preview .case-body h3,
+html[data-theme="dark"] body.brandbook-preview .trust-grid strong,
+html[data-theme="dark"] body.brandbook-preview .contact-card,
+html[data-theme="dark"] body.brandbook-preview .contact-card .section-title {
+  color: #F6F1EB !important;
+}
+html[data-theme="dark"] body.brandbook-preview .hero-card p,
+html[data-theme="dark"] body.brandbook-preview .section-copy,
+html[data-theme="dark"] body.brandbook-preview .gallery-body p,
+html[data-theme="dark"] body.brandbook-preview .case-body p,
+html[data-theme="dark"] body.brandbook-preview .address,
+html[data-theme="dark"] body.brandbook-preview .trust-grid span,
+html[data-theme="dark"] body.brandbook-preview .footer-inner,
+html[data-theme="dark"] body.brandbook-preview .brand-text small,
+html[data-theme="dark"] body.brandbook-preview .nav a {
+  color: #D9C2AE !important;
+}
+html[data-theme="dark"] body.brandbook-preview .eyebrow,
+html[data-theme="dark"] body.brandbook-preview .case-label {
+  color: #C78F7E !important;
+}
+html[data-theme="dark"] body.brandbook-preview .highlight-box,
+html[data-theme="dark"] body.brandbook-preview .contact-card {
+  background: #383230 !important;
+  border-color: #725E53 !important;
+}
+html[data-theme="dark"] body.brandbook-preview .trust-grid > div {
+  background: #443A35 !important;
+  border-color: #725E53 !important;
+}
+html[data-theme="dark"] body.brandbook-preview .theme-toggle {
+  background: #383230;
+  border-color: #725E53;
+  color: #F6F1EB;
+}
