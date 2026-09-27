@@ -550,7 +550,7 @@ export function VisualBuilder() {
           {range('Altura mínima do bloco', selection.blockHeightField, selection.blockHeightValue || 320, 180, 1000, 'blockHeight', 'px')}
           {range('Mover horizontal', selection.xField, selection.xValue || 0, -100, 100, 'x', 'px')}
           {range('Mover vertical', selection.yField, selection.yValue || 0, -80, 80, 'y', 'px')}
-          {range('Espaçamento vertical', selection.paddingField, selection.paddingValue || 32, 16, 160, 'padding', 'px')}
+          {range('Espaçamento interno vertical', selection.paddingField, selection.paddingValue || 32, 8, 120, 'padding', 'px')}
           {range('Altura da imagem', selection.heightField, selection.heightValue || 320, 160, 720, 'height', 'px')}
           {range('Foco horizontal', selection.positionXField, selection.positionXValue ?? 50, 0, 100, 'positionX', '%')}
           {range('Foco vertical', selection.positionYField, selection.positionYValue ?? 50, 0, 100, 'positionY', '%')}

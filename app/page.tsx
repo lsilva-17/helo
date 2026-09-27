@@ -116,7 +116,7 @@ function sectionPosition(order: string[] | undefined, section: string) {
 }
 
 function sectionOuterStyle(settings: Settings, key: string) {
-  return {order: sectionPosition(settings.sectionOrder, key), paddingTop: `${n(settings, `${key}PaddingY`, key === 'hero' ? 32 : 72)}px`, paddingBottom: `${n(settings, `${key}PaddingY`, key === 'hero' ? 32 : 72)}px`};
+  return {order: sectionPosition(settings.sectionOrder, key)};
 }
 
 function sectionLayout(settings: Settings, key: string, label: string) {
@@ -125,9 +125,9 @@ function sectionLayout(settings: Settings, key: string, label: string) {
     props: {
       'data-vb-layout': 'true', 'data-vb-style-doc-id': 'siteSettings', 'data-vb-style-doc-type': 'siteSettings', 'data-vb-label': `${label} · layout`,
       'data-vb-width-field': `${key}Width`, 'data-vb-x-field': `${key}OffsetX`, 'data-vb-y-field': `${key}OffsetY`, 'data-vb-padding-field': `${key}PaddingY`, 'data-vb-block-height-field': `${key}Height`,
-      'data-vb-width-value': width, 'data-vb-x-value': x, 'data-vb-y-value': y, 'data-vb-padding-value': n(settings, `${key}PaddingY`, key === 'hero' ? 32 : 72), 'data-vb-block-height-value': height,
+      'data-vb-width-value': width, 'data-vb-x-value': x, 'data-vb-y-value': y, 'data-vb-padding-value': n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32), 'data-vb-block-height-value': height,
     },
-    style: {width: `${width}%`, minHeight: `${height}px`, transform: `translate(${x}px, ${y}px)`},
+    style: {width: `${width}%`, minHeight: `${height}px`, paddingTop: `${n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32)}px`, paddingBottom: `${n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32)}px`, transform: `translate(${x}px, ${y}px)`},
   };
 }
 

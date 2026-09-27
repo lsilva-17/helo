@@ -56,11 +56,11 @@ const typographyFields = [
 ] as const;
 
 const sectionLayoutFields = [
-  ['hero', 'Hero', 100, 0, 0, 32, 560],
-  ['about', 'Sobre', 100, 0, 0, 72, 320],
-  ['treatments', 'Tratamentos', 100, 0, 0, 72, 320],
-  ['cases', 'Casos clínicos', 100, 0, 0, 72, 320],
-  ['contact', 'Contato', 100, 0, 0, 72, 320],
+  ['hero', 'Hero', 100, 0, 0, 24, 560],
+  ['about', 'Sobre', 100, 0, 0, 32, 320],
+  ['treatments', 'Tratamentos', 100, 0, 0, 32, 320],
+  ['cases', 'Casos clínicos', 100, 0, 0, 32, 320],
+  ['contact', 'Contato', 100, 0, 0, 32, 320],
 ] as const;
 
 export const siteSettings = defineType({

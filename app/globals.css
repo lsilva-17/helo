@@ -37,7 +37,7 @@ a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
 h1,h2,h3,p { margin-top: 0; }
 .container { width: min(calc(100% - 2rem), 1120px); margin: 0 auto; }
-.page-sections { display: flex; flex-direction: column; }
+.page-sections { display: flex; flex-direction: column; gap: 24px; }
 
 [data-vb-font-value="editorial"] { font-family: 'Cormorant Garamond',Georgia,serif !important; }
 [data-vb-font-value="sans"] { font-family: 'Manrope',Arial,sans-serif !important; }
@@ -621,4 +621,14 @@ body.brandbook-preview .gallery-body {
 /* CMS/Presentation values are authoritative over brandbook defaults. */
 body.brandbook-preview [data-vb-font-field] {
   font-family: inherit;
+}
+
+
+/* Section rhythm: a single predictable gap between content blocks.
+   Vertical spacing edited in Visual Builder now belongs to the selected block itself. */
+body.brandbook-preview .page-sections {
+  gap: 24px;
+}
+body.brandbook-preview .page-sections > [data-vb-section] {
+  padding-block: 0 !important;
 }
