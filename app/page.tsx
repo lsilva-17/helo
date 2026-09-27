@@ -167,9 +167,9 @@ export default async function HomePage() {
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
     {_id: 'estetica-facial', title: 'Estética facial', summary: 'Procedimentos estéticos planejados para harmonizar o sorriso com os traços e proporções do rosto.'},
   ];
-  const displayedTreatments = treatments
+  const displayedTreatments: Treatment[] = treatments
     .slice(0, 3)
-    .map((item) => {
+    .map((item): Treatment => {
       const fallback = fallbackTreatments.find((entry) => entry._id === stegaClean(item._id));
       return {
         ...item,
