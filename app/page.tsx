@@ -29,7 +29,7 @@ type Content = {settings: Settings | null; treatments: Treatment[]; cases: CaseS
 
 const contentQuery = `{
   "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url},
-  "treatments": *[_type == "treatment" && featured == true] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
+  "treatments": *[_type == "treatment" && (featured == true || _id in ["facetas","clareamento","estetica-facial"])] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
   "cases": *[_type == "caseStudy" && featured == true] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}
 }`;
 
@@ -167,12 +167,22 @@ export default async function HomePage() {
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
     {_id: 'estetica-facial', title: 'Estética facial', summary: 'Procedimentos estéticos planejados para harmonizar o sorriso com os traços e proporções do rosto.'},
   ];
-  const displayedTreatments = treatments.slice(0, 3);
+  const displayedTreatments = treatments
+    .slice(0, 3)
+    .map((item) => {
+      const fallback = fallbackTreatments.find((entry) => entry._id === stegaClean(item._id));
+      return {
+        ...item,
+        title: item.title || fallback?.title || '',
+        summary: item.summary || fallback?.summary || '',
+      };
+    });
+
   for (const fallback of fallbackTreatments) {
     if (displayedTreatments.length >= 3) break;
     const alreadyPresent = displayedTreatments.some((item) =>
       stegaClean(item._id) === fallback._id ||
-      stegaClean(item.title).trim().toLowerCase() === fallback.title.toLowerCase()
+      stegaClean(item.title || '').trim().toLowerCase() === fallback.title.toLowerCase()
     );
     if (!alreadyPresent) displayedTreatments.push(fallback);
   }
