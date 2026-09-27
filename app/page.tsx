@@ -124,10 +124,10 @@ function sectionLayout(settings: Settings, key: string, label: string) {
   return {
     props: {
       'data-vb-layout': 'true', 'data-vb-style-doc-id': 'siteSettings', 'data-vb-style-doc-type': 'siteSettings', 'data-vb-label': `${label} · layout`,
-      'data-vb-width-field': `${key}Width`, 'data-vb-x-field': `${key}OffsetX`, 'data-vb-y-field': `${key}OffsetY`, 'data-vb-padding-field': `${key}PaddingY`, 'data-vb-block-height-field': `${key}Height`,
+      'data-vb-width-field': `${key}Width`, 'data-vb-x-field': `${key}OffsetX`, 'data-vb-y-field': `${key}OffsetY`, 'data-vb-padding-field': `${key}PaddingY`, 'data-vb-block-height-field': `${key}Height`, 'data-vb-fixed-height': key === 'hero' ? 'true' : 'false',
       'data-vb-width-value': width, 'data-vb-x-value': x, 'data-vb-y-value': y, 'data-vb-padding-value': n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32), 'data-vb-block-height-value': height,
     },
-    style: {width: `${width}%`, minHeight: `${height}px`, paddingTop: `${n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32)}px`, paddingBottom: `${n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32)}px`, transform: `translate(${x}px, ${y}px)`},
+    style: {width: `${width}%`, ...(key === 'hero' ? {height: `${height}px`, minHeight: 0, overflow: 'hidden'} : {minHeight: `${height}px`}), paddingTop: `${n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32)}px`, paddingBottom: `${n(settings, `${key}PaddingY`, key === 'hero' ? 24 : 32)}px`, transform: `translate(${x}px, ${y}px)`},
   };
 }
 

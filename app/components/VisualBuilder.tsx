@@ -411,7 +411,14 @@ export function VisualBuilder() {
       selection.element.dataset.vbHeightValue = String(value);
       next.heightValue = Number(value);
     } else if (kind === 'blockHeight') {
-      selection.element.style.minHeight = `${value}px`;
+      const fixedHeight = selection.element.dataset.vbFixedHeight === 'true';
+      if (fixedHeight) {
+        selection.element.style.height = `${value}px`;
+        selection.element.style.minHeight = '0px';
+        selection.element.style.overflow = 'hidden';
+      } else {
+        selection.element.style.minHeight = `${value}px`;
+      }
       selection.element.dataset.vbBlockHeightValue = String(value);
       next.blockHeightValue = Number(value);
     } else if (kind === 'positionX' || kind === 'positionY') {
@@ -547,7 +554,7 @@ export function VisualBuilder() {
 
           {range('Tamanho', selection.sizeField, selection.sizeValue || 16, 10, 110, 'size', 'px')}
           {range('Largura do bloco', selection.widthField, selection.widthValue || 100, 60, 100, 'width', '%')}
-          {range('Altura mínima do bloco', selection.blockHeightField, selection.blockHeightValue || 320, 180, 1000, 'blockHeight', 'px')}
+          {range(selection.element.dataset.vbFixedHeight === 'true' ? 'Altura do bloco' : 'Altura mínima do bloco', selection.blockHeightField, selection.blockHeightValue || 320, selection.element.dataset.vbFixedHeight === 'true' ? 360 : 180, 1000, 'blockHeight', 'px')}
           {range('Mover horizontal', selection.xField, selection.xValue || 0, -100, 100, 'x', 'px')}
           {range('Mover vertical', selection.yField, selection.yValue || 0, -80, 80, 'y', 'px')}
           {range('Espaçamento interno vertical', selection.paddingField, selection.paddingValue || 32, 8, 120, 'padding', 'px')}
