@@ -21,9 +21,9 @@ const fallbackTreatments: Record<string, {title: string; summary: string; order:
     summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.',
     order: 2,
   },
-  avaliacao: {
-    title: 'Avaliação estética',
-    summary: 'Consulta para entender objetivos, possibilidades e construir um plano individualizado.',
+  'estetica-facial': {
+    title: 'Estética facial',
+    summary: 'Procedimentos estéticos planejados para harmonizar o sorriso com os traços e proporções do rosto.',
     order: 3,
   },
 };
