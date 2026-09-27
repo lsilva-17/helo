@@ -476,3 +476,48 @@ body.brandbook-preview .visual-builder-enabled .vb-selected {
   body.brandbook-preview .hero-card { order: 2; }
   body.brandbook-preview .hero-photo { order: 1; }
 }
+
+
+/* Dark-theme contrast refinement — brandbook palette only. */
+html[data-theme="dark"] body.brandbook-preview {
+  color: #F6F1EB;
+}
+html[data-theme="dark"] body.brandbook-preview .brand-text strong,
+html[data-theme="dark"] body.brandbook-preview .hero-card h1,
+html[data-theme="dark"] body.brandbook-preview .section-title,
+html[data-theme="dark"] body.brandbook-preview .gallery-body h3,
+html[data-theme="dark"] body.brandbook-preview .case-body h3,
+html[data-theme="dark"] body.brandbook-preview .trust-grid strong,
+html[data-theme="dark"] body.brandbook-preview .contact-card,
+html[data-theme="dark"] body.brandbook-preview .contact-card .section-title {
+  color: #F6F1EB !important;
+}
+html[data-theme="dark"] body.brandbook-preview .hero-card p,
+html[data-theme="dark"] body.brandbook-preview .section-copy,
+html[data-theme="dark"] body.brandbook-preview .gallery-body p,
+html[data-theme="dark"] body.brandbook-preview .case-body p,
+html[data-theme="dark"] body.brandbook-preview .address,
+html[data-theme="dark"] body.brandbook-preview .trust-grid span,
+html[data-theme="dark"] body.brandbook-preview .footer-inner,
+html[data-theme="dark"] body.brandbook-preview .brand-text small,
+html[data-theme="dark"] body.brandbook-preview .nav a {
+  color: #D9C2AE !important;
+}
+html[data-theme="dark"] body.brandbook-preview .eyebrow,
+html[data-theme="dark"] body.brandbook-preview .case-label {
+  color: #C78F7E !important;
+}
+html[data-theme="dark"] body.brandbook-preview .highlight-box,
+html[data-theme="dark"] body.brandbook-preview .contact-card {
+  background: #383230 !important;
+  border-color: #725E53 !important;
+}
+html[data-theme="dark"] body.brandbook-preview .trust-grid > div {
+  background: #443A35 !important;
+  border-color: #725E53 !important;
+}
+html[data-theme="dark"] body.brandbook-preview .theme-toggle {
+  background: #383230;
+  border-color: #725E53;
+  color: #F6F1EB;
+}
