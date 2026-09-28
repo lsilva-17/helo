@@ -6,7 +6,6 @@ import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDra
 import {VisualCustomizationBridge} from '@/app/components/VisualCustomizationBridge';
 import {VisualCustomizationControls} from '@/app/components/VisualCustomizationControls';
 import {FallbackTreatmentBindings} from '@/app/components/FallbackTreatmentBindings';
-import {ThemeToggle} from '@/app/components/ThemeToggle';
 import {SiteStyleBridge} from '@/app/components/SiteStyleBridge';
 import {GoogleTagManager} from '@/app/components/GoogleTagManager';
 import {ConversionTracking} from '@/app/components/ConversionTracking';
@@ -27,7 +26,6 @@ export const metadata: Metadata = {
 };
 
 const visualCapabilities = [
-  'theme-toggle',
   'expanded-fonts',
   'text-color',
   'section-background-color',
@@ -45,14 +43,13 @@ export default async function RootLayout({children}: Readonly<{children: React.R
   const {isEnabled: isDraftMode} = await draftMode();
 
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" data-theme="light">
       <body className="brandbook-preview" data-visual-capabilities={visualCapabilities}>
         <GoogleTagManager />
         <ConversionTracking />
         <SiteStyleBridge />
         <VisualCustomizationBridge />
         {children}
-        <ThemeToggle />
         {isDraftMode && <FallbackTreatmentBindings />}
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}
