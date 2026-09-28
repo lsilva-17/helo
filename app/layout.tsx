@@ -1,6 +1,6 @@
 import type {Metadata} from 'next';
 import {draftMode} from 'next/headers';
-import {VisualEditing} from 'next-sanity/visual-editing';
+import {EmbeddedVisualEditing} from '@/app/components/EmbeddedVisualEditing';
 import {VisualBuilder} from '@/app/components/VisualBuilder';
 import {VisualBuilderToolbarDrag} from '@/app/components/VisualBuilderToolbarDrag';
 import {VisualCustomizationBridge} from '@/app/components/VisualCustomizationBridge';
@@ -54,7 +54,7 @@ export default async function RootLayout({children}: Readonly<{children: React.R
         {isDraftMode && <VisualBuilder />}
         {isDraftMode && <VisualBuilderToolbarDrag />}
         {isDraftMode && <VisualCustomizationControls />}
-        {isDraftMode && <VisualEditing />}
+        {isDraftMode && <EmbeddedVisualEditing />}
       </body>
     </html>
   );
