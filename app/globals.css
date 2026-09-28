@@ -297,6 +297,10 @@ body.brandbook-preview .hero-inner {
   gap: 1.6rem;
   min-height: 0;
   height: 100%;
+  background: #F6F1EB;
+}
+html[data-theme="dark"] body.brandbook-preview .hero-inner {
+  background: #2F2B2A;
 }
 body.brandbook-preview .hero-card {
   align-self: center;
