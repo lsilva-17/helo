@@ -1,7 +1,7 @@
 .visual-builder-enabled [data-vb-layout] {
   position: relative;
   cursor: pointer;
-  transition: outline-color .15s ease, box-shadow .15s ease, transform .15s ease, width .15s ease;
+  transition: transform .15s ease, width .15s ease;
 }
 
 .visual-builder-enabled [data-vb-layout]:hover {
@@ -30,7 +30,7 @@
 }
 
 .visual-builder-enabled [data-vb-image-field] {
-  transition: height .15s ease, object-position .15s ease, outline-color .15s ease;
+  transition: height .15s ease, object-position .15s ease;
 }
 
 @media (max-width: 820px) {

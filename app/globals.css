@@ -124,7 +124,7 @@ html[data-theme="dark"] .btn-primary { color: #102b28; }
 
 /* Visual Builder — rendered only while the site is opened inside Sanity Presentation. */
 .visual-builder-enabled [data-vb-field],
-.visual-builder-enabled [data-vb-image-field] { cursor: text; transition: outline-color .15s ease, box-shadow .15s ease; }
+.visual-builder-enabled [data-vb-image-field] { cursor: text; }
 .visual-builder-enabled [data-vb-image-field] { cursor: pointer; }
 .visual-builder-enabled [data-vb-field]:hover,
 .visual-builder-enabled [data-vb-image-field]:hover { outline: 2px dashed rgba(15,118,110,.7); outline-offset: 4px; }
@@ -1075,4 +1075,15 @@ html:not(.visual-builder-enabled) body.brandbook-preview .gallery-image-hint {
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
   }
+}
+
+
+/* Prevent outline/selection flash on normal site load.
+   Visual Builder outlines remain available only while Presentation editing is active. */
+html:not(.visual-builder-enabled) [data-vb-layout],
+html:not(.visual-builder-enabled) [data-vb-field],
+html:not(.visual-builder-enabled) [data-vb-image-field] {
+  outline: none !important;
+  outline-offset: 0 !important;
+  transition: none !important;
 }
