@@ -1034,3 +1034,43 @@ html:not(.visual-builder-enabled) body.brandbook-preview .gallery-image-hint {
     padding-right: 1.35rem !important;
   }
 }
+
+
+/* Mobile-only content gutter normalization.
+   Keeps desktop untouched and gives every post-hero section a consistent inner text inset. */
+@media (max-width: 820px) {
+  body.brandbook-preview .section > [data-vb-layout].container,
+  body.brandbook-preview .cases-section > [data-vb-layout].container {
+    padding-left: 1.75rem !important;
+    padding-right: 1.75rem !important;
+  }
+
+  body.brandbook-preview .section > .highlight-box[data-vb-layout],
+  body.brandbook-preview .section > .contact-card[data-vb-layout] {
+    padding-left: 1.75rem !important;
+    padding-right: 1.75rem !important;
+  }
+
+  body.brandbook-preview .section > [data-vb-layout].container > .eyebrow,
+  body.brandbook-preview .section > [data-vb-layout].container > .section-title,
+  body.brandbook-preview .section > [data-vb-layout].container > .section-copy,
+  body.brandbook-preview .cases-section > [data-vb-layout].container > .eyebrow,
+  body.brandbook-preview .cases-section > [data-vb-layout].container > .section-title,
+  body.brandbook-preview .cases-section > [data-vb-layout].container > .section-copy,
+  body.brandbook-preview .contact-card[data-vb-layout] > .eyebrow,
+  body.brandbook-preview .contact-card[data-vb-layout] > .section-title,
+  body.brandbook-preview .contact-card[data-vb-layout] > .section-copy,
+  body.brandbook-preview .contact-card[data-vb-layout] > .address {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 520px) {
+  body.brandbook-preview .section > [data-vb-layout].container,
+  body.brandbook-preview .cases-section > [data-vb-layout].container,
+  body.brandbook-preview .section > .highlight-box[data-vb-layout],
+  body.brandbook-preview .section > .contact-card[data-vb-layout] {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+}
