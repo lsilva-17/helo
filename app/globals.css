@@ -283,12 +283,14 @@ body.brandbook-preview .hero-visual {
   min-height: 0;
   border-radius: 0;
   padding: clamp(1rem,2vw,1.6rem);
-  background: transparent;
-  border: 0;
-  box-shadow: none;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255,255,255,.78), transparent 22rem),
+    linear-gradient(120deg,#F6F1EB 0%,#F3EAE3 46%,#D9C2AE 100%);
+  border: 1px solid rgba(138,116,103,.18);
+  box-shadow: 0 30px 90px rgba(138,116,103,.12);
 }
 html[data-theme="dark"] body.brandbook-preview .hero-visual {
-  background: transparent;
+  background: linear-gradient(120deg,#2F2B2A 0%,#443A35 58%,#725E53 100%);
 }
 body.brandbook-preview .hero-inner {
   grid-template-columns: minmax(0,1.15fr) minmax(290px,.85fr);
