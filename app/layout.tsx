@@ -7,7 +7,6 @@ import {VisualCustomizationBridge} from '@/app/components/VisualCustomizationBri
 import {VisualCustomizationControls} from '@/app/components/VisualCustomizationControls';
 import {FallbackTreatmentBindings} from '@/app/components/FallbackTreatmentBindings';
 import {SiteStyleBridge} from '@/app/components/SiteStyleBridge';
-import {GoogleTagManager} from '@/app/components/GoogleTagManager';
 import {ConversionTracking} from '@/app/components/ConversionTracking';
 import './globals.css';
 import './visual-builder.css';
@@ -46,8 +45,27 @@ export default async function RootLayout({children}: Readonly<{children: React.R
 
   return (
     <html lang="pt-BR" data-theme="light">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5GQGVBG9');`,
+          }}
+        />
+      </head>
       <body className="brandbook-preview" data-visual-capabilities={visualCapabilities}>
-        <GoogleTagManager />
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-5GQGVBG9"
+            height="0"
+            width="0"
+            style={{display: 'none', visibility: 'hidden'}}
+            title="Google Tag Manager"
+          />
+        </noscript>
         <ConversionTracking />
         <SiteStyleBridge />
         <VisualCustomizationBridge />
