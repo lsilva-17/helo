@@ -15,6 +15,8 @@ import './visual-builder-toolbar-drag.css';
 import './visual-customization.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://draheloisaveiga.vercel.app'),
+  alternates: { canonical: '/' },
   title: 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo',
   description:
     'Odontologia estética com atendimento personalizado em São Paulo. Conheça o trabalho da Dra. Heloisa Veiga e agende uma avaliação.',
