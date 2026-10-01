@@ -179,7 +179,7 @@ export const servicePageFallbacks: Record<string, ServicePageFallback> = {
   },
   'dentista-santana': {
     slug: 'dentista-santana',
-    menuLabel: 'Consultório em Santana',
+    menuLabel: 'Localização',
     kind: 'location',
     eyebrow: 'Localização e atendimento',
     title: 'Consultório odontológico em Santana, São Paulo',
@@ -207,8 +207,7 @@ export const serviceMenuItems = [
   {href: '/facetas-em-resina', label: 'Facetas em resina'},
   {href: '/clareamento-dental', label: 'Clareamento dental'},
   {href: '/coroa-dentaria', label: 'Coroa dentária'},
-  {href: '/dente-quebrado', label: 'Dente quebrado'},
   {href: '/botox', label: 'Toxina botulínica'},
   {href: '/harmonizacao-facial', label: 'Harmonização facial'},
-  {href: '/dentista-santana', label: 'Consultório em Santana'},
+  {href: '/dentista-santana', label: 'Localização'},
 ];
