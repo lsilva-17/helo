@@ -2,6 +2,7 @@ import {stegaClean} from 'next-sanity';
 import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
 import {serviceMenuItems} from '@/app/lib/servicePages';
+import {SiteHeader} from '@/app/components/SiteHeader';
 
 export const revalidate = 60;
 
@@ -197,26 +198,30 @@ export default async function HomePage() {
   const heroLayout = sectionLayout(settings, 'hero', 'Hero'); const aboutLayout = sectionLayout(settings, 'about', 'Sobre'); const treatmentsLayout = sectionLayout(settings, 'treatments', 'Tratamentos'); const casesLayout = sectionLayout(settings, 'cases', 'Casos'); const contactLayout = sectionLayout(settings, 'contact', 'Contato');
 
   return <>
-    <header className="site-header"><div className="container header-inner">
-      <a className="brand" href="#inicio"><img className="brand-mark" src={brandLogoUrl} alt="Marca" data-vb-doc-id={settingsId(settings)} data-vb-doc-type="siteSettings" data-vb-image-field="brandLogo" data-vb-label="Ícone da marca" style={{objectFit: 'cover'}} /><span className="brand-text">
-        <strong {...siteText(settings, 'professionalName', 'Nome profissional', 'brandName')} style={typographyStyle(settings, 'brandName', 'sans', 15)}>{settings.professionalName}</strong>
-        <small {...siteText(settings, 'brandSubtitle', 'Subtítulo da marca', 'brandSubtitleStyle')} style={typographyStyle(settings, 'brandSubtitleStyle', 'sans', 12)}>{settings.brandSubtitle}</small>
-      </span></a>
-      <nav className="nav" aria-label="Menu principal">
-        <a href="#sobre" {...siteText(settings, 'navAboutLabel', 'Menu · Sobre', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navAboutLabel}</a>
-        <a href="#tratamentos" {...siteText(settings, 'navTreatmentsLabel', 'Menu · Tratamentos', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navTreatmentsLabel}</a>
-        <a href="#casos" {...siteText(settings, 'navCasesLabel', 'Menu · Casos', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navCasesLabel}</a>
-        <a href="#contato" {...siteText(settings, 'navContactLabel', 'Menu · Contato', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navContactLabel}</a>
-      </nav>
-    </div>
-      <div className="category-nav-shell">
-        <nav className="container category-nav" aria-label="Categorias de atendimento">
-          {serviceMenuItems.filter((item) => item.href !== '/').map((item) => (
-            <a key={item.href} href={item.href}>{item.label}</a>
-          ))}
-        </nav>
-      </div>
-    </header>
+    <SiteHeader
+      brandName={String(settings.professionalName || '')}
+      subtitle={String(settings.brandSubtitle || '')}
+      logoUrl={brandLogoUrl}
+      navAboutLabel={String(settings.navAboutLabel || 'Sobre')}
+      navTreatmentsLabel={String(settings.navTreatmentsLabel || 'Tratamentos')}
+      navCasesLabel={String(settings.navCasesLabel || 'Casos')}
+      navContactLabel={String(settings.navContactLabel || 'Contato')}
+      brandNameStyle={typographyStyle(settings, 'brandName', 'sans', 15)}
+      subtitleStyle={typographyStyle(settings, 'brandSubtitleStyle', 'sans', 12)}
+      navStyle={typographyStyle(settings, 'navStyle', 'sans', 14)}
+      brandNameProps={siteText(settings, 'professionalName', 'Nome profissional', 'brandName')}
+      subtitleProps={siteText(settings, 'brandSubtitle', 'Subtítulo da marca', 'brandSubtitleStyle')}
+      logoProps={{
+        'data-vb-doc-id': settingsId(settings),
+        'data-vb-doc-type': 'siteSettings',
+        'data-vb-image-field': 'brandLogo',
+        'data-vb-label': 'Ícone da marca',
+      } as any}
+      navAboutProps={siteText(settings, 'navAboutLabel', 'Menu · Sobre', 'navStyle')}
+      navTreatmentsProps={siteText(settings, 'navTreatmentsLabel', 'Menu · Tratamentos', 'navStyle')}
+      navCasesProps={siteText(settings, 'navCasesLabel', 'Menu · Casos', 'navStyle')}
+      navContactProps={siteText(settings, 'navContactLabel', 'Menu · Contato', 'navStyle')}
+    />
 
     <main className="page-sections" data-vb-layout="true" data-vb-style-doc-id={settingsId(settings)} data-vb-site-settings-id={settingsId(settings)} data-vb-style-doc-type="siteSettings" data-vb-label="Fundo entre as seções" data-vb-background-field="pageBackground">
       <section className="hero" id="inicio" data-vb-section="hero" style={sectionOuterStyle(settings, 'hero')}><div className="container hero-visual" {...heroLayout.props} style={heroLayout.style}><div className="hero-inner">

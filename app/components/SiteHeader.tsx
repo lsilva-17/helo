@@ -1,22 +1,5 @@
-import type {CSSProperties} from 'react';
+import type {AnchorHTMLAttributes, CSSProperties, HTMLAttributes, ImgHTMLAttributes} from 'react';
 import {serviceMenuItems} from '@/app/lib/servicePages';
-
-const fontStacks: Record<string, string> = {
-  editorial: "'Cormorant Garamond', Georgia, serif",
-  sans: "'Inter', Arial, sans-serif",
-  classic: "Georgia, 'Times New Roman', serif",
-  arial: "Arial, Helvetica, sans-serif",
-  roboto: "'Roboto', Arial, sans-serif",
-  inter: "'Inter', Arial, sans-serif",
-  opensans: "'Open Sans', Arial, sans-serif",
-  montserrat: "'Montserrat', Arial, sans-serif",
-  poppins: "'Poppins', Arial, sans-serif",
-  dmsans: "'DM Sans', Arial, sans-serif",
-  lato: "'Lato', Arial, sans-serif",
-  playfair: "'Playfair Display', Georgia, serif",
-  lora: "'Lora', Georgia, serif",
-  merriweather: "'Merriweather', Georgia, serif",
-};
 
 type HeaderTypography = {
   font?: string;
@@ -33,20 +16,17 @@ type SiteHeaderProps = {
   navTreatmentsLabel?: string;
   navCasesLabel?: string;
   navContactLabel?: string;
-  brandNameTypography?: HeaderTypography;
-  subtitleTypography?: HeaderTypography;
-  navTypography?: HeaderTypography;
+  brandNameStyle?: CSSProperties;
+  subtitleStyle?: CSSProperties;
+  navStyle?: CSSProperties;
+  brandNameProps?: HTMLAttributes<HTMLElement>;
+  subtitleProps?: HTMLAttributes<HTMLElement>;
+  logoProps?: ImgHTMLAttributes<HTMLImageElement>;
+  navAboutProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
+  navTreatmentsProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
+  navCasesProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
+  navContactProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
 };
-
-function typeStyle(value: HeaderTypography | undefined, fallbackFont: string, fallbackSize: number): CSSProperties {
-  const font = value?.font || fallbackFont;
-  return {
-    fontFamily: fontStacks[font] || fontStacks[fallbackFont],
-    fontSize: `${value?.size ?? fallbackSize}px`,
-    textAlign: value?.align || 'left',
-    ...(value?.color ? {color: value.color} : {}),
-  };
-}
 
 export function SiteHeader({
   brandName = 'Dra. Heloisa Veiga',
@@ -56,27 +36,32 @@ export function SiteHeader({
   navTreatmentsLabel = 'Tratamentos',
   navCasesLabel = 'Casos',
   navContactLabel = 'Contato',
-  brandNameTypography,
-  subtitleTypography,
-  navTypography,
+  brandNameStyle,
+  subtitleStyle,
+  navStyle,
+  brandNameProps,
+  subtitleProps,
+  logoProps,
+  navAboutProps,
+  navTreatmentsProps,
+  navCasesProps,
+  navContactProps,
 }: SiteHeaderProps) {
-  const navStyle = typeStyle(navTypography, 'sans', 14);
-
   return (
     <header className="site-header">
       <div className="container header-inner">
         <a className="brand" href="/#inicio" aria-label="Ir para a página inicial">
-          <img className="brand-mark" src={logoUrl} alt="Marca" style={{objectFit: 'cover'}} />
+          <img className="brand-mark" src={logoUrl} alt="Marca" style={{objectFit: 'cover'}} {...logoProps} />
           <span className="brand-text">
-            <strong style={typeStyle(brandNameTypography, 'sans', 15)}>{brandName}</strong>
-            <small style={typeStyle(subtitleTypography, 'sans', 12)}>{subtitle}</small>
+            <strong style={brandNameStyle} {...brandNameProps}>{brandName}</strong>
+            <small style={subtitleStyle} {...subtitleProps}>{subtitle}</small>
           </span>
         </a>
         <nav className="nav" aria-label="Menu principal">
-          <a href="/#sobre" style={navStyle}>{navAboutLabel}</a>
-          <a href="/#tratamentos" style={navStyle}>{navTreatmentsLabel}</a>
-          <a href="/#casos" style={navStyle}>{navCasesLabel}</a>
-          <a href="/#contato" style={navStyle}>{navContactLabel}</a>
+          <a href="/#sobre" style={navStyle} {...navAboutProps}>{navAboutLabel}</a>
+          <a href="/#tratamentos" style={navStyle} {...navTreatmentsProps}>{navTreatmentsLabel}</a>
+          <a href="/#casos" style={navStyle} {...navCasesProps}>{navCasesLabel}</a>
+          <a href="/#contato" style={navStyle} {...navContactProps}>{navContactLabel}</a>
         </nav>
       </div>
       <div className="category-nav-shell">
