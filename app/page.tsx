@@ -207,6 +207,19 @@ export default async function HomePage() {
         <a href="#casos" {...siteText(settings, 'navCasesLabel', 'Menu · Casos', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navCasesLabel}</a>
         <a href="#contato" {...siteText(settings, 'navContactLabel', 'Menu · Contato', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navContactLabel}</a>
       </nav>
+      <details className="site-menu">
+        <summary aria-label="Abrir menu de navegação"><span className="menu-icon" aria-hidden="true"><i /><i /><i /></span><span className="menu-label">Menu</span></summary>
+        <nav className="site-menu-panel" aria-label="Páginas do site">
+          <a href="/">Início</a>
+          <a href="/facetas-em-resina">Facetas em resina</a>
+          <a href="/clareamento-dental">Clareamento dental</a>
+          <a href="/coroa-dentaria">Coroa dentária</a>
+          <a href="/dente-quebrado">Dente quebrado</a>
+          <a href="/botox">Toxina botulínica</a>
+          <a href="/harmonizacao-facial">Harmonização facial</a>
+          <a href="/dentista-santana">Consultório em Santana</a>
+        </nav>
+      </details>
     </div></header>
 
     <main className="page-sections" data-vb-layout="true" data-vb-style-doc-id={settingsId(settings)} data-vb-site-settings-id={settingsId(settings)} data-vb-style-doc-type="siteSettings" data-vb-label="Fundo entre as seções" data-vb-background-field="pageBackground">
@@ -236,12 +249,12 @@ export default async function HomePage() {
         <span className="eyebrow" {...siteText(settings, 'treatmentsEyebrow', 'Tratamentos · chamada curta', 'eyebrowStyle')} style={typographyStyle(settings, 'eyebrowStyle', 'sans', 12)}>{settings.treatmentsEyebrow}</span>
         <h2 className="section-title" {...siteText(settings, 'treatmentsTitle', 'Tratamentos · título', 'treatmentsTitle')} style={typographyStyle(settings, 'treatmentsTitle', 'editorial', 56)}>{settings.treatmentsTitle}</h2>
         <p className="section-copy" {...siteText(settings, 'treatmentsDescription', 'Tratamentos · descrição', 'treatmentsDescription')} style={typographyStyle(settings, 'treatmentsDescription', 'sans', 16)}>{settings.treatmentsDescription}</p>
-        <div className="gallery-grid">{displayedTreatments.map((item) => { const imageUrl = cleanUrl(item.imageUrl); const fallbackImageUrl = mobileTreatmentFallbackImages[stegaClean(item._id)]; const effectiveImageUrl = imageUrl || fallbackImageUrl; const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); return <article className="gallery-card" key={item._id}>
+        <div className="gallery-grid">{displayedTreatments.map((item) => { const imageUrl = cleanUrl(item.imageUrl); const fallbackImageUrl = mobileTreatmentFallbackImages[stegaClean(item._id)]; const effectiveImageUrl = imageUrl || fallbackImageUrl; const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); const normalizedTitle = stegaClean(item.title || '').toLowerCase(); const serviceHref = normalizedTitle.includes('faceta') ? '/facetas-em-resina' : normalizedTitle.includes('clareamento') ? '/clareamento-dental' : normalizedTitle.includes('estética facial') ? '/harmonizacao-facial' : undefined; return <article className="gallery-card" key={item._id}>
           <div className="gallery-media-shell">
             <img className={`gallery-media${effectiveImageUrl ? '' : ' gallery-media-empty'}`} src={effectiveImageUrl || '/treatment-image-placeholder.svg'} alt={stegaClean(item.title)} {...imageProps} style={imageStyle(settings, 'treatment')} />
             {!effectiveImageUrl && <span className="gallery-image-hint" aria-hidden="true">Adicionar imagem</span>}
           </div>
-          <div className="gallery-body"><h3 {...(editable ? documentText(settings, item._id, 'treatment', 'title', 'Tratamento · título', 'treatmentCardTitleStyle') : {})} style={typographyStyle(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{item.title}</h3><p {...(editable ? documentText(settings, item._id, 'treatment', 'summary', 'Tratamento · descrição', 'treatmentCardBodyStyle') : {})} style={typographyStyle(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{item.summary}</p></div>
+          <div className="gallery-body"><h3 {...(editable ? documentText(settings, item._id, 'treatment', 'title', 'Tratamento · título', 'treatmentCardTitleStyle') : {})} style={typographyStyle(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{item.title}</h3><p {...(editable ? documentText(settings, item._id, 'treatment', 'summary', 'Tratamento · descrição', 'treatmentCardBodyStyle') : {})} style={typographyStyle(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{item.summary}</p>{serviceHref && <a className="treatment-learn-more" href={serviceHref}>Saiba mais</a>}</div>
         </article>; })}</div>
       </div></section>
 

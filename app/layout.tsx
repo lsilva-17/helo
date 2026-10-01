@@ -12,6 +12,7 @@ import './globals.css';
 import './visual-builder.css';
 import './visual-builder-toolbar-drag.css';
 import './visual-customization.css';
+import './service-pages.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://draheloisaveiga.vercel.app'),

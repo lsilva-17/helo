@@ -13,10 +13,14 @@ const singletonTypes = new Set(['siteSettings']);
 const SITE_SETTINGS_ID = '143778fa-0f7b-4e2b-9f1b-d34bdce5907d';
 
 const mainDocuments = defineDocuments([
-  {
-    route: '/',
-    type: 'siteSettings',
-  },
+  {route: '/', type: 'siteSettings'},
+  {route: '/facetas-em-resina', type: 'servicePage'},
+  {route: '/clareamento-dental', type: 'servicePage'},
+  {route: '/coroa-dentaria', type: 'servicePage'},
+  {route: '/dente-quebrado', type: 'servicePage'},
+  {route: '/botox', type: 'servicePage'},
+  {route: '/harmonizacao-facial', type: 'servicePage'},
+  {route: '/dentista-santana', type: 'servicePage'},
 ]);
 
 const locations = {
@@ -31,6 +35,15 @@ const locations = {
           href: '/',
         },
       ],
+    }),
+  }),
+  servicePage: defineLocations({
+    select: {
+      title: 'menuLabel',
+      slug: 'slug.current',
+    },
+    resolve: (doc) => ({
+      locations: doc?.slug ? [{title: doc?.title || 'Página de serviço', href: '/' + doc.slug}] : [],
     }),
   }),
   treatment: defineLocations({
@@ -83,9 +96,13 @@ export default defineConfig({
                   .documentId(SITE_SETTINGS_ID)
                   .title('Configurações do site'),
               ),
+            S.listItem()
+              .title('Páginas de serviços e localização')
+              .schemaType('servicePage')
+              .child(S.documentTypeList('servicePage').title('Páginas de serviços e localização')),
             S.divider(),
             ...S.documentTypeListItems().filter(
-              (item) => !singletonTypes.has(item.getId() || ''),
+              (item) => !singletonTypes.has(item.getId() || '') && item.getId() !== 'servicePage',
             ),
           ]),
     }),
