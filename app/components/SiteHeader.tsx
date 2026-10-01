@@ -1,37 +1,70 @@
+import type {CSSProperties} from 'react';
 import {serviceMenuItems} from '@/app/lib/servicePages';
 
 type SiteHeaderProps = {
   brandName?: string;
   subtitle?: string;
   logoUrl?: string;
+  navAboutLabel?: string;
+  navTreatmentsLabel?: string;
+  navCasesLabel?: string;
+  navContactLabel?: string;
+  brandNameStyle?: CSSProperties;
+  subtitleStyle?: CSSProperties;
+  navStyle?: CSSProperties;
+  categoryStyle?: CSSProperties;
+  brandNameProps?: Record<string, any>;
+  subtitleProps?: Record<string, any>;
+  logoProps?: Record<string, any>;
+  navAboutProps?: Record<string, any>;
+  navTreatmentsProps?: Record<string, any>;
+  navCasesProps?: Record<string, any>;
+  navContactProps?: Record<string, any>;
 };
 
 export function SiteHeader({
   brandName = 'Dra. Heloisa Veiga',
   subtitle = 'Odontologia estética · São Paulo',
   logoUrl = '/brand-hv.svg',
+  navAboutLabel = 'Sobre',
+  navTreatmentsLabel = 'Tratamentos',
+  navCasesLabel = 'Casos',
+  navContactLabel = 'Contato',
+  brandNameStyle,
+  subtitleStyle,
+  navStyle,
+  categoryStyle,
+  brandNameProps,
+  subtitleProps,
+  logoProps,
+  navAboutProps,
+  navTreatmentsProps,
+  navCasesProps,
+  navContactProps,
 }: SiteHeaderProps) {
   return (
-    <header className="site-header service-site-header">
+    <header className="site-header">
       <div className="container header-inner">
-        <a className="brand" href="/" aria-label="Ir para a página inicial">
-          <img className="brand-mark" src={logoUrl} alt="" />
+        <a className="brand" href="/#inicio" aria-label="Ir para a página inicial">
+          <img className="brand-mark" src={logoUrl} alt="Marca" style={{objectFit: 'cover'}} {...logoProps} />
           <span className="brand-text">
-            <strong>{brandName}</strong>
-            <small>{subtitle}</small>
+            <strong style={brandNameStyle} {...brandNameProps}>{brandName}</strong>
+            <small style={subtitleStyle} {...subtitleProps}>{subtitle}</small>
           </span>
         </a>
-        <details className="site-menu">
-          <summary aria-label="Abrir menu de navegação">
-            <span className="menu-icon" aria-hidden="true"><i /><i /><i /></span>
-            <span className="menu-label">Menu</span>
-          </summary>
-          <nav className="site-menu-panel" aria-label="Navegação entre páginas">
-            {serviceMenuItems.map((item) => (
-              <a key={item.href} href={item.href}>{item.label}</a>
-            ))}
-          </nav>
-        </details>
+        <nav className="nav" aria-label="Menu principal">
+          <a href="/#sobre" style={navStyle} {...navAboutProps}>{navAboutLabel}</a>
+          <a href="/#tratamentos" style={navStyle} {...navTreatmentsProps}>{navTreatmentsLabel}</a>
+          <a href="/#casos" style={navStyle} {...navCasesProps}>{navCasesLabel}</a>
+          <a href="/#contato" style={navStyle} {...navContactProps}>{navContactLabel}</a>
+        </nav>
+      </div>
+      <div className="category-nav-shell">
+        <nav className="container category-nav" aria-label="Categorias de atendimento">
+          {serviceMenuItems.filter((item) => item.href !== '/').map((item) => (
+            <a key={item.href} href={item.href} style={categoryStyle || navStyle} data-brand-style="navStyle">{item.label}</a>
+          ))}
+        </nav>
       </div>
     </header>
   );

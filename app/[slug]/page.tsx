@@ -28,9 +28,34 @@ type PageDoc = {
 };
 
 type SiteSettings = {
+  _id?: string;
   professionalName?: string;
   brandSubtitle?: string;
   brandLogoUrl?: string;
+  navAboutLabel?: string;
+  navTreatmentsLabel?: string;
+  navCasesLabel?: string;
+  navContactLabel?: string;
+  brandNameFont?: string;
+  brandNameSize?: number;
+  brandNameAlign?: 'left' | 'center' | 'right';
+  brandNameColor?: string;
+  brandSubtitleStyleFont?: string;
+  brandSubtitleStyleSize?: number;
+  brandSubtitleStyleAlign?: 'left' | 'center' | 'right';
+  brandSubtitleStyleColor?: string;
+  navStyleFont?: string;
+  navStyleSize?: number;
+  navStyleAlign?: 'left' | 'center' | 'right';
+  navStyleColor?: string;
+  eyebrowStyleFont?: string; eyebrowStyleSize?: number; eyebrowStyleAlign?: 'left' | 'center' | 'right'; eyebrowStyleColor?: string;
+  buttonStyleFont?: string; buttonStyleSize?: number; buttonStyleAlign?: 'left' | 'center' | 'right'; buttonStyleColor?: string;
+  heroTitleFont?: string; heroTitleSize?: number; heroTitleAlign?: 'left' | 'center' | 'right'; heroTitleColor?: string;
+  heroDescriptionFont?: string; heroDescriptionSize?: number; heroDescriptionAlign?: 'left' | 'center' | 'right'; heroDescriptionColor?: string;
+  treatmentsTitleFont?: string; treatmentsTitleSize?: number; treatmentsTitleAlign?: 'left' | 'center' | 'right'; treatmentsTitleColor?: string;
+  treatmentsDescriptionFont?: string; treatmentsDescriptionSize?: number; treatmentsDescriptionAlign?: 'left' | 'center' | 'right'; treatmentsDescriptionColor?: string;
+  treatmentCardTitleStyleFont?: string; treatmentCardTitleStyleSize?: number; treatmentCardTitleStyleAlign?: 'left' | 'center' | 'right'; treatmentCardTitleStyleColor?: string;
+  treatmentCardBodyStyleFont?: string; treatmentCardBodyStyleSize?: number; treatmentCardBodyStyleAlign?: 'left' | 'center' | 'right'; treatmentCardBodyStyleColor?: string;
   whatsapp?: string;
   instagram?: string;
   clinicAddress?: string;
@@ -46,14 +71,50 @@ const pageQuery = `{
     "caseImages": caseImages[]{"url": asset->url, alt},
     address, hours, mapEmbedUrl, seoTitle, seoDescription
   },
-  "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{
-    professionalName, brandSubtitle, "brandLogoUrl": brandLogo.asset->url,
-    whatsapp, instagram, clinicAddress, mapsUrl
-  }
+  "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url}
 }`;
+
+const fontStacks: Record<string, string> = {
+  editorial: "'Cormorant Garamond', Georgia, serif",
+  sans: "'Inter', Arial, sans-serif",
+  classic: "Georgia, 'Times New Roman', serif",
+  arial: "Arial, Helvetica, sans-serif",
+  roboto: "'Roboto', Arial, sans-serif",
+  inter: "'Inter', Arial, sans-serif",
+  opensans: "'Open Sans', Arial, sans-serif",
+  montserrat: "'Montserrat', Arial, sans-serif",
+  poppins: "'Poppins', Arial, sans-serif",
+  dmsans: "'DM Sans', Arial, sans-serif",
+  lato: "'Lato', Arial, sans-serif",
+  playfair: "'Playfair Display', Georgia, serif",
+  lora: "'Lora', Georgia, serif",
+  merriweather: "'Merriweather', Georgia, serif",
+};
 
 function clean(value?: string) {
   return value ? stegaClean(value) : undefined;
+}
+
+function headerTypographyStyle(font: string | undefined, size: number | undefined, align: 'left' | 'center' | 'right' | undefined, fallbackFont: string, fallbackSize: number) {
+  const resolvedFont = clean(font) || fallbackFont;
+  return {
+    fontFamily: fontStacks[resolvedFont] || fontStacks[fallbackFont],
+    fontSize: `${size ?? fallbackSize}px`,
+    textAlign: align || 'left',
+  } as const;
+}
+
+function settingTypography(settings: SiteSettings | null, key: string, fallbackFont: string, fallbackSize: number, fallbackAlign: 'left' | 'center' | 'right' = 'left') {
+  const value = settings as Record<string, unknown> | null;
+  const font = clean(typeof value?.[`${key}Font`] === 'string' ? String(value?.[`${key}Font`]) : undefined) || fallbackFont;
+  const size = typeof value?.[`${key}Size`] === 'number' ? Number(value?.[`${key}Size`]) : fallbackSize;
+  const alignValue = typeof value?.[`${key}Align`] === 'string' ? String(value?.[`${key}Align`]) : fallbackAlign;
+  const align = (alignValue === 'center' || alignValue === 'right') ? alignValue : 'left';
+  return {fontFamily: fontStacks[font] || fontStacks[fallbackFont], fontSize: `${size}px`, textAlign: align} as const;
+}
+
+function brandStyle(key: string) {
+  return {'data-brand-style': key};
 }
 
 function whatsappLink(number?: string, pageTitle?: string) {
@@ -150,31 +211,28 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
 
   return (
     <>
-      <SiteHeader brandName={brandName} subtitle={subtitle} logoUrl={logoUrl} />
+      <SiteHeader
+        brandName={brandName}
+        subtitle={subtitle}
+        logoUrl={logoUrl}
+        navAboutLabel={clean(settings?.navAboutLabel) || 'Sobre'}
+        navTreatmentsLabel={clean(settings?.navTreatmentsLabel) || 'Tratamentos'}
+        navCasesLabel={clean(settings?.navCasesLabel) || 'Casos'}
+        navContactLabel={clean(settings?.navContactLabel) || 'Contato'}
+        brandNameStyle={headerTypographyStyle(settings?.brandNameFont, settings?.brandNameSize, settings?.brandNameAlign, 'sans', 15)}
+        subtitleStyle={headerTypographyStyle(settings?.brandSubtitleStyleFont, settings?.brandSubtitleStyleSize, settings?.brandSubtitleStyleAlign, 'sans', 12)}
+        navStyle={headerTypographyStyle(settings?.navStyleFont, settings?.navStyleSize, settings?.navStyleAlign, 'sans', 14)}
+        categoryStyle={headerTypographyStyle(settings?.navStyleFont, settings?.navStyleSize, settings?.navStyleAlign, 'sans', 14)}
+        brandNameProps={brandStyle('brandName')}
+        subtitleProps={brandStyle('brandSubtitleStyle')}
+        navAboutProps={brandStyle('navStyle')}
+        navTreatmentsProps={brandStyle('navStyle')}
+        navCasesProps={brandStyle('navStyle')}
+        navContactProps={brandStyle('navStyle')}
+      />
       <main className="service-page">
-        <section className="service-hero">
-          <div className="container service-hero-grid">
-            <div className="service-hero-copy">
-              <span className="eyebrow" {...editProps(page, 'eyebrow', 'Chamada curta')}>{content.eyebrow}</span>
-              <h1 {...editProps(page, 'title', 'Título principal')}>{content.title}</h1>
-              <p {...editProps(page, 'intro', 'Introdução')}>{content.intro}</p>
-              <div className="service-actions">
-                <a className="btn btn-primary" href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
-                {settings?.mapsUrl && <a className="btn btn-secondary" href={clean(settings.mapsUrl)} target="_blank" rel="noreferrer">Como chegar</a>}
-              </div>
-            </div>
-            <div className="service-hero-media">
-              {page?.heroImageUrl ? (
-                <img src={clean(page.heroImageUrl)} alt={clean(content.title)} data-vb-doc-id={page._id?.replace(/^drafts\./, '')} data-vb-doc-type="servicePage" data-vb-image-field="heroImage" data-vb-label="Imagem principal" />
-              ) : (
-                <div className="service-image-placeholder"><span>Imagem do procedimento</span><small>Adicione no Studio quando desejar</small></div>
-              )}
-            </div>
-          </div>
-        </section>
-
         {content.kind === 'location' && (
-          <section className="service-section location-overview">
+          <section className="service-section location-overview location-overview-top">
             <div className="container location-grid">
               <div>
                 <span className="eyebrow">Consultório</span>
@@ -190,14 +248,38 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           </section>
         )}
 
+        <section className="service-hero">
+          <div className={`container service-hero-grid${content.kind === 'location' ? ' service-hero-location' : ''}`}>
+            <div className="hero-card service-hero-copy">
+              <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)} {...editProps(page, 'eyebrow', 'Chamada curta')}>{content.eyebrow}</span>
+              <h1 {...brandStyle('heroTitle')} style={settingTypography(settings, 'heroTitle', 'editorial', 67)} {...editProps(page, 'title', 'Título principal')}>{content.title}</h1>
+              <p {...brandStyle('heroDescription')} style={settingTypography(settings, 'heroDescription', 'sans', 16)} {...editProps(page, 'intro', 'Introdução')}>{content.intro}</p>
+              <div className="service-actions">
+                <a className="btn btn-primary" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
+                {settings?.mapsUrl && <a className="btn btn-secondary" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={clean(settings.mapsUrl)} target="_blank" rel="noreferrer">Como chegar</a>}
+              </div>
+            </div>
+            {content.kind !== 'location' && (
+              <div className="service-hero-media">
+                {page?.heroImageUrl ? (
+                  <img src={clean(page.heroImageUrl)} alt={clean(content.title)} data-vb-doc-id={page._id?.replace(/^drafts\./, '')} data-vb-doc-type="servicePage" data-vb-image-field="heroImage" data-vb-label="Imagem principal" />
+                ) : (
+                  <div className="service-image-placeholder"><span>Imagem do procedimento</span><small>Adicione no Studio quando desejar</small></div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+
         <section className="service-section">
           <div className="container service-content-grid">
             {content.sections.map((section, index) => (
               <article className="service-content-card" key={section.heading + index}>
                 <span className="service-index">{String(index + 1).padStart(2, '0')}</span>
-                <h2>{section.heading}</h2>
-                <p>{section.body}</p>
-                {!!section.bullets?.length && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
+                <h2 {...brandStyle('treatmentCardTitleStyle')} style={settingTypography(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{section.heading}</h2>
+                <p {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{section.body}</p>
+                {!!section.bullets?.length && <ul>{section.bullets.map((bullet) => <li key={bullet} {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{bullet}</li>)}</ul>}
               </article>
             ))}
           </div>
@@ -208,8 +290,8 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
             <div className="container">
               <span className="eyebrow">Casos e imagens</span>
               <div className="service-section-heading">
-                <h2>Espaço para casos clínicos e detalhes do procedimento</h2>
-                <p>As imagens podem ser adicionadas depois pelo Studio, mantendo o conteúdo atual intacto.</p>
+                <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Espaço para casos clínicos e detalhes do procedimento</h2>
+                <p {...brandStyle('treatmentsDescription')} style={settingTypography(settings, 'treatmentsDescription', 'sans', 16)}>As imagens podem ser adicionadas depois pelo Studio, mantendo o conteúdo atual intacto.</p>
               </div>
               <div className="service-case-grid">
                 {page?.caseImages?.length ? page.caseImages.map((image, index) => (
@@ -229,12 +311,12 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           <section className="service-section faq-section">
             <div className="container faq-wrap">
               <span className="eyebrow">Perguntas frequentes</span>
-              <h2>Dúvidas comuns sobre {content.menuLabel.toLowerCase()}</h2>
+              <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Dúvidas comuns sobre {content.menuLabel.toLowerCase()}</h2>
               <div className="faq-list">
                 {content.faqs.map((faq) => (
                   <details key={faq.question}>
-                    <summary>{faq.question}</summary>
-                    <p>{faq.answer}</p>
+                    <summary {...brandStyle('treatmentCardTitleStyle')} style={settingTypography(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{faq.question}</summary>
+                    <p {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{faq.answer}</p>
                   </details>
                 ))}
               </div>
@@ -246,8 +328,8 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           <div className="container service-cta">
             <div>
               <span className="eyebrow">Contato</span>
-              <h2 {...editProps(page, 'ctaTitle', 'CTA · título')}>{content.ctaTitle}</h2>
-              <p {...editProps(page, 'ctaBody', 'CTA · texto')}>{content.ctaBody}</p>
+              <h2 {...brandStyle('contactTitle')} style={settingTypography(settings, 'contactTitle', 'editorial', 56)} {...editProps(page, 'ctaTitle', 'CTA · título')}>{content.ctaTitle}</h2>
+              <p {...brandStyle('contactDescription')} style={settingTypography(settings, 'contactDescription', 'sans', 16)} {...editProps(page, 'ctaBody', 'CTA · texto')}>{content.ctaBody}</p>
             </div>
             <a className="btn btn-whatsapp" href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
           </div>
