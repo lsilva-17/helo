@@ -72,8 +72,34 @@ const pageQuery = `{
   }
 }`;
 
+const fontStacks: Record<string, string> = {
+  editorial: "'Cormorant Garamond', Georgia, serif",
+  sans: "'Inter', Arial, sans-serif",
+  classic: "Georgia, 'Times New Roman', serif",
+  arial: "Arial, Helvetica, sans-serif",
+  roboto: "'Roboto', Arial, sans-serif",
+  inter: "'Inter', Arial, sans-serif",
+  opensans: "'Open Sans', Arial, sans-serif",
+  montserrat: "'Montserrat', Arial, sans-serif",
+  poppins: "'Poppins', Arial, sans-serif",
+  dmsans: "'DM Sans', Arial, sans-serif",
+  lato: "'Lato', Arial, sans-serif",
+  playfair: "'Playfair Display', Georgia, serif",
+  lora: "'Lora', Georgia, serif",
+  merriweather: "'Merriweather', Georgia, serif",
+};
+
 function clean(value?: string) {
   return value ? stegaClean(value) : undefined;
+}
+
+function headerTypographyStyle(font: string | undefined, size: number | undefined, align: 'left' | 'center' | 'right' | undefined, fallbackFont: string, fallbackSize: number) {
+  const resolvedFont = clean(font) || fallbackFont;
+  return {
+    fontFamily: fontStacks[resolvedFont] || fontStacks[fallbackFont],
+    fontSize: `${size ?? fallbackSize}px`,
+    textAlign: align || 'left',
+  } as const;
 }
 
 function whatsappLink(number?: string, pageTitle?: string) {
@@ -178,24 +204,9 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         navTreatmentsLabel={clean(settings?.navTreatmentsLabel) || 'Tratamentos'}
         navCasesLabel={clean(settings?.navCasesLabel) || 'Casos'}
         navContactLabel={clean(settings?.navContactLabel) || 'Contato'}
-        brandNameTypography={{
-          font: clean(settings?.brandNameFont),
-          size: settings?.brandNameSize,
-          align: settings?.brandNameAlign,
-          color: clean(settings?.brandNameColor),
-        }}
-        subtitleTypography={{
-          font: clean(settings?.brandSubtitleStyleFont),
-          size: settings?.brandSubtitleStyleSize,
-          align: settings?.brandSubtitleStyleAlign,
-          color: clean(settings?.brandSubtitleStyleColor),
-        }}
-        navTypography={{
-          font: clean(settings?.navStyleFont),
-          size: settings?.navStyleSize,
-          align: settings?.navStyleAlign,
-          color: clean(settings?.navStyleColor),
-        }}
+        brandNameStyle={headerTypographyStyle(settings?.brandNameFont, settings?.brandNameSize, settings?.brandNameAlign, 'sans', 15)}
+        subtitleStyle={headerTypographyStyle(settings?.brandSubtitleStyleFont, settings?.brandSubtitleStyleSize, settings?.brandSubtitleStyleAlign, 'sans', 12)}
+        navStyle={headerTypographyStyle(settings?.navStyleFont, settings?.navStyleSize, settings?.navStyleAlign, 'sans', 14)}
       />
       <main className="service-page">
         {content.kind === 'location' && (
