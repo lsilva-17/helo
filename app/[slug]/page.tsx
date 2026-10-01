@@ -31,6 +31,22 @@ type SiteSettings = {
   professionalName?: string;
   brandSubtitle?: string;
   brandLogoUrl?: string;
+  navAboutLabel?: string;
+  navTreatmentsLabel?: string;
+  navCasesLabel?: string;
+  navContactLabel?: string;
+  brandNameFont?: string;
+  brandNameSize?: number;
+  brandNameAlign?: 'left' | 'center' | 'right';
+  brandNameColor?: string;
+  brandSubtitleStyleFont?: string;
+  brandSubtitleStyleSize?: number;
+  brandSubtitleStyleAlign?: 'left' | 'center' | 'right';
+  brandSubtitleStyleColor?: string;
+  navStyleFont?: string;
+  navStyleSize?: number;
+  navStyleAlign?: 'left' | 'center' | 'right';
+  navStyleColor?: string;
   whatsapp?: string;
   instagram?: string;
   clinicAddress?: string;
@@ -48,6 +64,10 @@ const pageQuery = `{
   },
   "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{
     professionalName, brandSubtitle, "brandLogoUrl": brandLogo.asset->url,
+    navAboutLabel, navTreatmentsLabel, navCasesLabel, navContactLabel,
+    brandNameFont, brandNameSize, brandNameAlign, brandNameColor,
+    brandSubtitleStyleFont, brandSubtitleStyleSize, brandSubtitleStyleAlign, brandSubtitleStyleColor,
+    navStyleFont, navStyleSize, navStyleAlign, navStyleColor,
     whatsapp, instagram, clinicAddress, mapsUrl
   }
 }`;
@@ -150,7 +170,33 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
 
   return (
     <>
-      <SiteHeader brandName={brandName} subtitle={subtitle} logoUrl={logoUrl} />
+      <SiteHeader
+        brandName={brandName}
+        subtitle={subtitle}
+        logoUrl={logoUrl}
+        navAboutLabel={clean(settings?.navAboutLabel) || 'Sobre'}
+        navTreatmentsLabel={clean(settings?.navTreatmentsLabel) || 'Tratamentos'}
+        navCasesLabel={clean(settings?.navCasesLabel) || 'Casos'}
+        navContactLabel={clean(settings?.navContactLabel) || 'Contato'}
+        brandNameTypography={{
+          font: clean(settings?.brandNameFont),
+          size: settings?.brandNameSize,
+          align: settings?.brandNameAlign,
+          color: clean(settings?.brandNameColor),
+        }}
+        subtitleTypography={{
+          font: clean(settings?.brandSubtitleStyleFont),
+          size: settings?.brandSubtitleStyleSize,
+          align: settings?.brandSubtitleStyleAlign,
+          color: clean(settings?.brandSubtitleStyleColor),
+        }}
+        navTypography={{
+          font: clean(settings?.navStyleFont),
+          size: settings?.navStyleSize,
+          align: settings?.navStyleAlign,
+          color: clean(settings?.navStyleColor),
+        }}
+      />
       <main className="service-page">
         {content.kind === 'location' && (
           <section className="service-section location-overview location-overview-top">
