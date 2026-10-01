@@ -152,29 +152,8 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
     <>
       <SiteHeader brandName={brandName} subtitle={subtitle} logoUrl={logoUrl} />
       <main className="service-page">
-        <section className="service-hero">
-          <div className="container service-hero-grid">
-            <div className="service-hero-copy">
-              <span className="eyebrow" {...editProps(page, 'eyebrow', 'Chamada curta')}>{content.eyebrow}</span>
-              <h1 {...editProps(page, 'title', 'Título principal')}>{content.title}</h1>
-              <p {...editProps(page, 'intro', 'Introdução')}>{content.intro}</p>
-              <div className="service-actions">
-                <a className="btn btn-primary" href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
-                {settings?.mapsUrl && <a className="btn btn-secondary" href={clean(settings.mapsUrl)} target="_blank" rel="noreferrer">Como chegar</a>}
-              </div>
-            </div>
-            <div className="service-hero-media">
-              {page?.heroImageUrl ? (
-                <img src={clean(page.heroImageUrl)} alt={clean(content.title)} data-vb-doc-id={page._id?.replace(/^drafts\./, '')} data-vb-doc-type="servicePage" data-vb-image-field="heroImage" data-vb-label="Imagem principal" />
-              ) : (
-                <div className="service-image-placeholder"><span>Imagem do procedimento</span><small>Adicione no Studio quando desejar</small></div>
-              )}
-            </div>
-          </div>
-        </section>
-
         {content.kind === 'location' && (
-          <section className="service-section location-overview">
+          <section className="service-section location-overview location-overview-top">
             <div className="container location-grid">
               <div>
                 <span className="eyebrow">Consultório</span>
@@ -189,6 +168,30 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
             </div>
           </section>
         )}
+
+        <section className="service-hero">
+          <div className={`container service-hero-grid${content.kind === 'location' ? ' service-hero-location' : ''}`}>
+            <div className="service-hero-copy">
+              <span className="eyebrow" {...editProps(page, 'eyebrow', 'Chamada curta')}>{content.eyebrow}</span>
+              <h1 {...editProps(page, 'title', 'Título principal')}>{content.title}</h1>
+              <p {...editProps(page, 'intro', 'Introdução')}>{content.intro}</p>
+              <div className="service-actions">
+                <a className="btn btn-primary" href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
+                {settings?.mapsUrl && <a className="btn btn-secondary" href={clean(settings.mapsUrl)} target="_blank" rel="noreferrer">Como chegar</a>}
+              </div>
+            </div>
+            {content.kind !== 'location' && (
+              <div className="service-hero-media">
+                {page?.heroImageUrl ? (
+                  <img src={clean(page.heroImageUrl)} alt={clean(content.title)} data-vb-doc-id={page._id?.replace(/^drafts\./, '')} data-vb-doc-type="servicePage" data-vb-image-field="heroImage" data-vb-label="Imagem principal" />
+                ) : (
+                  <div className="service-image-placeholder"><span>Imagem do procedimento</span><small>Adicione no Studio quando desejar</small></div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
 
         <section className="service-section">
           <div className="container service-content-grid">
