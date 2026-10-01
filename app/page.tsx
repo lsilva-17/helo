@@ -1,7 +1,6 @@
 import {stegaClean} from 'next-sanity';
 import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
-import {serviceMenuItems} from '@/app/lib/servicePages';
 import {SiteHeader} from '@/app/components/SiteHeader';
 
 export const revalidate = 60;

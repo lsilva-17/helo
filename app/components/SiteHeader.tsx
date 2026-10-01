@@ -1,12 +1,5 @@
-import type {AnchorHTMLAttributes, CSSProperties, HTMLAttributes, ImgHTMLAttributes} from 'react';
+import type {CSSProperties} from 'react';
 import {serviceMenuItems} from '@/app/lib/servicePages';
-
-type HeaderTypography = {
-  font?: string;
-  size?: number;
-  align?: 'left' | 'center' | 'right';
-  color?: string;
-};
 
 type SiteHeaderProps = {
   brandName?: string;
@@ -19,13 +12,13 @@ type SiteHeaderProps = {
   brandNameStyle?: CSSProperties;
   subtitleStyle?: CSSProperties;
   navStyle?: CSSProperties;
-  brandNameProps?: HTMLAttributes<HTMLElement>;
-  subtitleProps?: HTMLAttributes<HTMLElement>;
-  logoProps?: ImgHTMLAttributes<HTMLImageElement>;
-  navAboutProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
-  navTreatmentsProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
-  navCasesProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
-  navContactProps?: AnchorHTMLAttributes<HTMLAnchorElement>;
+  brandNameProps?: Record<string, any>;
+  subtitleProps?: Record<string, any>;
+  logoProps?: Record<string, any>;
+  navAboutProps?: Record<string, any>;
+  navTreatmentsProps?: Record<string, any>;
+  navCasesProps?: Record<string, any>;
+  navContactProps?: Record<string, any>;
 };
 
 export function SiteHeader({
