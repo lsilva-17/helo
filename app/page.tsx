@@ -1,6 +1,9 @@
+import type {Metadata} from 'next';
 import {stegaClean} from 'next-sanity';
 import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
+import {SiteHeader} from '@/app/components/SiteHeader';
+import {SITE_URL, DENTIST_ID, DEFAULT_ADDRESS, absoluteUrl, phoneInternational} from '@/app/lib/site';
 
 export const revalidate = 60;
 
@@ -158,10 +161,52 @@ function imageStyle(settings: Settings, prefix: 'hero' | 'treatment' | 'case') {
   return {...base, height: '100%', minHeight: `${n(settings, 'heroImageHeight', fallbackHeight)}px`, width: `${n(settings, 'heroImageWidth', 100)}%`, transform: `translate(${n(settings, 'heroImageOffsetX', 0)}px, ${n(settings, 'heroImageOffsetY', 0)}px)`, marginInline: 'auto'};
 }
 
+export async function generateMetadata(): Promise<Metadata> {
+  const {settings} = await getContent();
+  const title = s(settings, 'seoTitle', 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo');
+  const description = s(settings, 'seoDescription', 'Odontologia estética com atendimento personalizado em São Paulo. Conheça o trabalho da Dra. Heloisa Veiga e agende uma avaliação.');
+  const image = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl));
+  return {
+    title,
+    description,
+    alternates: {canonical: SITE_URL + '/'},
+    openGraph: {
+      title,
+      description,
+      url: SITE_URL + '/',
+      type: 'website',
+      locale: 'pt_BR',
+      ...(image ? {images: [{url: image, alt: 'Dra. Heloisa Veiga - Odontologia Estética'}]} : {}),
+    },
+    twitter: {card: 'summary_large_image', title, description, ...(image ? {images: [image]} : {})},
+    robots: {index: true, follow: true},
+  };
+}
+
 export default async function HomePage() {
   const {isEnabled: isDraftMode} = await draftMode();
   const {settings, treatments, cases} = await getContent();
   const wa = whatsappLink(settings.whatsapp); const floatingWa = whatsappLink(String(fallbackSettings.whatsapp)); const instagram = cleanUrl(settings.instagram); const mapsUrl = cleanUrl(settings.mapsUrl); const heroImageUrl = cleanUrl(settings.heroImageUrl || String(fallbackSettings.heroImageUrl)); const brandLogoUrl = cleanUrl(settings.brandLogoUrl) || '/brand-hv.svg';
+  const businessName = stegaClean(String(settings.professionalName || fallbackSettings.professionalName || 'Dra. Heloisa Veiga'));
+  const businessAddress = stegaClean(String(settings.clinicAddress || DEFAULT_ADDRESS));
+  const businessPhone = phoneInternational(String(settings.whatsapp || fallbackSettings.whatsapp || ''));
+  const mapReference = mapsUrl || `https://www.google.com/maps?q=${encodeURIComponent(businessAddress)}`;
+  const dentistSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Dentist',
+    '@id': DENTIST_ID,
+    name: businessName,
+    url: SITE_URL + '/',
+    telephone: businessPhone,
+    address: {'@type': 'PostalAddress', streetAddress: businessAddress, addressLocality: 'São Paulo', addressRegion: 'SP', postalCode: '02013-002', addressCountry: 'BR'},
+    areaServed: {'@type': 'City', name: 'São Paulo'},
+    hasMap: mapReference,
+    ...(heroImageUrl ? {image: heroImageUrl} : {}),
+    ...(brandLogoUrl ? {logo: absoluteUrl(brandLogoUrl)} : {}),
+    ...(instagram ? {sameAs: [instagram]} : {}),
+    openingHoursSpecification: [{'@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '09:00', closes: '19:00'}],
+  };
+  const websiteSchema = {'@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: SITE_URL + '/', name: businessName, inLanguage: 'pt-BR', publisher: {'@id': DENTIST_ID}};
   const fallbackTreatments: Treatment[] = [
     {_id: 'facetas', title: 'Facetas em resina', summary: 'Planejamento estético para transformar forma, proporção e harmonia do sorriso.'},
     {_id: 'clareamento', title: 'Clareamento dental', summary: 'Estratégias de clareamento indicadas de acordo com a avaliação clínica.'},
@@ -196,18 +241,31 @@ export default async function HomePage() {
   const heroLayout = sectionLayout(settings, 'hero', 'Hero'); const aboutLayout = sectionLayout(settings, 'about', 'Sobre'); const treatmentsLayout = sectionLayout(settings, 'treatments', 'Tratamentos'); const casesLayout = sectionLayout(settings, 'cases', 'Casos'); const contactLayout = sectionLayout(settings, 'contact', 'Contato');
 
   return <>
-    <header className="site-header"><div className="container header-inner">
-      <a className="brand" href="#inicio"><img className="brand-mark" src={brandLogoUrl} alt="Marca" data-vb-doc-id={settingsId(settings)} data-vb-doc-type="siteSettings" data-vb-image-field="brandLogo" data-vb-label="Ícone da marca" style={{objectFit: 'cover'}} /><span className="brand-text">
-        <strong {...siteText(settings, 'professionalName', 'Nome profissional', 'brandName')} style={typographyStyle(settings, 'brandName', 'sans', 15)}>{settings.professionalName}</strong>
-        <small {...siteText(settings, 'brandSubtitle', 'Subtítulo da marca', 'brandSubtitleStyle')} style={typographyStyle(settings, 'brandSubtitleStyle', 'sans', 12)}>{settings.brandSubtitle}</small>
-      </span></a>
-      <nav className="nav" aria-label="Menu principal">
-        <a href="#sobre" {...siteText(settings, 'navAboutLabel', 'Menu · Sobre', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navAboutLabel}</a>
-        <a href="#tratamentos" {...siteText(settings, 'navTreatmentsLabel', 'Menu · Tratamentos', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navTreatmentsLabel}</a>
-        <a href="#casos" {...siteText(settings, 'navCasesLabel', 'Menu · Casos', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navCasesLabel}</a>
-        <a href="#contato" {...siteText(settings, 'navContactLabel', 'Menu · Contato', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navContactLabel}</a>
-      </nav>
-    </div></header>
+    <SiteHeader
+      brandName={String(settings.professionalName || '')}
+      subtitle={String(settings.brandSubtitle || '')}
+      logoUrl={brandLogoUrl}
+      navAboutLabel={String(settings.navAboutLabel || 'Sobre')}
+      navTreatmentsLabel={String(settings.navTreatmentsLabel || 'Tratamentos')}
+      navCasesLabel={String(settings.navCasesLabel || 'Casos')}
+      navContactLabel={String(settings.navContactLabel || 'Contato')}
+      brandNameStyle={typographyStyle(settings, 'brandName', 'sans', 15)}
+      subtitleStyle={typographyStyle(settings, 'brandSubtitleStyle', 'sans', 12)}
+      navStyle={typographyStyle(settings, 'navStyle', 'sans', 14)}
+      categoryStyle={typographyStyle(settings, 'navStyle', 'sans', 14)}
+      brandNameProps={siteText(settings, 'professionalName', 'Nome profissional', 'brandName')}
+      subtitleProps={siteText(settings, 'brandSubtitle', 'Subtítulo da marca', 'brandSubtitleStyle')}
+      logoProps={{
+        'data-vb-doc-id': settingsId(settings),
+        'data-vb-doc-type': 'siteSettings',
+        'data-vb-image-field': 'brandLogo',
+        'data-vb-label': 'Ícone da marca',
+      } as any}
+      navAboutProps={siteText(settings, 'navAboutLabel', 'Menu · Sobre', 'navStyle')}
+      navTreatmentsProps={siteText(settings, 'navTreatmentsLabel', 'Menu · Tratamentos', 'navStyle')}
+      navCasesProps={siteText(settings, 'navCasesLabel', 'Menu · Casos', 'navStyle')}
+      navContactProps={siteText(settings, 'navContactLabel', 'Menu · Contato', 'navStyle')}
+    />
 
     <main className="page-sections" data-vb-layout="true" data-vb-style-doc-id={settingsId(settings)} data-vb-site-settings-id={settingsId(settings)} data-vb-style-doc-type="siteSettings" data-vb-label="Fundo entre as seções" data-vb-background-field="pageBackground">
       <section className="hero" id="inicio" data-vb-section="hero" style={sectionOuterStyle(settings, 'hero')}><div className="container hero-visual" {...heroLayout.props} style={heroLayout.style}><div className="hero-inner">
@@ -236,12 +294,12 @@ export default async function HomePage() {
         <span className="eyebrow" {...siteText(settings, 'treatmentsEyebrow', 'Tratamentos · chamada curta', 'eyebrowStyle')} style={typographyStyle(settings, 'eyebrowStyle', 'sans', 12)}>{settings.treatmentsEyebrow}</span>
         <h2 className="section-title" {...siteText(settings, 'treatmentsTitle', 'Tratamentos · título', 'treatmentsTitle')} style={typographyStyle(settings, 'treatmentsTitle', 'editorial', 56)}>{settings.treatmentsTitle}</h2>
         <p className="section-copy" {...siteText(settings, 'treatmentsDescription', 'Tratamentos · descrição', 'treatmentsDescription')} style={typographyStyle(settings, 'treatmentsDescription', 'sans', 16)}>{settings.treatmentsDescription}</p>
-        <div className="gallery-grid">{displayedTreatments.map((item) => { const imageUrl = cleanUrl(item.imageUrl); const fallbackImageUrl = mobileTreatmentFallbackImages[stegaClean(item._id)]; const effectiveImageUrl = imageUrl || fallbackImageUrl; const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); return <article className="gallery-card" key={item._id}>
+        <div className="gallery-grid">{displayedTreatments.map((item) => { const imageUrl = cleanUrl(item.imageUrl); const fallbackImageUrl = mobileTreatmentFallbackImages[stegaClean(item._id)]; const effectiveImageUrl = imageUrl || fallbackImageUrl; const editable = !fallbackTreatmentIds.has(stegaClean(item._id)); const imageProps = imageMeta(settings, item._id, 'treatment', 'image', `Imagem · ${stegaClean(item.title)}`, 'treatment'); const normalizedTitle = stegaClean(item.title || '').toLowerCase(); const serviceHref = normalizedTitle.includes('faceta') ? '/facetas-em-resina' : normalizedTitle.includes('clareamento') ? '/clareamento-dental' : normalizedTitle.includes('estética facial') ? '/harmonizacao-facial' : undefined; return <article className="gallery-card" key={item._id}>
           <div className="gallery-media-shell">
             <img className={`gallery-media${effectiveImageUrl ? '' : ' gallery-media-empty'}`} src={effectiveImageUrl || '/treatment-image-placeholder.svg'} alt={stegaClean(item.title)} {...imageProps} style={imageStyle(settings, 'treatment')} />
             {!effectiveImageUrl && <span className="gallery-image-hint" aria-hidden="true">Adicionar imagem</span>}
           </div>
-          <div className="gallery-body"><h3 {...(editable ? documentText(settings, item._id, 'treatment', 'title', 'Tratamento · título', 'treatmentCardTitleStyle') : {})} style={typographyStyle(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{item.title}</h3><p {...(editable ? documentText(settings, item._id, 'treatment', 'summary', 'Tratamento · descrição', 'treatmentCardBodyStyle') : {})} style={typographyStyle(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{item.summary}</p></div>
+          <div className="gallery-body"><h3 {...(editable ? documentText(settings, item._id, 'treatment', 'title', 'Tratamento · título', 'treatmentCardTitleStyle') : {})} style={typographyStyle(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{item.title}</h3><p {...(editable ? documentText(settings, item._id, 'treatment', 'summary', 'Tratamento · descrição', 'treatmentCardBodyStyle') : {})} style={typographyStyle(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{item.summary}</p>{serviceHref && <a className="treatment-learn-more" href={serviceHref}>Saiba mais</a>}</div>
         </article>; })}</div>
       </div></section>
 
@@ -266,6 +324,9 @@ export default async function HomePage() {
     </main>
 
     <footer className="site-footer"><div className="container footer-inner" style={typographyStyle(settings, 'footerStyle', 'sans', 14)}><p><span {...siteText(settings, 'professionalName', 'Rodapé · nome', 'footerStyle')}>{settings.professionalName}</span>{settings.cro ? ` · ${settings.cro}` : ''}</p><p {...siteText(settings, 'footerLocation', 'Rodapé · localização', 'footerStyle')}>{settings.footerLocation}</p></div></footer>
+
+    <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(dentistSchema)}} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(websiteSchema)}} />
 
     {!isDraftMode && <SanityLive />}
 
