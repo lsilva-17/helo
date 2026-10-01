@@ -30,7 +30,7 @@ export async function SiteStyleBridge() {
   if (pageBackground) rules.push(`@media (min-width:821px){body.brandbook-preview .page-sections{background-color:${pageBackground}!important}}@media (max-width:820px){html:not([data-theme="dark"]) body.brandbook-preview .page-sections{background-color:${pageBackground}!important}}`);
   for (const key of typographyKeys) {
     const color = safeColor(settings[`${key}Color`]);
-    if (color) rules.push(`@media (min-width:821px){body.brandbook-preview [data-vb-font-field="${key}Font"][data-vb-font-field="${key}Font"]{color:${color}!important}}@media (max-width:820px){html:not([data-theme="dark"]) body.brandbook-preview [data-vb-font-field="${key}Font"][data-vb-font-field="${key}Font"]{color:${color}!important}}`);
+    if (color) rules.push(`@media (min-width:821px){body.brandbook-preview [data-vb-font-field="${key}Font"][data-vb-font-field="${key}Font"],body.brandbook-preview [data-brand-style="${key}"]{color:${color}!important}}@media (max-width:820px){html:not([data-theme="dark"]) body.brandbook-preview [data-vb-font-field="${key}Font"][data-vb-font-field="${key}Font"],html:not([data-theme="dark"]) body.brandbook-preview [data-brand-style="${key}"]{color:${color}!important}}`);
   }
   for (const key of sectionKeys) {
     const background = safeColor(settings[`${key}Background`]);

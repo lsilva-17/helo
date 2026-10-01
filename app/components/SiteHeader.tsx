@@ -12,6 +12,7 @@ type SiteHeaderProps = {
   brandNameStyle?: CSSProperties;
   subtitleStyle?: CSSProperties;
   navStyle?: CSSProperties;
+  categoryStyle?: CSSProperties;
   brandNameProps?: Record<string, any>;
   subtitleProps?: Record<string, any>;
   logoProps?: Record<string, any>;
@@ -32,6 +33,7 @@ export function SiteHeader({
   brandNameStyle,
   subtitleStyle,
   navStyle,
+  categoryStyle,
   brandNameProps,
   subtitleProps,
   logoProps,
@@ -60,7 +62,7 @@ export function SiteHeader({
       <div className="category-nav-shell">
         <nav className="container category-nav" aria-label="Categorias de atendimento">
           {serviceMenuItems.filter((item) => item.href !== '/').map((item) => (
-            <a key={item.href} href={item.href}>{item.label}</a>
+            <a key={item.href} href={item.href} style={categoryStyle || navStyle} data-brand-style="navStyle">{item.label}</a>
           ))}
         </nav>
       </div>

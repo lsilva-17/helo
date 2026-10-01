@@ -208,6 +208,7 @@ export default async function HomePage() {
       brandNameStyle={typographyStyle(settings, 'brandName', 'sans', 15)}
       subtitleStyle={typographyStyle(settings, 'brandSubtitleStyle', 'sans', 12)}
       navStyle={typographyStyle(settings, 'navStyle', 'sans', 14)}
+      categoryStyle={typographyStyle(settings, 'navStyle', 'sans', 14)}
       brandNameProps={siteText(settings, 'professionalName', 'Nome profissional', 'brandName')}
       subtitleProps={siteText(settings, 'brandSubtitle', 'Subtítulo da marca', 'brandSubtitleStyle')}
       logoProps={{
