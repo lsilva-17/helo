@@ -21,7 +21,15 @@ export function SiteHeader({
             <small>{subtitle}</small>
           </span>
         </a>
+
+        <nav className="nav" aria-label="Menu principal">
+          <a href="/#sobre">Sobre</a>
+          <a href="/#tratamentos">Tratamentos</a>
+          <a href="/#casos">Casos</a>
+          <a href="/#contato">Contato</a>
+        </nav>
       </div>
+
       <div className="category-nav-shell">
         <nav className="container category-nav" aria-label="Categorias de atendimento">
           {serviceMenuItems.filter((item) => item.href !== '/').map((item) => (
