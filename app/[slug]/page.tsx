@@ -261,18 +261,18 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         navContactProps={brandStyle('navStyle')}
       />
       <main className="service-page">
-        <nav className="container seo-breadcrumb" aria-label="Breadcrumb">
+        <nav className="container seo-breadcrumb" aria-label="Breadcrumb" {...brandStyle('navStyle')} style={settingTypography(settings, 'navStyle', 'sans', 14)}>
           <a href="/">Início</a><span aria-hidden="true">/</span><span aria-current="page">{content.menuLabel}</span>
         </nav>
         {content.kind === 'location' && (
           <section className="service-section location-overview location-overview-top">
             <div className="container location-grid">
               <div>
-                <span className="eyebrow">Consultório</span>
-                <h2>Localização e horário de atendimento</h2>
-                <p className="location-address">{address}</p>
-                <div className="hours-list">{(content.hours || []).map((hour) => <p key={hour}>{hour}</p>)}</div>
-                <a className="btn btn-primary" href={wa} target="_blank" rel="noreferrer">Consultar agenda no WhatsApp</a>
+                <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Consultório</span>
+                <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Localização e horário de atendimento</h2>
+                <p className="location-address" {...brandStyle('treatmentsDescription')} style={settingTypography(settings, 'treatmentsDescription', 'sans', 16)}>{address}</p>
+                <div className="hours-list">{(content.hours || []).map((hour) => <p key={hour} {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{hour}</p>)}</div>
+                <a className="btn btn-primary" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer">Consultar agenda no WhatsApp</a>
               </div>
               <div className="map-shell">
                 <iframe title="Mapa do consultório da Dra. Heloisa Veiga" src={mapEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
@@ -321,7 +321,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         {content.kind === 'service' && (
           <section className="service-section cases-placeholder-section">
             <div className="container">
-              <span className="eyebrow">Casos e imagens</span>
+              <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Casos e imagens</span>
               <div className="service-section-heading">
                 <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Espaço para casos clínicos e detalhes do procedimento</h2>
                 <p {...brandStyle('treatmentsDescription')} style={settingTypography(settings, 'treatmentsDescription', 'sans', 16)}>As imagens podem ser adicionadas depois pelo Studio, mantendo o conteúdo atual intacto.</p>
@@ -333,7 +333,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
                     {image.alt && <figcaption>{image.alt}</figcaption>}
                   </figure>
                 )) : [1, 2, 3].map((item) => (
-                  <div className="service-case-placeholder" key={item}><span>Adicionar imagem / case</span></div>
+                  <div className="service-case-placeholder" key={item}><span {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>Adicionar imagem / case</span></div>
                 ))}
               </div>
             </div>
@@ -343,7 +343,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         {!!content.faqs.length && (
           <section className="service-section faq-section">
             <div className="container faq-wrap">
-              <span className="eyebrow">Perguntas frequentes</span>
+              <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Perguntas frequentes</span>
               <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Dúvidas comuns sobre {content.menuLabel.toLowerCase()}</h2>
               <div className="faq-list">
                 {content.faqs.map((faq) => (
@@ -361,13 +361,13 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           <section className="service-review-section">
             <div className="container service-review-card">
               <div>
-                <span className="eyebrow">Revisão profissional</span>
+                <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Revisão profissional</span>
                 <h2 {...brandStyle('treatmentCardTitleStyle')} style={settingTypography(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>Conteúdo revisado por {brandName}</h2>
                 <p {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>
                   Cirurgiã-dentista{settings?.cro ? ` · ${clean(settings.cro)}` : ''}. O conteúdo tem caráter informativo e não substitui avaliação clínica individual.
                 </p>
               </div>
-              {page?._updatedAt && <p className="service-reviewed-date">Atualizado em {new Intl.DateTimeFormat('pt-BR', {month: 'long', year: 'numeric'}).format(new Date(page._updatedAt))}</p>}
+              {page?._updatedAt && <p className="service-reviewed-date" {...brandStyle('footerStyle')} style={settingTypography(settings, 'footerStyle', 'sans', 14)}>Atualizado em {new Intl.DateTimeFormat('pt-BR', {month: 'long', year: 'numeric'}).format(new Date(page._updatedAt))}</p>}
             </div>
           </section>
         )}
@@ -375,23 +375,23 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         <section className="service-section service-cta-section">
           <div className="container service-cta">
             <div>
-              <span className="eyebrow">Contato</span>
+              <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Contato</span>
               <h2 {...brandStyle('contactTitle')} style={settingTypography(settings, 'contactTitle', 'editorial', 56)} {...editProps(page, 'ctaTitle', 'CTA · título')}>{content.ctaTitle}</h2>
               <p {...brandStyle('contactDescription')} style={settingTypography(settings, 'contactDescription', 'sans', 16)} {...editProps(page, 'ctaBody', 'CTA · texto')}>{content.ctaBody}</p>
             </div>
-            <a className="btn btn-whatsapp" href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
+            <a className="btn btn-whatsapp" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
           </div>
         </section>
 
         <nav className="container service-next-links" aria-label="Outros conteúdos">
           {serviceRelatedItems.filter((item) => item.href !== '/' + slug).map((item) => (
-            <a href={item.href} key={item.href}>{item.label}</a>
+            <a href={item.href} key={item.href} {...brandStyle('navStyle')} style={settingTypography(settings, 'navStyle', 'sans', 14)}>{item.label}</a>
           ))}
         </nav>
       </main>
 
       <footer className="site-footer">
-        <div className="container footer-inner">
+        <div className="container footer-inner" {...brandStyle('footerStyle')} style={settingTypography(settings, 'footerStyle', 'sans', 14)}>
           <p>{brandName}{settings?.cro ? ` · ${clean(settings.cro)}` : ''}</p>
           <p>{address} · {businessPhone}</p>
         </div>
