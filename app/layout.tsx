@@ -1,4 +1,5 @@
 import type {Metadata} from 'next';
+import {SITE_URL} from '@/app/lib/site';
 import {draftMode} from 'next/headers';
 import {EmbeddedVisualEditing} from '@/app/components/EmbeddedVisualEditing';
 import {VisualBuilder} from '@/app/components/VisualBuilder';
@@ -15,8 +16,7 @@ import './visual-customization.css';
 import './service-pages.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://draheloisaveiga.vercel.app'),
-  alternates: { canonical: '/' },
+  metadataBase: new URL(SITE_URL),
   title: 'Dra. Heloisa Veiga | Odontologia Estética em São Paulo',
   description:
     'Odontologia estética com atendimento personalizado em São Paulo. Conheça o trabalho da Dra. Heloisa Veiga e agende uma avaliação.',

@@ -1,8 +1,9 @@
 import type {MetadataRoute} from 'next';
 import {servicePageFallbacks} from '@/app/lib/servicePages';
+import {SITE_URL} from '@/app/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://draheloisaveiga.vercel.app';
+  const base = SITE_URL;
   return [
     {
       url: base + '/',

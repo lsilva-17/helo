@@ -3,10 +3,12 @@ import {notFound} from 'next/navigation';
 import {stegaClean} from 'next-sanity';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
 import {SiteHeader} from '@/app/components/SiteHeader';
-import {servicePageFallbacks, serviceMenuItems, type ServiceFaq, type ServiceSection} from '@/app/lib/servicePages';
+import {servicePageFallbacks, serviceRelatedItems, type ServiceFaq, type ServiceSection} from '@/app/lib/servicePages';
+import {SITE_URL, DENTIST_ID, DEFAULT_ADDRESS, absoluteUrl, phoneInternational} from '@/app/lib/site';
 
 type PageDoc = {
   _id?: string;
+  _updatedAt?: string;
   menuLabel?: string;
   slug?: string;
   pageKind?: 'service' | 'location';
@@ -32,6 +34,8 @@ type SiteSettings = {
   professionalName?: string;
   brandSubtitle?: string;
   brandLogoUrl?: string;
+  heroImageUrl?: string;
+  cro?: string;
   navAboutLabel?: string;
   navTreatmentsLabel?: string;
   navCasesLabel?: string;
@@ -66,12 +70,12 @@ type PagePayload = {page: PageDoc | null; settings: SiteSettings | null};
 
 const pageQuery = `{
   "page": *[_type == "servicePage" && slug.current == $slug][0]{
-    _id, menuLabel, "slug": slug.current, pageKind, eyebrow, title, intro, sections, faqs,
+    _id, _updatedAt, menuLabel, "slug": slug.current, pageKind, eyebrow, title, intro, sections, faqs,
     ctaTitle, ctaBody, ctaLabel, "heroImageUrl": heroImage.asset->url,
     "caseImages": caseImages[]{"url": asset->url, alt},
     address, hours, mapEmbedUrl, seoTitle, seoDescription
   },
-  "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url}
+  "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url}
 }`;
 
 const fontStacks: Record<string, string> = {
@@ -150,14 +154,18 @@ export async function generateMetadata({params}: {params: Promise<{slug: string}
   const {slug} = await params;
   const fallback = servicePageFallbacks[slug];
   if (!fallback) return {};
-  const {page} = await getPage(slug);
+  const {page, settings} = await getPage(slug);
   const title = clean(page?.seoTitle) || fallback.seoTitle;
   const description = clean(page?.seoDescription) || fallback.seoDescription;
+  const image = clean(page?.heroImageUrl) || clean(settings?.heroImageUrl);
+  const url = `${SITE_URL}/${slug}`;
   return {
     title,
     description,
-    alternates: {canonical: `/${slug}`},
-    openGraph: {title, description, url: `https://draheloisaveiga.vercel.app/${slug}`, type: 'website'},
+    alternates: {canonical: url},
+    openGraph: {title, description, url, type: 'website', locale: 'pt_BR', ...(image ? {images: [{url: image, alt: title}]} : {})},
+    twitter: {card: 'summary_large_image', title, description, ...(image ? {images: [image]} : {})},
+    robots: {index: true, follow: true},
   };
 }
 
@@ -179,24 +187,46 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
   const subtitle = clean(settings?.brandSubtitle) || 'Odontologia estética · São Paulo';
   const logoUrl = clean(settings?.brandLogoUrl) || '/brand-hv.svg';
   const wa = whatsappLink(settings?.whatsapp, clean(content.title));
-  const address = clean(content.address) || clean(settings?.clinicAddress) || 'Rua Dr. César, 530 - Conj 106 - Santana, São Paulo - SP, 02013-002';
+  const address = clean(content.address) || clean(settings?.clinicAddress) || DEFAULT_ADDRESS;
   const defaultMap = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
   const mapEmbed = clean(content.mapEmbedUrl) || defaultMap;
 
-  const localBusiness = {
+  const canonicalUrl = `${SITE_URL}/${slug}`;
+  const instagram = clean(settings?.instagram);
+  const mapReference = clean(settings?.mapsUrl) || `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
+  const businessPhone = phoneInternational(settings?.whatsapp);
+  const dentistSchema = {
     '@context': 'https://schema.org',
     '@type': 'Dentist',
+    '@id': DENTIST_ID,
     name: brandName,
-    url: 'https://draheloisaveiga.vercel.app/',
-    telephone: '+55 11 98731-2961',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Rua Dr. César, 530 - Conj 106',
-      addressLocality: 'São Paulo',
-      addressRegion: 'SP',
-      postalCode: '02013-002',
-      addressCountry: 'BR',
-    },
+    url: SITE_URL + '/',
+    telephone: businessPhone,
+    address: {'@type': 'PostalAddress', streetAddress: address, addressLocality: 'São Paulo', addressRegion: 'SP', postalCode: '02013-002', addressCountry: 'BR'},
+    areaServed: {'@type': 'City', name: 'São Paulo'},
+    hasMap: mapReference,
+    ...(clean(settings?.heroImageUrl) ? {image: clean(settings?.heroImageUrl)} : {}),
+    ...(logoUrl ? {logo: absoluteUrl(logoUrl)} : {}),
+    ...(instagram ? {sameAs: [instagram]} : {}),
+    openingHoursSpecification: [{'@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '09:00', closes: '19:00'}],
+  };
+  const serviceSchema = content.kind === 'service' ? {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${canonicalUrl}#service`,
+    name: clean(content.menuLabel) || clean(content.title),
+    description: clean(content.intro),
+    url: canonicalUrl,
+    provider: {'@id': DENTIST_ID},
+    areaServed: {'@type': 'City', name: 'São Paulo'},
+  } : null;
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {'@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL + '/'},
+      {'@type': 'ListItem', position: 2, name: clean(content.menuLabel) || clean(content.title), item: canonicalUrl},
+    ],
   };
 
   const faqSchema = content.faqs.length ? {
@@ -231,6 +261,9 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         navContactProps={brandStyle('navStyle')}
       />
       <main className="service-page">
+        <nav className="container seo-breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Início</a><span aria-hidden="true">/</span><span aria-current="page">{content.menuLabel}</span>
+        </nav>
         {content.kind === 'location' && (
           <section className="service-section location-overview location-overview-top">
             <div className="container location-grid">
@@ -324,6 +357,21 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           </section>
         )}
 
+        {content.kind === 'service' && (
+          <section className="service-review-section">
+            <div className="container service-review-card">
+              <div>
+                <span className="eyebrow">Revisão profissional</span>
+                <h2 {...brandStyle('treatmentCardTitleStyle')} style={settingTypography(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>Conteúdo revisado por {brandName}</h2>
+                <p {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>
+                  Cirurgiã-dentista{settings?.cro ? ` · ${clean(settings.cro)}` : ''}. O conteúdo tem caráter informativo e não substitui avaliação clínica individual.
+                </p>
+              </div>
+              {page?._updatedAt && <p className="service-reviewed-date">Atualizado em {new Intl.DateTimeFormat('pt-BR', {month: 'long', year: 'numeric'}).format(new Date(page._updatedAt))}</p>}
+            </div>
+          </section>
+        )}
+
         <section className="service-section service-cta-section">
           <div className="container service-cta">
             <div>
@@ -336,7 +384,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         </section>
 
         <nav className="container service-next-links" aria-label="Outros conteúdos">
-          {serviceMenuItems.filter((item) => item.href !== '/' && item.href !== '/' + slug).map((item) => (
+          {serviceRelatedItems.filter((item) => item.href !== '/' + slug).map((item) => (
             <a href={item.href} key={item.href}>{item.label}</a>
           ))}
         </nav>
@@ -344,12 +392,14 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
 
       <footer className="site-footer">
         <div className="container footer-inner">
-          <p>{brandName}</p>
-          <p>São Paulo, SP</p>
+          <p>{brandName}{settings?.cro ? ` · ${clean(settings.cro)}` : ''}</p>
+          <p>{address} · {businessPhone}</p>
         </div>
       </footer>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(localBusiness)}} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(dentistSchema)}} />
+      {serviceSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(serviceSchema)}} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(breadcrumbSchema)}} />
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(faqSchema)}} />}
       <SanityLive />
     </>

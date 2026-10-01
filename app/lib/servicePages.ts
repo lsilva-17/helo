@@ -211,3 +211,14 @@ export const serviceMenuItems = [
   {href: '/harmonizacao-facial', label: 'Harmonização facial'},
   {href: '/dentista-santana', label: 'Localização'},
 ];
+
+
+export const serviceRelatedItems = [
+  {href: '/facetas-em-resina', label: 'Facetas em resina'},
+  {href: '/clareamento-dental', label: 'Clareamento dental'},
+  {href: '/coroa-dentaria', label: 'Coroa dentária'},
+  {href: '/dente-quebrado', label: 'Dente quebrado'},
+  {href: '/botox', label: 'Toxina botulínica'},
+  {href: '/harmonizacao-facial', label: 'Harmonização facial'},
+  {href: '/dentista-santana', label: 'Localização'},
+];
