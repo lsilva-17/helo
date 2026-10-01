@@ -1,6 +1,7 @@
 import {stegaClean} from 'next-sanity';
 import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
+import {serviceMenuItems} from '@/app/lib/servicePages';
 
 export const revalidate = 60;
 
@@ -207,20 +208,15 @@ export default async function HomePage() {
         <a href="#casos" {...siteText(settings, 'navCasesLabel', 'Menu · Casos', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navCasesLabel}</a>
         <a href="#contato" {...siteText(settings, 'navContactLabel', 'Menu · Contato', 'navStyle')} style={typographyStyle(settings, 'navStyle', 'sans', 14)}>{settings.navContactLabel}</a>
       </nav>
-      <details className="site-menu">
-        <summary aria-label="Abrir menu de navegação"><span className="menu-icon" aria-hidden="true"><i /><i /><i /></span><span className="menu-label">Menu</span></summary>
-        <nav className="site-menu-panel" aria-label="Páginas do site">
-          <a href="/">Início</a>
-          <a href="/facetas-em-resina">Facetas em resina</a>
-          <a href="/clareamento-dental">Clareamento dental</a>
-          <a href="/coroa-dentaria">Coroa dentária</a>
-          <a href="/dente-quebrado">Dente quebrado</a>
-          <a href="/botox">Toxina botulínica</a>
-          <a href="/harmonizacao-facial">Harmonização facial</a>
-          <a href="/dentista-santana">Consultório em Santana</a>
+    </div>
+      <div className="category-nav-shell">
+        <nav className="container category-nav" aria-label="Categorias de atendimento">
+          {serviceMenuItems.filter((item) => item.href !== '/').map((item) => (
+            <a key={item.href} href={item.href}>{item.label}</a>
+          ))}
         </nav>
-      </details>
-    </div></header>
+      </div>
+    </header>
 
     <main className="page-sections" data-vb-layout="true" data-vb-style-doc-id={settingsId(settings)} data-vb-site-settings-id={settingsId(settings)} data-vb-style-doc-type="siteSettings" data-vb-label="Fundo entre as seções" data-vb-background-field="pageBackground">
       <section className="hero" id="inicio" data-vb-section="hero" style={sectionOuterStyle(settings, 'hero')}><div className="container hero-visual" {...heroLayout.props} style={heroLayout.style}><div className="hero-inner">
