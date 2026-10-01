@@ -318,28 +318,6 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           </div>
         </section>
 
-        {content.kind === 'service' && (
-          <section className="service-section cases-placeholder-section">
-            <div className="container">
-              <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Casos e imagens</span>
-              <div className="service-section-heading">
-                <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Espaço para casos clínicos e detalhes do procedimento</h2>
-                <p {...brandStyle('treatmentsDescription')} style={settingTypography(settings, 'treatmentsDescription', 'sans', 16)}>As imagens podem ser adicionadas depois pelo Studio, mantendo o conteúdo atual intacto.</p>
-              </div>
-              <div className="service-case-grid">
-                {page?.caseImages?.length ? page.caseImages.map((image, index) => (
-                  <figure key={(image.url || '') + index}>
-                    <img src={clean(image.url)} alt={clean(image.alt) || `Caso clínico relacionado a ${clean(content.menuLabel)}`} />
-                    {image.alt && <figcaption>{image.alt}</figcaption>}
-                  </figure>
-                )) : [1, 2, 3].map((item) => (
-                  <div className="service-case-placeholder" key={item}><span {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>Adicionar imagem / case</span></div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
         {!!content.faqs.length && (
           <section className="service-section faq-section">
             <div className="container faq-wrap">
