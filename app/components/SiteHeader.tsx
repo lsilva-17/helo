@@ -21,17 +21,13 @@ export function SiteHeader({
             <small>{subtitle}</small>
           </span>
         </a>
-        <details className="site-menu">
-          <summary aria-label="Abrir menu de navegação">
-            <span className="menu-icon" aria-hidden="true"><i /><i /><i /></span>
-            <span className="menu-label">Menu</span>
-          </summary>
-          <nav className="site-menu-panel" aria-label="Navegação entre páginas">
-            {serviceMenuItems.map((item) => (
-              <a key={item.href} href={item.href}>{item.label}</a>
-            ))}
-          </nav>
-        </details>
+      </div>
+      <div className="category-nav-shell">
+        <nav className="container category-nav" aria-label="Categorias de atendimento">
+          {serviceMenuItems.filter((item) => item.href !== '/').map((item) => (
+            <a key={item.href} href={item.href}>{item.label}</a>
+          ))}
+        </nav>
       </div>
     </header>
   );
