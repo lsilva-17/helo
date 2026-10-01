@@ -20,6 +20,8 @@ export type ServicePageFallback = {
   faqs: ServiceFaq[];
   ctaTitle: string;
   ctaBody: string;
+  ctaLabel?: string;
+  mapEmbedUrl?: string;
   seoTitle: string;
   seoDescription: string;
   address?: string;
