@@ -1,4 +1,4 @@
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://draheloisaveiga.vercel.app').replace(/\/$/, '');
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://draheloisaveiga.com.br').replace(/\/$/, '');
 export const DENTIST_ID = `${SITE_URL}/#dentist`;
 export const DEFAULT_ADDRESS = 'Rua Dr. César, 530 - Conj 106 - Santana, São Paulo - SP, 02013-002';
 export const DEFAULT_PHONE = '5511987312961';

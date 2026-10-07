@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      PRODUCTION_URL: https://draheloisaveiga.vercel.app
+      PRODUCTION_URL: https://draheloisaveiga.com.br
       DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url }}
       EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
     steps:
