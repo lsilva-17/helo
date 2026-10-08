@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import {fontStacks} from '@/app/lib/brandTypography';
 import {brandTextColor} from '@/app/lib/brandTextColors';
+import {caseImageUrl} from '@/app/lib/caseImageOrientation';
 import {stegaClean} from 'next-sanity';
 import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
@@ -293,7 +294,7 @@ export default async function HomePage() {
         <span className="eyebrow" {...siteText(settings, 'casesEyebrow', 'Casos · chamada curta', 'eyebrowStyle')} style={typographyStyle(settings, 'eyebrowStyle', 'sans', 12)}>{settings.casesEyebrow}</span>
         <h2 className="section-title" {...siteText(settings, 'casesTitle', 'Casos · título', 'casesTitle')} style={typographyStyle(settings, 'casesTitle', 'editorial', 56)}>{settings.casesTitle}</h2>
         <p className="section-copy" {...siteText(settings, 'casesDescription', 'Casos · descrição', 'casesDescription')} style={typographyStyle(settings, 'casesDescription', 'sans', 16)}>{settings.casesDescription}</p>
-        {cases.length ? <div className="cases-grid">{cases.map((item) => { const beforeUrl = cleanUrl(item.beforeUrl); const afterUrl = cleanUrl(item.afterUrl); return <article className="case-card" key={item._id}>
+        {cases.length ? <div className="cases-grid">{cases.map((item) => { const beforeUrl = caseImageUrl(stegaClean(item._id), cleanUrl(item.beforeUrl)); const afterUrl = caseImageUrl(stegaClean(item._id), cleanUrl(item.afterUrl)); return <article className="case-card" key={item._id}>
           <div className="before-after">
             {beforeUrl && <figure><img src={beforeUrl} alt={`Antes - ${stegaClean(item.title)}`} {...imageMeta(settings, item._id, 'caseStudy', 'beforeImage', 'Foto antes', 'case')} style={imageStyle(settings, 'case')} /><figcaption {...siteText(settings, 'beforeLabel', 'Etiqueta · Antes', 'caseLabelStyle')} style={typographyStyle(settings, 'caseLabelStyle', 'sans', 12)}>{settings.beforeLabel}</figcaption></figure>}
             {afterUrl && <figure><img src={afterUrl} alt={`Depois - ${stegaClean(item.title)}`} {...imageMeta(settings, item._id, 'caseStudy', 'afterImage', 'Foto depois', 'case')} style={imageStyle(settings, 'case')} /><figcaption {...siteText(settings, 'afterLabel', 'Etiqueta · Depois', 'caseLabelStyle')} style={typographyStyle(settings, 'caseLabelStyle', 'sans', 12)}>{settings.afterLabel}</figcaption></figure>}
