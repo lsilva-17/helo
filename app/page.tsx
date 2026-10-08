@@ -1,4 +1,5 @@
 import type {Metadata} from 'next';
+import {fontStacks} from '@/app/lib/brandTypography';
 import {stegaClean} from 'next-sanity';
 import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
@@ -38,22 +39,6 @@ const contentQuery = `{
 
 const defaultSectionOrder = ['hero', 'about', 'treatments', 'cases', 'contact'];
 const fallbackTreatmentIds = new Set(['facetas', 'clareamento', 'estetica-facial']);
-const fontStacks: Record<string, string> = {
-  editorial: "'Cormorant Garamond', Georgia, serif",
-  sans: "'Inter', Arial, sans-serif",
-  classic: "Georgia, 'Times New Roman', serif",
-  arial: "Arial, Helvetica, sans-serif",
-  roboto: "'Roboto', Arial, sans-serif",
-  inter: "'Inter', Arial, sans-serif",
-  opensans: "'Open Sans', Arial, sans-serif",
-  montserrat: "'Montserrat', Arial, sans-serif",
-  poppins: "'Poppins', Arial, sans-serif",
-  dmsans: "'DM Sans', Arial, sans-serif",
-  lato: "'Lato', Arial, sans-serif",
-  playfair: "'Playfair Display', Georgia, serif",
-  lora: "'Lora', Georgia, serif",
-  merriweather: "'Merriweather', Georgia, serif",
-};
 
 const fallbackSettings: Settings = {
   professionalName: 'Dra. Heloisa Veiga', brandSubtitle: 'Odontologia estética · São Paulo', whatsapp: '5511987312961', instagram: 'https://www.instagram.com/dra.heloisaveiga',

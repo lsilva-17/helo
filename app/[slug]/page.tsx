@@ -1,4 +1,5 @@
 import type {Metadata} from 'next';
+import {homeFontStack} from '@/app/lib/brandTypography';
 import {notFound} from 'next/navigation';
 import {stegaClean} from 'next-sanity';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
@@ -78,23 +79,6 @@ const pageQuery = `{
   "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url}
 }`;
 
-const fontStacks: Record<string, string> = {
-  editorial: "'Cormorant Garamond', Georgia, serif",
-  sans: "'Inter', Arial, sans-serif",
-  classic: "Georgia, 'Times New Roman', serif",
-  arial: "Arial, Helvetica, sans-serif",
-  roboto: "'Roboto', Arial, sans-serif",
-  inter: "'Inter', Arial, sans-serif",
-  opensans: "'Open Sans', Arial, sans-serif",
-  montserrat: "'Montserrat', Arial, sans-serif",
-  poppins: "'Poppins', Arial, sans-serif",
-  dmsans: "'DM Sans', Arial, sans-serif",
-  lato: "'Lato', Arial, sans-serif",
-  playfair: "'Playfair Display', Georgia, serif",
-  lora: "'Lora', Georgia, serif",
-  merriweather: "'Merriweather', Georgia, serif",
-};
-
 function clean(value?: string) {
   return value ? stegaClean(value) : undefined;
 }
@@ -102,19 +86,20 @@ function clean(value?: string) {
 function headerTypographyStyle(font: string | undefined, size: number | undefined, align: 'left' | 'center' | 'right' | undefined, fallbackFont: string, fallbackSize: number) {
   const resolvedFont = clean(font) || fallbackFont;
   return {
-    fontFamily: fontStacks[resolvedFont] || fontStacks[fallbackFont],
+    fontFamily: homeFontStack(resolvedFont, fallbackFont),
     fontSize: `${size ?? fallbackSize}px`,
     textAlign: align || 'left',
   } as const;
 }
 
-function settingTypography(settings: SiteSettings | null, key: string, fallbackFont: string, fallbackSize: number, fallbackAlign: 'left' | 'center' | 'right' = 'left') {
+function settingTypography(settings: SiteSettings | null, key: string, fallbackFont: string, fallbackSize: number, fallbackAlign: 'left' | 'center' | 'right' = 'left', boundOverride?: boolean) {
   const value = settings as Record<string, unknown> | null;
   const font = clean(typeof value?.[`${key}Font`] === 'string' ? String(value?.[`${key}Font`]) : undefined) || fallbackFont;
   const size = typeof value?.[`${key}Size`] === 'number' ? Number(value?.[`${key}Size`]) : fallbackSize;
   const alignValue = typeof value?.[`${key}Align`] === 'string' ? String(value?.[`${key}Align`]) : fallbackAlign;
   const align = (alignValue === 'center' || alignValue === 'right') ? alignValue : 'left';
-  return {fontFamily: fontStacks[font] || fontStacks[fallbackFont], fontSize: `${size}px`, textAlign: align} as const;
+  const bound = boundOverride ?? !key.startsWith('treatmentCard');
+  return {fontFamily: homeFontStack(font, fallbackFont, bound), fontSize: `${size}px`, textAlign: align} as const;
 }
 
 function brandStyle(key: string) {
@@ -252,7 +237,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         brandNameStyle={headerTypographyStyle(settings?.brandNameFont, settings?.brandNameSize, settings?.brandNameAlign, 'sans', 15)}
         subtitleStyle={headerTypographyStyle(settings?.brandSubtitleStyleFont, settings?.brandSubtitleStyleSize, settings?.brandSubtitleStyleAlign, 'sans', 12)}
         navStyle={headerTypographyStyle(settings?.navStyleFont, settings?.navStyleSize, settings?.navStyleAlign, 'sans', 14)}
-        categoryStyle={headerTypographyStyle(settings?.navStyleFont, settings?.navStyleSize, settings?.navStyleAlign, 'sans', 14)}
+        categoryStyle={settingTypography(settings, 'navStyle', 'sans', 14, 'left', false)}
         brandNameProps={brandStyle('brandName')}
         subtitleProps={brandStyle('brandSubtitleStyle')}
         navAboutProps={brandStyle('navStyle')}
@@ -269,8 +254,8 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
             <div className="container location-grid">
               <div>
                 <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Consultório</span>
-                <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Localização e horário de atendimento</h2>
-                <p className="location-address" {...brandStyle('treatmentsDescription')} style={settingTypography(settings, 'treatmentsDescription', 'sans', 16)}>{address}</p>
+                <h2 className="section-title" {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Localização e horário de atendimento</h2>
+                <p className="location-address section-copy" {...brandStyle('treatmentsDescription')} style={settingTypography(settings, 'treatmentsDescription', 'sans', 16)}>{address}</p>
                 <div className="hours-list">{(content.hours || []).map((hour) => <p key={hour} {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{hour}</p>)}</div>
                 <a className="btn btn-primary" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer">Consultar agenda no WhatsApp</a>
               </div>
@@ -322,7 +307,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           <section className="service-section faq-section">
             <div className="container faq-wrap">
               <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Perguntas frequentes</span>
-              <h2 {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Dúvidas comuns sobre {content.menuLabel.toLowerCase()}</h2>
+              <h2 className="section-title" {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Dúvidas comuns sobre {content.menuLabel.toLowerCase()}</h2>
               <div className="faq-list">
                 {content.faqs.map((faq) => (
                   <details key={faq.question}>
@@ -357,7 +342,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         </nav>
       </main>
 
-      <footer className="site-footer">
+      <footer className="site-footer service-footer">
         <div className="container footer-inner" {...brandStyle('footerStyle')} style={settingTypography(settings, 'footerStyle', 'sans', 14)}>
           <p>{brandName}{settings?.cro ? ` · ${clean(settings.cro)}` : ''}</p>
           <p>{address} · {businessPhone}</p>

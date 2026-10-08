@@ -76,6 +76,61 @@ body.brandbook-preview .service-hero-copy p{line-height:1.65;max-width:62ch;marg
 .service-reviewed-date{white-space:nowrap}
 @media(max-width:820px){.service-review-card{align-items:flex-start;flex-direction:column;gap:1rem}.service-reviewed-date{white-space:nowrap}}
 
-/* LP typography follows the same editable brand style keys used by the home page. */
-.service-page [data-brand-style]{font-weight:inherit}
-.service-page .location-address,.service-page .hours-list p,.service-page .service-content-card p,.service-page .service-content-card li,.service-page .service-section-heading p,.service-page .service-cta p,.service-page .faq-list p{color:inherit}
+/* Match the home hierarchy; Sanity's shared color overrides remain authoritative. */
+body.brandbook-preview .service-page .section-title {
+  margin: 1rem 0 .75rem;
+  font-weight: 500;
+  line-height: .98;
+  letter-spacing: -.018em;
+  color: #2F2B2A;
+}
+body.brandbook-preview .service-hero-copy p {
+  line-height: 1.6;
+  color: #6F6058;
+}
+body.brandbook-preview .service-content-card h2,
+body.brandbook-preview .faq-list summary,
+body.brandbook-preview .service-review-card h2 {
+  font-weight: 500;
+  line-height: 1.6;
+  color: #2F2B2A;
+}
+body.brandbook-preview .service-content-card p,
+body.brandbook-preview .service-content-card li,
+body.brandbook-preview .faq-list p,
+body.brandbook-preview .service-review-card p,
+body.brandbook-preview .location-address,
+body.brandbook-preview .hours-list p {
+  font-weight: 400;
+  line-height: 1.6;
+  color: #6F6058;
+}
+body.brandbook-preview .service-page .eyebrow {
+  font-weight: 600;
+}
+body.brandbook-preview .service-page .btn {
+  font-weight: 600;
+}
+.service-index {
+  font-family: 'Inter', Arial, sans-serif;
+  color: #8A7467;
+}
+.service-image-placeholder {
+  font-family: 'Inter', Arial, sans-serif;
+}
+.seo-breadcrumb a {
+  color: inherit;
+}
+.service-footer .footer-inner p {
+  font-family: inherit;
+}
+@media (max-width:520px) {
+  body.brandbook-preview .service-content-card p,
+  body.brandbook-preview .service-content-card li,
+  body.brandbook-preview .faq-list p,
+  body.brandbook-preview .service-review-card p,
+  body.brandbook-preview .hours-list p {
+    font-size: clamp(.98rem, 4.4vw, 1.08rem) !important;
+    line-height: 1.55 !important;
+  }
+}
