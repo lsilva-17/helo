@@ -1,10 +1,16 @@
 # Imagens ilustrativas das LPs
 
-Branch de avaliação: `dev/lp-procedure-images`. Produção e conteúdo do Sanity não são alterados por este preview.
+Branch de avaliação: `dev/lp-procedure-images`. Publicar este preview não altera a produção. As edições feitas no editor visual são salvas como rascunhos no Sanity.
 
-Geradas com a ferramenta integrada de imagem (image_gen). Formato WebP de 1120 × 1400 px, otimizado para o site. As imagens do CMS têm prioridade; os arquivos locais preenchem apenas os campos vazios. Legenda: “Imagem ilustrativa gerada por IA”.
+Geradas com a ferramenta integrada de imagem (image_gen). Formato WebP de 1120 × 1400 px, otimizado para o site. As imagens do CMS têm prioridade; os arquivos locais preenchem apenas os campos vazios. A legenda visível foi removida após aprovação do usuário; os textos alternativos continuam descritivos.
 
 Nenhuma imagem representa um caso clínico ou uma paciente real da Dra. Heloisa. As composições odontológicas usam modelos demonstrativos.
+
+## Customização no Sanity
+
+Cada LP e a página de localização têm controles próprios de texto, tipografia, cor, layout e ordem das seções. Imagem principal, enquadramento, cores dos botões e largura dos textos podem ser ajustados no Presentation. Os estilos vazios herdam os valores da home; uma alteração na LP é salva em seu próprio documento `servicePage`.
+
+Quando a página ainda usa o conteúdo padrão, a primeira edição cria um rascunho com URL, textos e listas completos. Publicar esse documento no Studio publica as customizações dessa página. A navegação do Presentation resolve o documento pela URL de cada LP.
 
 ## facetas-em-resina
 

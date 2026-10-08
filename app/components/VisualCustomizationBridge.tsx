@@ -37,20 +37,32 @@ export function VisualCustomizationBridge() {
   useEffect(() => {
     let cancelled = false;
     let payload: Payload = {};
+    let pageDocumentId: string | undefined;
+    let generation = 0;
+    const currentPageId = () => document.querySelector<HTMLElement>('[data-vb-page-document-id]')?.dataset.vbPageDocumentId || '';
 
     const load = async () => {
+      pageDocumentId = currentPageId();
+      const requestGeneration = ++generation;
+      const url = `/api/visual-customization${pageDocumentId ? `?documentId=${encodeURIComponent(pageDocumentId)}` : ''}`;
       try {
-        const response = await fetch('/api/visual-customization', {credentials: 'same-origin', cache: 'no-store'});
+        const response = await fetch(url, {credentials: 'same-origin', cache: 'no-store'});
         if (!response.ok) return;
-        payload = await response.json();
-        if (!cancelled) apply(payload);
+        const result: Payload = await response.json();
+        if (!cancelled && requestGeneration === generation) {
+          payload = result;
+          apply(payload);
+        }
       } catch {
         // O site segue com os estilos padrão caso a camada opcional falhe.
       }
     };
 
     void load();
-    const observer = new MutationObserver(() => apply(payload));
+    const observer = new MutationObserver(() => {
+      if (currentPageId() !== pageDocumentId) void load();
+      else apply(payload);
+    });
     observer.observe(document.body, {childList: true, subtree: true});
 
     return () => {

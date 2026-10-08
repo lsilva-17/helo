@@ -1,6 +1,7 @@
 import {draftMode} from 'next/headers';
 import {NextRequest, NextResponse} from 'next/server';
 import {stegaClean} from 'next-sanity';
+import {isServiceEditableField, serviceSectionKeys, serviceSectionOrder} from '@/app/lib/servicePageCustomization';
 import {ensureDraftDocument, mutationClient} from '@/sanity/lib/mutations';
 
 const contentFields = [
@@ -84,7 +85,12 @@ function cleanColor(value: unknown) {
   return clean.toLowerCase();
 }
 
-function cleanValue(field: string, value: unknown) {
+function cleanValue(field: string, value: unknown, documentType: string) {
+  if (field === 'sectionOrder' && documentType === 'servicePage') {
+    if (!Array.isArray(value) || !value.length || value.length > serviceSectionKeys.length
+      || new Set(value).size !== value.length || value.some(key => !serviceSectionKeys.includes(key))) throw new Error('Invalid section order');
+    return serviceSectionOrder(value);
+  }
   if (field === 'sectionOrder') {
     if (!Array.isArray(value) || value.length !== 5) throw new Error('Invalid section order');
     const clean = value.map(String);
@@ -138,10 +144,11 @@ export async function PATCH(request: NextRequest) {
     const documentType = body.documentType || '';
     const field = body.field || '';
 
-    if (!documentId || !allowedFields[documentType]?.has(field)) {
+    if (!documentId || !(documentType === 'servicePage' ? isServiceEditableField(field) : allowedFields[documentType]?.has(field))) {
       return NextResponse.json({error: 'Field is not editable in Visual Builder.'}, {status: 400});
     }
 
+    const value = cleanValue(field, body.value, documentType);
     const draftId = await ensureDraftDocument(documentId, documentType);
 
     if (documentType === 'treatment' && fallbackTreatments[documentId]) {
@@ -154,7 +161,6 @@ export async function PATCH(request: NextRequest) {
       }).commit();
     }
 
-    const value = cleanValue(field, body.value);
     const result = await mutationClient.patch(draftId).set({[field]: value}).commit();
 
     return NextResponse.json({ok: true, documentId: result._id, field, value});

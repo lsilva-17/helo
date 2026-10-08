@@ -14,13 +14,13 @@ const SITE_SETTINGS_ID = '143778fa-0f7b-4e2b-9f1b-d34bdce5907d';
 
 const mainDocuments = defineDocuments([
   {route: '/', type: 'siteSettings'},
-  {route: '/facetas-em-resina', type: 'servicePage'},
-  {route: '/clareamento-dental', type: 'servicePage'},
-  {route: '/coroa-dentaria', type: 'servicePage'},
-  {route: '/dente-quebrado', type: 'servicePage'},
-  {route: '/botox', type: 'servicePage'},
-  {route: '/harmonizacao-facial', type: 'servicePage'},
-  {route: '/dentista-santana', type: 'servicePage'},
+  {route: '/facetas-em-resina', filter: '_type == "servicePage" && slug.current == "facetas-em-resina"'},
+  {route: '/clareamento-dental', filter: '_type == "servicePage" && slug.current == "clareamento-dental"'},
+  {route: '/coroa-dentaria', filter: '_type == "servicePage" && slug.current == "coroa-dentaria"'},
+  {route: '/dente-quebrado', filter: '_type == "servicePage" && slug.current == "dente-quebrado"'},
+  {route: '/botox', filter: '_type == "servicePage" && slug.current == "botox"'},
+  {route: '/harmonizacao-facial', filter: '_type == "servicePage" && slug.current == "harmonizacao-facial"'},
+  {route: '/dentista-santana', filter: '_type == "servicePage" && slug.current == "dentista-santana"'},
 ]);
 
 const locations = {
