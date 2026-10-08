@@ -1,4 +1,6 @@
 import type {Metadata} from 'next';
+import Image from 'next/image';
+import {serviceIllustrations} from '@/app/lib/serviceIllustrations';
 import {homeFontStack} from '@/app/lib/brandTypography';
 import {notFound} from 'next/navigation';
 import {stegaClean} from 'next-sanity';
@@ -142,7 +144,7 @@ export async function generateMetadata({params}: {params: Promise<{slug: string}
   const {page, settings} = await getPage(slug);
   const title = clean(page?.seoTitle) || fallback.seoTitle;
   const description = clean(page?.seoDescription) || fallback.seoDescription;
-  const image = clean(page?.heroImageUrl) || clean(settings?.heroImageUrl);
+  const image = clean(page?.heroImageUrl) || (serviceIllustrations[slug] ? absoluteUrl(serviceIllustrations[slug].src) : clean(settings?.heroImageUrl));
   const url = `${SITE_URL}/${slug}`;
   return {
     title,
@@ -160,6 +162,7 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
   if (!fallback) notFound();
 
   const {page, settings} = await getPage(slug);
+  const illustration = serviceIllustrations[slug];
   const content = {
     ...fallback,
     ...Object.fromEntries(Object.entries(page || {}).filter(([, value]) => value !== undefined && value !== null)),
@@ -281,6 +284,11 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
               <div className="service-hero-media">
                 {page?.heroImageUrl ? (
                   <img src={clean(page.heroImageUrl)} alt={clean(content.title)} data-vb-doc-id={page._id?.replace(/^drafts\./, '')} data-vb-doc-type="servicePage" data-vb-image-field="heroImage" data-vb-label="Imagem principal" />
+                ) : illustration ? (
+                  <figure className="service-illustration">
+                    <Image src={illustration.src} alt={illustration.alt} fill sizes="(max-width: 820px) 100vw, (max-width: 1080px) 43vw, 480px" priority />
+                    <figcaption>Imagem ilustrativa gerada por IA</figcaption>
+                  </figure>
                 ) : (
                   <div className="service-image-placeholder"><span>Imagem do procedimento</span><small>Adicione no Studio quando desejar</small></div>
                 )}
