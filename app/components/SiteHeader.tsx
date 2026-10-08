@@ -1,6 +1,7 @@
 import type {CSSProperties} from 'react';
 import {serviceMenuItems} from '@/app/lib/servicePages';
 import {HeaderScrollOffset} from '@/app/components/HeaderScrollOffset';
+import {MobileNavigation} from '@/app/components/MobileNavigation';
 
 type SiteHeaderProps = {
   brandName?: string;
@@ -60,6 +61,16 @@ export function SiteHeader({
           <a href="/#casos" style={navStyle} {...navCasesProps}>{navCasesLabel}</a>
           <a href="/#contato" style={navStyle} {...navContactProps}>{navContactLabel}</a>
         </nav>
+        <MobileNavigation
+          links={[
+            {href: '/#sobre', label: navAboutLabel},
+            {href: '/#tratamentos', label: navTreatmentsLabel},
+            {href: '/#casos', label: navCasesLabel},
+            {href: '/#contato', label: navContactLabel},
+          ]}
+          navStyle={navStyle}
+          categoryStyle={categoryStyle}
+        />
       </div>
       <div className="category-nav-shell">
         <nav className="container category-nav" aria-label="Categorias de atendimento">
