@@ -14,6 +14,7 @@ import './visual-builder.css';
 import './visual-builder-toolbar-drag.css';
 import './visual-customization.css';
 import './service-pages.css';
+import './mobile-ui.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
