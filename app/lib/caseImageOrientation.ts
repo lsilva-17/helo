@@ -11,7 +11,11 @@ export function caseImageUrl(documentId: string, source?: string) {
   const url = new URL(source);
   const asset = url.pathname.split('/').at(-1) || '';
   if (url.hostname !== 'cdn.sanity.io' || !sidewaysAssets.has(asset)) return source;
-  // Sanity rotates the image itself before the browser applies its crop.
+  // A resize is required: Sanity serves the unchanged original when `or`
+  // is the only transform. Resize without cropping, then rotate the pixels.
+  url.searchParams.set('w', '1600');
+  url.searchParams.set('fit', 'max');
+  url.searchParams.set('auto', 'format');
   url.searchParams.set('or', '90');
   return url.toString();
 }
