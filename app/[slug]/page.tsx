@@ -4,6 +4,7 @@ import {servicePageId, serviceSectionOrder, type ServiceSectionKey} from '@/app/
 import Image from 'next/image';
 import {serviceIllustrations} from '@/app/lib/serviceIllustrations';
 import {homeFontStack} from '@/app/lib/brandTypography';
+import {brandTextColor} from '@/app/lib/brandTextColors';
 import {notFound} from 'next/navigation';
 import {stegaClean} from 'next-sanity';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
@@ -103,7 +104,7 @@ function settingTypography(settings: SiteSettings | null, key: string, fallbackF
   const alignValue = typeof value?.[`${key}Align`] === 'string' ? String(value?.[`${key}Align`]) : fallbackAlign;
   const align = (alignValue === 'center' || alignValue === 'right') ? alignValue : 'left';
   const bound = boundOverride ?? !key.startsWith('treatmentCard');
-  const color = typeof value?.[`${key}Color`] === 'string' ? clean(String(value[`${key}Color`])) : undefined;
+  const color = brandTextColor(key, typeof value?.[`${key}Color`] === 'string' ? clean(String(value[`${key}Color`])) : undefined);
   return {fontFamily: homeFontStack(font, fallbackFont, bound), fontSize: `${size}px`, textAlign: align, ...(color && /^#[0-9a-f]{6}$/i.test(color) ? {color} : {})} as const;
 }
 

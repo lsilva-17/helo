@@ -128,6 +128,7 @@ export const siteSettings = defineType({
     seoDescription: 'Odontologia estética com atendimento personalizado em São Paulo. Conheça o trabalho da Dra. Heloisa Veiga e agende uma avaliação.',
   },
   fields: [
+    defineField({name: 'copyColorPaletteVersion', title: 'Versão da paleta das copys', type: 'number', hidden: true, readOnly: true, group: 'style'}),
     defineField({ name: 'professionalName', title: 'Nome profissional', type: 'string', group: 'content' }),
     defineField({ name: 'brandSubtitle', title: 'Subtítulo da marca', type: 'string', group: 'content' }),
     defineField({ name: 'brandLogo', title: 'Ícone / logo da marca', type: 'image', options: {hotspot: true}, group: 'content', description: 'Substitui o ícone HV no cabeçalho.' }),

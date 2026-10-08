@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "colors": {
+    "navStyle": "#6F6058",
+    "heroDescription": "#6F6058",
+    "aboutDescription": "#6F6058",
+    "trustBodyStyle": "#6F6058",
+    "treatmentsDescription": "#6F6058",
+    "treatmentCardBodyStyle": "#6F6058",
+    "casesDescription": "#6F6058",
+    "caseCardBodyStyle": "#6F6058",
+    "contactDescription": "#6F6058",
+    "footerStyle": "#6F6058"
+  }
+}

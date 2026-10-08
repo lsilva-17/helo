@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import {fontStacks} from '@/app/lib/brandTypography';
+import {brandTextColor} from '@/app/lib/brandTextColors';
 import {stegaClean} from 'next-sanity';
 import {draftMode} from 'next/headers';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
@@ -77,7 +78,7 @@ function s(settings: Settings, field: string, fallback: string) { const value = 
 
 function typographyStyle(settings: Settings, key: string, fallbackFont: string, fallbackSize: number, fallbackAlign = 'left') {
   const font = s(settings, `${key}Font`, fallbackFont);
-  return {fontFamily: fontStacks[font] || fontStacks[fallbackFont], fontSize: `${n(settings, `${key}Size`, fallbackSize)}px`, textAlign: s(settings, `${key}Align`, fallbackAlign) as 'left' | 'center' | 'right'};
+  return {fontFamily: fontStacks[font] || fontStacks[fallbackFont], fontSize: `${n(settings, `${key}Size`, fallbackSize)}px`, textAlign: s(settings, `${key}Align`, fallbackAlign) as 'left' | 'center' | 'right', color: brandTextColor(key, s(settings, `${key}Color`, ''))};
 }
 
 function typographyMeta(settings: Settings, key: string) {

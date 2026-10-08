@@ -60,6 +60,7 @@ const stubs = {
 };
 const modules = new Map();
 function load(filename) {
+  if (filename.endsWith('.json')) return JSON.parse(readFileSync(filename, 'utf8'));
   if (modules.has(filename)) return modules.get(filename).exports;
   const module = {exports: {}};
   modules.set(filename, module);

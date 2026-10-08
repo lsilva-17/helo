@@ -2,7 +2,7 @@
 /* Shared category navigation — intentionally inherits the same brand typography as the homepage nav. */
 .category-nav-shell{border-top:1px solid rgba(138,116,103,.12);border-bottom:1px solid rgba(138,116,103,.16);background:rgba(246,241,235,.96)}
 .category-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:stretch;min-height:54px}
-.category-nav a{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:54px;padding:0 .65rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;font-weight:500;letter-spacing:0;transition:background-color .18s ease,color .18s ease}
+.category-nav a{color:#6F6058;position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:54px;padding:0 .65rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;font-weight:500;letter-spacing:0;transition:background-color .18s ease,color .18s ease}
 .category-nav a::after{content:'';position:absolute;left:24%;right:24%;bottom:0;height:2px;background:#C78F7E;transform:scaleX(0);transform-origin:center;transition:transform .18s ease}
 .category-nav a:hover,.category-nav a:focus-visible{background:rgba(217,194,174,.20);color:#2F2B2A}
 .category-nav a:hover::after,.category-nav a:focus-visible::after{transform:scaleX(1)}
