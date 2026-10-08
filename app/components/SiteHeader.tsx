@@ -1,5 +1,6 @@
 import type {CSSProperties} from 'react';
 import {serviceMenuItems} from '@/app/lib/servicePages';
+import {HeaderScrollOffset} from '@/app/components/HeaderScrollOffset';
 
 type SiteHeaderProps = {
   brandName?: string;
@@ -44,8 +45,9 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   return (
     <header className="site-header">
+      <HeaderScrollOffset />
       <div className="container header-inner">
-        <a className="brand" href="/#inicio" aria-label="Ir para a página inicial">
+        <a className="brand" href="/" aria-label="Ir para a página inicial">
           <img className="brand-mark" src={logoUrl} alt="Marca" style={{objectFit: 'cover'}} {...logoProps} />
           <span className="brand-text">
             <strong style={brandNameStyle} {...brandNameProps}>{brandName}</strong>
