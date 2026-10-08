@@ -33,10 +33,17 @@ type Treatment = {_id: string; title: string; summary?: string; imageUrl?: strin
 type CaseStudy = {_id: string; title: string; description?: string; beforeUrl?: string; afterUrl?: string; treatmentTitle?: string};
 type Content = {settings: Settings | null; treatments: Treatment[]; cases: CaseStudy[]};
 
+// Remove only the case identified in the supplied screenshot, including drafts.
+// Keep other recontouring cases eligible for display.
+const excludedCase = {
+  title: 'Recontorno estético',
+  description: 'apenas 4 dentes com resina',
+};
+
 const contentQuery = `{
   "settings": *[_type == "siteSettings" && _id == "143778fa-0f7b-4e2b-9f1b-d34bdce5907d"][0]{..., "brandLogoUrl": brandLogo.asset->url, "heroImageUrl": heroImage.asset->url},
   "treatments": *[_type == "treatment" && featured == true] | order(order asc){_id,title,summary,"imageUrl":image.asset->url},
-  "cases": *[_type == "caseStudy" && featured == true] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}
+  "cases": *[_type == "caseStudy" && featured == true && !(title == $excludedCaseTitle && description match $excludedCaseDescription)] | order(order asc){_id,title,description,"beforeUrl":beforeImage.asset->url,"afterUrl":afterImage.asset->url,"treatmentTitle":treatment->title}
 }`;
 
 const defaultSectionOrder = ['hero', 'about', 'treatments', 'cases', 'contact'];
@@ -60,7 +67,7 @@ const fallbackSettings: Settings = {
 
 async function getContent() {
   try {
-    const response = await sanityFetch({query: contentQuery});
+    const response = await sanityFetch({query: contentQuery, params: {excludedCaseTitle: excludedCase.title, excludedCaseDescription: excludedCase.description}});
     const data = response.data as Content;
     return {settings: {...fallbackSettings, ...(data.settings || {})}, treatments: data.treatments || [], cases: data.cases || []};
   } catch {
