@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "typecheck": "tsc --noEmit",
-    "build": "npm run typecheck && next build",
+    "build": "npm run typecheck && npm run test:text-colors && npm run test:lp-customization && npm run test:image-upload && node scripts/align-home-text-colors.mjs && next build",
     "validate": "npm run build && npm run test:image-upload",
     "smoke:studio": "node scripts/studio-smoke.mjs",
     "smoke:presentation": "node scripts/presentation-smoke.mjs",
     "smoke:visual-features": "node scripts/visual-features-smoke.mjs",
+    "test:lp-customization": "node scripts/lp-customization-regression.mjs",
     "test:image-upload": "node scripts/image-upload-regression.mjs",
-    "start": "next start"
+    "start": "next start",
+    "test:text-colors": "node scripts/text-colors-regression.mjs"
   },
   "dependencies": {
     "@sanity/client": "7.12.0",

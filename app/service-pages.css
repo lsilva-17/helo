@@ -2,7 +2,7 @@
 /* Shared category navigation — intentionally inherits the same brand typography as the homepage nav. */
 .category-nav-shell{border-top:1px solid rgba(138,116,103,.12);border-bottom:1px solid rgba(138,116,103,.16);background:rgba(246,241,235,.96)}
 .category-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:stretch;min-height:54px}
-.category-nav a{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:54px;padding:0 .65rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;font-weight:500;letter-spacing:0;transition:background-color .18s ease,color .18s ease}
+.category-nav a{color:#6F6058;position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:54px;padding:0 .65rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;font-weight:500;letter-spacing:0;transition:background-color .18s ease,color .18s ease}
 .category-nav a::after{content:'';position:absolute;left:24%;right:24%;bottom:0;height:2px;background:#C78F7E;transform:scaleX(0);transform-origin:center;transition:transform .18s ease}
 .category-nav a:hover,.category-nav a:focus-visible{background:rgba(217,194,174,.20);color:#2F2B2A}
 .category-nav a:hover::after,.category-nav a:focus-visible::after{transform:scaleX(1)}
@@ -19,6 +19,8 @@ body.brandbook-preview .service-hero-copy p{line-height:1.65;max-width:62ch;marg
 .service-image-placeholder{height:100%;min-height:520px;display:grid;place-content:center;text-align:center;gap:.4rem;background:linear-gradient(135deg,#EFE4DA,#E7D8CC);border:1px dashed rgba(138,116,103,.30);color:#8A7467}
 .service-image-placeholder span{font-weight:500}
 .service-image-placeholder small{}
+.service-hero-media{position:relative}
+.service-illustration{position:absolute;inset:0;margin:0}
 
 .service-section{padding:clamp(4rem,8vw,7rem) 0}
 .service-content-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem}
@@ -134,3 +136,8 @@ body.brandbook-preview .service-page .btn {
     line-height: 1.55 !important;
   }
 }
+
+/* Per-page visual editing preserves the default composition until an override is saved. */
+.service-page-sections{display:flex;flex-direction:column}
+.service-page-hero-image{position:absolute;inset:0;max-width:none}
+@media(max-width:820px){.service-page [data-vb-layout].container{transform:none!important;max-width:calc(100% - 2rem)}}

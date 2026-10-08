@@ -6,6 +6,7 @@ export const runtime = 'nodejs';
 
 const allowedImages: Record<string, Set<string>> = {
   siteSettings: new Set(['brandLogo', 'heroImage']),
+  servicePage: new Set(['heroImage']),
   treatment: new Set(['image']),
   caseStudy: new Set(['beforeImage', 'afterImage']),
 };

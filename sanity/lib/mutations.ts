@@ -1,4 +1,5 @@
 import {createClient} from '@sanity/client';
+import {servicePageDefaults} from '@/app/lib/servicePageCustomization';
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
 
@@ -28,6 +29,17 @@ function stripSystemFields(document: Record<string, unknown>) {
   return content;
 }
 
+async function seedServiceDraft(draftId: string, publishedId: string, document?: Record<string, unknown> | null) {
+  const defaults = servicePageDefaults(publishedId, document);
+  if (!defaults) return;
+  // The renderer displays fallback lists for missing or empty collections.
+  // Materialize those same lists so indexed text edits target real items.
+  const collections = Object.fromEntries(Object.entries(defaults).filter(([field, value]) =>
+    Array.isArray(value) && value.length && (!Array.isArray(document?.[field]) || !document[field].length),
+  ));
+  await mutationClient.patch(draftId).setIfMissing(defaults).set(collections).commit();
+}
+
 export async function ensureDraftDocument(documentId: string, documentType: string) {
   assertMutationToken();
 
@@ -37,18 +49,31 @@ export async function ensureDraftDocument(documentId: string, documentType: stri
   const draftId = `drafts.${publishedId}`;
 
   const existingDraft = await mutationClient.getDocument(draftId);
-  if (existingDraft) return draftId;
+  if (existingDraft) {
+    if (existingDraft._type !== documentType) throw new Error('Document type does not match');
+    if (documentType === 'servicePage') {
+      await seedServiceDraft(draftId, publishedId, existingDraft);
+    }
+    return draftId;
+  }
 
   const published = await mutationClient.getDocument(publishedId);
+  if (published && published._type !== documentType) throw new Error('Document type does not match');
+  if (documentType === 'servicePage' && !published && !servicePageDefaults(publishedId)) {
+    throw new Error('Unknown service page');
+  }
   const base = published
     ? stripSystemFields(published as unknown as Record<string, unknown>)
-    : {_type: documentType};
+    : (documentType === 'servicePage' ? servicePageDefaults(publishedId) : null) || {_type: documentType};
 
-  await mutationClient.createIfNotExists({
+  const createdDraft = await mutationClient.createIfNotExists({
     ...base,
     _id: draftId,
     _type: documentType,
   });
 
+  if (documentType === 'servicePage') {
+    await seedServiceDraft(draftId, publishedId, createdDraft);
+  }
   return draftId;
 }

@@ -1,5 +1,10 @@
 import type {Metadata} from 'next';
+import type {CSSProperties} from 'react';
+import {servicePageId, serviceSectionOrder, type ServiceSectionKey} from '@/app/lib/servicePageCustomization';
+import Image from 'next/image';
+import {serviceIllustrations} from '@/app/lib/serviceIllustrations';
 import {homeFontStack} from '@/app/lib/brandTypography';
+import {brandTextColor} from '@/app/lib/brandTextColors';
 import {notFound} from 'next/navigation';
 import {stegaClean} from 'next-sanity';
 import {sanityFetch, SanityLive} from '@/sanity/lib/live';
@@ -7,7 +12,7 @@ import {SiteHeader} from '@/app/components/SiteHeader';
 import {servicePageFallbacks, serviceRelatedItems, type ServiceFaq, type ServiceSection} from '@/app/lib/servicePages';
 import {SITE_URL, DENTIST_ID, DEFAULT_ADDRESS, absoluteUrl, phoneInternational} from '@/app/lib/site';
 
-type PageDoc = {
+type PageDoc = Record<string, unknown> & {
   _id?: string;
   _updatedAt?: string;
   menuLabel?: string;
@@ -71,7 +76,7 @@ type PagePayload = {page: PageDoc | null; settings: SiteSettings | null};
 
 const pageQuery = `{
   "page": *[_type == "servicePage" && slug.current == $slug][0]{
-    _id, _updatedAt, menuLabel, "slug": slug.current, pageKind, eyebrow, title, intro, sections, faqs,
+    ..., _id, _updatedAt, menuLabel, "slug": slug.current, pageKind, eyebrow, title, intro, sections, faqs,
     ctaTitle, ctaBody, ctaLabel, "heroImageUrl": heroImage.asset->url,
     "caseImages": caseImages[]{"url": asset->url, alt},
     address, hours, mapEmbedUrl, seoTitle, seoDescription
@@ -99,7 +104,8 @@ function settingTypography(settings: SiteSettings | null, key: string, fallbackF
   const alignValue = typeof value?.[`${key}Align`] === 'string' ? String(value?.[`${key}Align`]) : fallbackAlign;
   const align = (alignValue === 'center' || alignValue === 'right') ? alignValue : 'left';
   const bound = boundOverride ?? !key.startsWith('treatmentCard');
-  return {fontFamily: homeFontStack(font, fallbackFont, bound), fontSize: `${size}px`, textAlign: align} as const;
+  const color = brandTextColor(key, typeof value?.[`${key}Color`] === 'string' ? clean(String(value[`${key}Color`])) : undefined);
+  return {fontFamily: homeFontStack(font, fallbackFont, bound), fontSize: `${size}px`, textAlign: align, ...(color && /^#[0-9a-f]{6}$/i.test(color) ? {color} : {})} as const;
 }
 
 function brandStyle(key: string) {
@@ -142,7 +148,7 @@ export async function generateMetadata({params}: {params: Promise<{slug: string}
   const {page, settings} = await getPage(slug);
   const title = clean(page?.seoTitle) || fallback.seoTitle;
   const description = clean(page?.seoDescription) || fallback.seoDescription;
-  const image = clean(page?.heroImageUrl) || clean(settings?.heroImageUrl);
+  const image = clean(page?.heroImageUrl) || (serviceIllustrations[slug] ? absoluteUrl(serviceIllustrations[slug].src) : clean(settings?.heroImageUrl));
   const url = `${SITE_URL}/${slug}`;
   return {
     title,
@@ -160,6 +166,59 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
   if (!fallback) notFound();
 
   const {page, settings} = await getPage(slug);
+  const illustration = serviceIllustrations[slug];
+  const editingPage: PageDoc = {...page, _id: clean(page?._id) || servicePageId(slug)};
+  const pageStyles = {...settings, ...Object.fromEntries(Object.entries(page || {}).filter(([, value]) => value !== undefined && value !== null && value !== ''))} as SiteSettings;
+  const documentId = editingPage._id!.replace(/^drafts\./, '');
+  const documentMeta = {'data-vb-doc-id': documentId, 'data-vb-doc-type': 'servicePage'};
+  const number = (field: string, fallback: number) => typeof page?.[field] === 'number' ? Number(page[field]) : fallback;
+  const text = (field: string, fallback: string) => typeof page?.[field] === 'string' ? clean(String(page[field])) || fallback : fallback;
+  const color = (field: string) => /^#[0-9a-f]{6}$/i.test(text(field, '')) ? text(field, '') : undefined;
+  const typographyDefaults: Record<string, [string, number, string]> = {
+    navStyle: ['sans', 14, 'Links e navegação'], eyebrowStyle: ['sans', 12, 'Chamada curta'], heroTitle: ['editorial', 67, 'Título principal'],
+    heroDescription: ['sans', 16, 'Introdução'], buttonStyle: ['sans', 14, 'Botão'],
+    treatmentsTitle: ['editorial', 56, 'Título da seção'], treatmentsDescription: ['sans', 16, 'Descrição da seção'],
+    treatmentCardTitleStyle: ['editorial', 26, 'Título do bloco'], treatmentCardBodyStyle: ['sans', 16, 'Texto do bloco'],
+    footerStyle: ['sans', 14, 'Rodapé'],
+  };
+  const pageStyle = (key: string) => {
+    const [fallbackFont, fallbackSize, label] = typographyDefaults[key];
+    const values = pageStyles as Record<string, unknown>;
+    const rawFont = clean(typeof values[`${key}Font`] === 'string' ? String(values[`${key}Font`]) : undefined) || fallbackFont;
+    const font = key.startsWith('treatmentCard') && rawFont === 'sans' ? 'inter' : rawFont;
+    return {...brandStyle(key), ...documentMeta, 'data-vb-style-doc-id': documentId, 'data-vb-style-doc-type': 'servicePage',
+      'data-vb-font-field': `${key}Font`, 'data-vb-size-field': `${key}Size`, 'data-vb-align-field': `${key}Align`,
+      'data-vb-font-value': font, 'data-vb-size-value': values[`${key}Size`] ?? fallbackSize,
+      'data-vb-align-value': values[`${key}Align`] || (key === 'buttonStyle' ? 'center' : 'left'), 'data-vb-label': label};
+  };
+  const order = serviceSectionOrder(page?.sectionOrder, fallback.kind === 'location');
+  const sectionProps = (key: ServiceSectionKey) => ({...documentMeta, 'data-vb-section': key, style: {order: order.indexOf(key)}});
+  const layoutProps = (key: ServiceSectionKey, label: string) => ({
+    ...documentMeta, 'data-vb-style-doc-id': documentId, 'data-vb-style-doc-type': 'servicePage', 'data-vb-layout': 'true', 'data-vb-label': label,
+    'data-vb-width-field': `${key}Width`, 'data-vb-x-field': `${key}OffsetX`, 'data-vb-y-field': `${key}OffsetY`,
+    'data-vb-padding-field': `${key}PaddingY`, 'data-vb-block-height-field': `${key}Height`, 'data-vb-background-field': `${key}Background`,
+    'data-vb-width-value': number(`${key}Width`, 100), 'data-vb-x-value': number(`${key}OffsetX`, 0), 'data-vb-y-value': number(`${key}OffsetY`, 0),
+    'data-vb-padding-value': number(`${key}PaddingY`, key === 'hero' ? 24 : 32), 'data-vb-block-height-value': number(`${key}Height`, key === 'hero' ? 520 : 320),
+    style: {
+      ...(typeof page?.[`${key}Width`] === 'number' ? {width: `${number(`${key}Width`, 100)}%`} : {}),
+      ...(typeof page?.[`${key}OffsetX`] === 'number' || typeof page?.[`${key}OffsetY`] === 'number' ? {transform: `translate(${number(`${key}OffsetX`, 0)}px, ${number(`${key}OffsetY`, 0)}px)`} : {}),
+      ...(typeof page?.[`${key}PaddingY`] === 'number' ? {paddingTop: `${number(`${key}PaddingY`, 32)}px`, paddingBottom: `${number(`${key}PaddingY`, 32)}px`} : {}),
+      ...(typeof page?.[`${key}Height`] === 'number' ? {minHeight: `${number(`${key}Height`, 320)}px`} : {}),
+      ...(color(`${key}Background`) ? {backgroundColor: color(`${key}Background`)} : {}),
+    } as CSSProperties,
+  });
+  const imageProps = {...documentMeta, 'data-vb-style-doc-id': documentId, 'data-vb-style-doc-type': 'servicePage',
+    'data-vb-image-field': 'heroImage', 'data-vb-label': 'Imagem principal', 'data-vb-height-field': 'heroImageHeight',
+    'data-vb-width-field': 'heroImageWidth', 'data-vb-x-field': 'heroImageOffsetX', 'data-vb-y-field': 'heroImageOffsetY',
+    'data-vb-position-x-field': 'heroImagePositionX', 'data-vb-position-y-field': 'heroImagePositionY',
+    'data-vb-height-value': number('heroImageHeight', 520), 'data-vb-width-value': number('heroImageWidth', 100),
+    'data-vb-x-value': number('heroImageOffsetX', 0), 'data-vb-y-value': number('heroImageOffsetY', 0),
+    'data-vb-position-x-value': number('heroImagePositionX', 50), 'data-vb-position-y-value': number('heroImagePositionY', 50),
+    style: {width: `${number('heroImageWidth', 100)}%`, height: typeof page?.heroImageHeight === 'number' ? `${number('heroImageHeight', 520)}px` : '100%',
+      objectFit: 'cover', objectPosition: `${number('heroImagePositionX', 50)}% ${number('heroImagePositionY', 50)}%`,
+      transform: `translate(${number('heroImageOffsetX', 0)}px, ${number('heroImageOffsetY', 0)}px)`} as CSSProperties,
+  };
+
   const content = {
     ...fallback,
     ...Object.fromEntries(Object.entries(page || {}).filter(([, value]) => value !== undefined && value !== null)),
@@ -245,19 +304,20 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         navCasesProps={brandStyle('navStyle')}
         navContactProps={brandStyle('navStyle')}
       />
-      <main className="service-page">
-        <nav className="container seo-breadcrumb" aria-label="Breadcrumb" {...brandStyle('navStyle')} style={settingTypography(settings, 'navStyle', 'sans', 14)}>
+      <main className="service-page" data-vb-page-document-id={documentId} {...documentMeta} data-vb-layout="true" data-vb-background-field="pageBackground" data-vb-label="Fundo da página" style={{backgroundColor: color('pageBackground')}}>
+        <nav className="container seo-breadcrumb" aria-label="Breadcrumb" {...pageStyle('navStyle')} style={settingTypography(pageStyles, 'navStyle', 'sans', 14)}>
           <a href="/">Início</a><span aria-hidden="true">/</span><span aria-current="page">{content.menuLabel}</span>
         </nav>
+        <div className="service-page-sections">
         {content.kind === 'location' && (
-          <section className="service-section location-overview location-overview-top">
-            <div className="container location-grid">
+          <section className="service-section location-overview location-overview-top" {...sectionProps('location')}>
+            <div className="container location-grid" {...layoutProps('location', 'Localização · layout')}>
               <div>
-                <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Consultório</span>
-                <h2 className="section-title" {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Localização e horário de atendimento</h2>
-                <p className="location-address section-copy" {...brandStyle('treatmentsDescription')} style={settingTypography(settings, 'treatmentsDescription', 'sans', 16)}>{address}</p>
-                <div className="hours-list">{(content.hours || []).map((hour) => <p key={hour} {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{hour}</p>)}</div>
-                <a className="btn btn-primary" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer">Consultar agenda no WhatsApp</a>
+                <span className="eyebrow" {...pageStyle('eyebrowStyle')} style={settingTypography(pageStyles, 'eyebrowStyle', 'sans', 12)} {...editProps(editingPage, 'locationEyebrow', 'Localização · chamada curta')}>{text('locationEyebrow', 'Consultório')}</span>
+                <h2 className="section-title" {...pageStyle('treatmentsTitle')} style={settingTypography(pageStyles, 'treatmentsTitle', 'editorial', 56)} {...editProps(editingPage, 'locationTitle', 'Localização · título')}>{text('locationTitle', 'Localização e horário de atendimento')}</h2>
+                <p className="location-address section-copy" {...pageStyle('treatmentsDescription')} style={settingTypography(pageStyles, 'treatmentsDescription', 'sans', 16)} {...editProps(editingPage, 'address', 'Endereço')}>{address}</p>
+                <div className="hours-list">{(content.hours || []).map((hour, index) => <p key={index} {...editProps(editingPage, `hours[${index}]`, 'Horário de atendimento')} {...pageStyle('treatmentCardBodyStyle')} style={settingTypography(pageStyles, 'treatmentCardBodyStyle', 'sans', 16)}>{hour}</p>)}</div>
+                <a className="btn btn-primary" {...pageStyle('buttonStyle')} style={settingTypography(pageStyles, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer" {...editProps(editingPage, 'locationCtaLabel', 'Localização · botão')}>{text('locationCtaLabel', 'Consultar agenda no WhatsApp')}</a>
               </div>
               <div className="map-shell">
                 <iframe title="Mapa do consultório da Dra. Heloisa Veiga" src={mapEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
@@ -266,21 +326,25 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
           </section>
         )}
 
-        <section className="service-hero">
-          <div className={`container service-hero-grid${content.kind === 'location' ? ' service-hero-location' : ''}`}>
+        <section className="service-hero" {...sectionProps('hero')}>
+          <div className={`container service-hero-grid${content.kind === 'location' ? ' service-hero-location' : ''}`} {...layoutProps('hero', 'Primeiro bloco · layout')}>
             <div className="hero-card service-hero-copy">
-              <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)} {...editProps(page, 'eyebrow', 'Chamada curta')}>{content.eyebrow}</span>
-              <h1 {...brandStyle('heroTitle')} style={settingTypography(settings, 'heroTitle', 'editorial', 67)} {...editProps(page, 'title', 'Título principal')}>{content.title}</h1>
-              <p {...brandStyle('heroDescription')} style={settingTypography(settings, 'heroDescription', 'sans', 16)} {...editProps(page, 'intro', 'Introdução')}>{content.intro}</p>
+              <span className="eyebrow" {...pageStyle('eyebrowStyle')} style={settingTypography(pageStyles, 'eyebrowStyle', 'sans', 12)} {...editProps(editingPage, 'eyebrow', 'Chamada curta')}>{content.eyebrow}</span>
+              <h1 {...pageStyle('heroTitle')} style={settingTypography(pageStyles, 'heroTitle', 'editorial', 67)} {...editProps(editingPage, 'title', 'Título principal')}>{content.title}</h1>
+              <p {...pageStyle('heroDescription')} style={settingTypography(pageStyles, 'heroDescription', 'sans', 16)} {...editProps(editingPage, 'intro', 'Introdução')}>{content.intro}</p>
               <div className="service-actions">
-                <a className="btn btn-primary" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer">{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
-                {settings?.mapsUrl && <a className="btn btn-secondary" {...brandStyle('buttonStyle')} style={settingTypography(settings, 'buttonStyle', 'sans', 14, 'center')} href={clean(settings.mapsUrl)} target="_blank" rel="noreferrer">Como chegar</a>}
+                <a className="btn btn-primary" {...pageStyle('buttonStyle')} style={settingTypography(pageStyles, 'buttonStyle', 'sans', 14, 'center')} href={wa} target="_blank" rel="noreferrer" {...editProps(editingPage, 'ctaLabel', 'Botão principal')}>{clean(content.ctaLabel) || 'Falar no WhatsApp'}</a>
+                {settings?.mapsUrl && <a className="btn btn-secondary" {...pageStyle('buttonStyle')} style={settingTypography(pageStyles, 'buttonStyle', 'sans', 14, 'center')} href={clean(settings.mapsUrl)} target="_blank" rel="noreferrer" {...editProps(editingPage, 'mapsCtaLabel', 'Botão · como chegar')}>{text('mapsCtaLabel', 'Como chegar')}</a>}
               </div>
             </div>
             {content.kind !== 'location' && (
-              <div className="service-hero-media">
+              <div className="service-hero-media" style={typeof page?.heroImageHeight === 'number' ? {height: number('heroImageHeight', 520), minHeight: number('heroImageHeight', 520), alignSelf: 'center'} : undefined}>
                 {page?.heroImageUrl ? (
-                  <img src={clean(page.heroImageUrl)} alt={clean(content.title)} data-vb-doc-id={page._id?.replace(/^drafts\./, '')} data-vb-doc-type="servicePage" data-vb-image-field="heroImage" data-vb-label="Imagem principal" />
+                  <img src={clean(page.heroImageUrl)} alt={clean(content.title)} className="service-page-hero-image" {...imageProps} />
+                ) : illustration ? (
+                  <figure className="service-illustration">
+                    <Image src={illustration.src} alt={illustration.alt} width={1120} height={1400} className="service-page-hero-image" {...imageProps} sizes="(max-width: 820px) 100vw, (max-width: 1080px) 43vw, 480px" priority />
+                  </figure>
                 ) : (
                   <div className="service-image-placeholder"><span>Imagem do procedimento</span><small>Adicione no Studio quando desejar</small></div>
                 )}
@@ -290,29 +354,29 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         </section>
 
 
-        <section className="service-section">
-          <div className="container service-content-grid">
+        <section className="service-section" {...sectionProps('content')}>
+          <div className="container service-content-grid" {...layoutProps('content', 'Blocos de conteúdo · layout')}>
             {content.sections.map((section, index) => (
               <article className="service-content-card" key={section.heading + index}>
                 <span className="service-index">{String(index + 1).padStart(2, '0')}</span>
-                <h2 {...brandStyle('treatmentCardTitleStyle')} style={settingTypography(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{section.heading}</h2>
-                <p {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{section.body}</p>
-                {!!section.bullets?.length && <ul>{section.bullets.map((bullet) => <li key={bullet} {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{bullet}</li>)}</ul>}
+                <h2 {...pageStyle('treatmentCardTitleStyle')} style={settingTypography(pageStyles, 'treatmentCardTitleStyle', 'editorial', 26)} {...editProps(editingPage, `sections[${index}].heading`, 'Título do bloco')}>{section.heading}</h2>
+                <p {...pageStyle('treatmentCardBodyStyle')} style={settingTypography(pageStyles, 'treatmentCardBodyStyle', 'sans', 16)} {...editProps(editingPage, `sections[${index}].body`, 'Texto do bloco')}>{section.body}</p>
+                {!!section.bullets?.length && <ul>{section.bullets.map((bullet, bulletIndex) => <li key={bulletIndex} {...editProps(editingPage, `sections[${index}].bullets[${bulletIndex}]`, 'Ponto de apoio')} {...pageStyle('treatmentCardBodyStyle')} style={settingTypography(pageStyles, 'treatmentCardBodyStyle', 'sans', 16)}>{bullet}</li>)}</ul>}
               </article>
             ))}
           </div>
         </section>
 
         {!!content.faqs.length && (
-          <section className="service-section faq-section">
-            <div className="container faq-wrap">
-              <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Perguntas frequentes</span>
-              <h2 className="section-title" {...brandStyle('treatmentsTitle')} style={settingTypography(settings, 'treatmentsTitle', 'editorial', 56)}>Dúvidas comuns sobre {content.menuLabel.toLowerCase()}</h2>
+          <section className="service-section faq-section" {...sectionProps('faq')}>
+            <div className="container faq-wrap" {...layoutProps('faq', 'Perguntas frequentes · layout')}>
+              <span className="eyebrow" {...pageStyle('eyebrowStyle')} style={settingTypography(pageStyles, 'eyebrowStyle', 'sans', 12)} {...editProps(editingPage, 'faqEyebrow', 'Perguntas frequentes · chamada curta')}>{text('faqEyebrow', 'Perguntas frequentes')}</span>
+              <h2 className="section-title" {...pageStyle('treatmentsTitle')} style={settingTypography(pageStyles, 'treatmentsTitle', 'editorial', 56)} {...editProps(editingPage, 'faqTitle', 'Perguntas frequentes · título')}>{text('faqTitle', `Dúvidas comuns sobre ${content.menuLabel.toLowerCase()}`)}</h2>
               <div className="faq-list">
-                {content.faqs.map((faq) => (
+                {content.faqs.map((faq, index) => (
                   <details key={faq.question}>
-                    <summary {...brandStyle('treatmentCardTitleStyle')} style={settingTypography(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>{faq.question}</summary>
-                    <p {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>{faq.answer}</p>
+                    <summary {...pageStyle('treatmentCardTitleStyle')} style={settingTypography(pageStyles, 'treatmentCardTitleStyle', 'editorial', 26)} {...editProps(editingPage, `faqs[${index}].question`, 'Pergunta')}>{faq.question}</summary>
+                    <p {...pageStyle('treatmentCardBodyStyle')} style={settingTypography(pageStyles, 'treatmentCardBodyStyle', 'sans', 16)} {...editProps(editingPage, `faqs[${index}].answer`, 'Resposta')}>{faq.answer}</p>
                   </details>
                 ))}
               </div>
@@ -321,29 +385,30 @@ export default async function ServicePage({params}: {params: Promise<{slug: stri
         )}
 
         {content.kind === 'service' && (
-          <section className="service-review-section">
-            <div className="container service-review-card">
+          <section className="service-review-section" {...sectionProps('review')}>
+            <div className="container service-review-card" {...layoutProps('review', 'Revisão profissional · layout')}>
               <div>
-                <span className="eyebrow" {...brandStyle('eyebrowStyle')} style={settingTypography(settings, 'eyebrowStyle', 'sans', 12)}>Revisão profissional</span>
-                <h2 {...brandStyle('treatmentCardTitleStyle')} style={settingTypography(settings, 'treatmentCardTitleStyle', 'editorial', 26)}>Conteúdo revisado por {brandName}</h2>
-                <p {...brandStyle('treatmentCardBodyStyle')} style={settingTypography(settings, 'treatmentCardBodyStyle', 'sans', 16)}>
+                <span className="eyebrow" {...pageStyle('eyebrowStyle')} style={settingTypography(pageStyles, 'eyebrowStyle', 'sans', 12)}>Revisão profissional</span>
+                <h2 {...pageStyle('treatmentCardTitleStyle')} style={settingTypography(pageStyles, 'treatmentCardTitleStyle', 'editorial', 26)}>Conteúdo revisado por {brandName}</h2>
+                <p {...pageStyle('treatmentCardBodyStyle')} style={settingTypography(pageStyles, 'treatmentCardBodyStyle', 'sans', 16)}>
                   Cirurgiã-dentista{settings?.cro ? ` · ${clean(settings.cro)}` : ''}. O conteúdo tem caráter informativo e não substitui avaliação clínica individual.
                 </p>
               </div>
-              {page?._updatedAt && <p className="service-reviewed-date" {...brandStyle('footerStyle')} style={settingTypography(settings, 'footerStyle', 'sans', 14)}>Atualizado em {new Intl.DateTimeFormat('pt-BR', {month: 'long', year: 'numeric'}).format(new Date(page._updatedAt))}</p>}
+              {page?._updatedAt && <p className="service-reviewed-date" {...pageStyle('footerStyle')} style={settingTypography(pageStyles, 'footerStyle', 'sans', 14)}>Atualizado em {new Intl.DateTimeFormat('pt-BR', {month: 'long', year: 'numeric'}).format(new Date(page._updatedAt))}</p>}
             </div>
           </section>
         )}
 
+        </div>
         <nav className="container service-next-links" aria-label="Outros conteúdos">
           {serviceRelatedItems.filter((item) => item.href !== '/' + slug).map((item) => (
-            <a href={item.href} key={item.href} {...brandStyle('navStyle')} style={settingTypography(settings, 'navStyle', 'sans', 14)}>{item.label}</a>
+            <a href={item.href} key={item.href} {...pageStyle('navStyle')} style={settingTypography(pageStyles, 'navStyle', 'sans', 14)}>{item.label}</a>
           ))}
         </nav>
       </main>
 
       <footer className="site-footer service-footer">
-        <div className="container footer-inner" {...brandStyle('footerStyle')} style={settingTypography(settings, 'footerStyle', 'sans', 14)}>
+        <div className="container footer-inner" {...pageStyle('footerStyle')} style={settingTypography(pageStyles, 'footerStyle', 'sans', 14)}>
           <p>{brandName}{settings?.cro ? ` · ${clean(settings.cro)}` : ''}</p>
           <p>{address} · {businessPhone}</p>
         </div>

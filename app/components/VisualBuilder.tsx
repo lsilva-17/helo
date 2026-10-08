@@ -178,6 +178,7 @@ function applyTranslate(selection: Selection, nextX?: number, nextY?: number) {
 function selectionType(selection: Selection) {
   if (selection.imageField) return 'Imagem';
   if (selection.field) return 'Texto';
+  if (selection.fontField) return 'Estilo do texto';
   return 'Layout';
 }
 
@@ -237,7 +238,7 @@ export function VisualBuilder() {
 
     const clickHandler = (event: Event) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
-      const editable = target?.closest<HTMLElement>('[data-vb-field], [data-vb-image-field], [data-vb-layout]');
+      const editable = target?.closest<HTMLElement>('[data-vb-field], [data-vb-image-field], [data-vb-layout], [data-vb-font-field]');
       if (!editable) return;
 
       const current = selectionFromElement(editable);
@@ -358,7 +359,7 @@ export function VisualBuilder() {
             const settingsDocumentId = section.querySelector<HTMLElement>('[data-vb-style-doc-type="siteSettings"]')?.dataset.vbStyleDocId
               || document.querySelector<HTMLElement>('[data-vb-site-settings-id]')?.dataset.vbSiteSettingsId
               || 'siteSettings';
-            await patchField(settingsDocumentId, 'siteSettings', 'sectionOrder', visualOrder);
+            await patchField(section.dataset.vbDocId || settingsDocumentId, section.dataset.vbDocType || 'siteSettings', 'sectionOrder', visualOrder);
             setSaveState('saved');
             setMessage('Nova ordem salva como rascunho.');
           } catch (error) {
@@ -513,7 +514,10 @@ export function VisualBuilder() {
       const body = await response.json().catch(() => ({}));
       if (response.status === 413) throw new Error('A imagem excedeu o limite de upload. Tente um arquivo menor.');
       if (!response.ok) throw new Error(body?.error || `Não foi possível trocar a imagem (HTTP ${response.status}).`);
-      if (selection.element instanceof HTMLImageElement && body.url) selection.element.src = body.url;
+      if (selection.element instanceof HTMLImageElement && body.url) {
+        selection.element.removeAttribute('srcset');
+        selection.element.src = body.url;
+      }
       setSaveState('saved');
       setMessage('Imagem atualizada no rascunho.');
     } catch (error) {
@@ -544,7 +548,7 @@ export function VisualBuilder() {
             <button type="button" onClick={closeSelection} aria-label="Fechar editor">×</button>
           </div>
 
-          <p className="vb-help">{selection.field ? 'Digite diretamente no conteúdo. Use os controles abaixo para aparência, cor e posição.' : selection.imageField ? 'Troque a imagem e ajuste o enquadramento sem sair da página.' : 'Use os controles abaixo para redimensionar, reposicionar e alterar o fundo do bloco.'}</p>
+          <p className="vb-help">{selection.field ? 'Digite diretamente no conteúdo. Use os controles abaixo para aparência, cor e posição.' : selection.imageField ? 'Troque a imagem e ajuste o enquadramento sem sair da página.' : selection.fontField ? 'Use os controles abaixo para alterar a fonte, o tamanho, o alinhamento e a cor.' : 'Use os controles abaixo para redimensionar, reposicionar e alterar o fundo do bloco.'}</p>
 
           {selection.fontField && (
             <label className="vb-control">
@@ -598,7 +602,7 @@ export function VisualBuilder() {
           {range(selection.element.dataset.vbFixedHeight === 'true' ? 'Altura do bloco' : 'Altura mínima do bloco', selection.blockHeightField, selection.blockHeightValue || 320, selection.element.dataset.vbFixedHeight === 'true' ? 360 : 180, 1000, 'blockHeight', 'px')}
           {range('Mover horizontal', selection.xField, selection.xValue || 0, -100, 100, 'x', 'px')}
           {range('Mover vertical', selection.yField, selection.yValue || 0, -80, 80, 'y', 'px')}
-          {range('Espaçamento interno vertical', selection.paddingField, selection.paddingValue || 32, 8, 120, 'padding', 'px')}
+          {range('Espaçamento interno vertical', selection.paddingField, selection.paddingValue || 32, 16, 160, 'padding', 'px')}
           {range('Altura da imagem', selection.heightField, selection.heightValue || 320, 160, 720, 'height', 'px')}
           {range('Foco horizontal', selection.positionXField, selection.positionXValue ?? 50, 0, 100, 'positionX', '%')}
           {range('Foco vertical', selection.positionYField, selection.positionYValue ?? 50, 0, 100, 'positionY', '%')}
