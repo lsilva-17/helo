@@ -1,5 +1,6 @@
 import {sanityFetch} from '@/sanity/lib/live';
 import {brandTextColor} from '@/app/lib/brandTextColors';
+import {buttonCustomStylesCss} from '@/app/lib/buttonCustomStyles';
 
 const SITE_SETTINGS_ID = '143778fa-0f7b-4e2b-9f1b-d34bdce5907d';
 
@@ -27,6 +28,8 @@ export async function SiteStyleBridge() {
   }
 
   const rules: string[] = [];
+  const buttonStyles = buttonCustomStylesCss(settings.buttonCustomStyles);
+  if (buttonStyles) rules.push(buttonStyles);
   const pageBackground = safeColor(settings.pageBackground);
   if (pageBackground) rules.push(`@media (min-width:821px){body.brandbook-preview .page-sections{background-color:${pageBackground}!important}}@media (max-width:820px){html:not([data-theme="dark"]) body.brandbook-preview .page-sections{background-color:${pageBackground}!important}}`);
   for (const key of typographyKeys) {
