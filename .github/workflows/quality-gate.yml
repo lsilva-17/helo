@@ -1,14 +1,9 @@
 name: Quality Gate
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  deployment_status:
-  workflow_dispatch:
   schedule:
-    - cron: '17 * * * *'
+    # Daily at 01:00 in Sao Paulo (UTC-3).
+    - cron: '0 4 * * *'
 
 concurrency:
   group: helo-quality-gate-${{ github.ref }}
